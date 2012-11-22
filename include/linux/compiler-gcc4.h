@@ -35,6 +35,8 @@
 
 #define __linktime_error(message) __attribute__((__error__(message)))
 
+#define __UNIQUE_ID(prefix) __PASTE(__PASTE(__UNIQUE_ID_, prefix), __COUNTER__)
+
 #ifndef __CHECKER__
 # define __compiletime_warning(message) __attribute__((warning(message)))
 # define __compiletime_error(message) __attribute__((error(message)))
@@ -63,4 +65,6 @@
  * Tell the optimizer that something else uses this function or variable.
  */
 #define __visible __attribute__((externally_visible))
+#endif
+
 #endif
