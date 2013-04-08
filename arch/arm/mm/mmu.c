@@ -222,7 +222,7 @@ static struct mem_type mem_types[] = {
 		.prot_l1	= PMD_TYPE_TABLE,
 		.prot_sect	= PROT_SECT_DEVICE | PMD_SECT_WB,
 		.domain		= DOMAIN_IO,
-	},
+	},	
 	[MT_DEVICE_WC] = {	/* ioremap_wc */
 		.prot_pte	= PROT_PTE_DEVICE | L_PTE_MT_DEV_WC,
 		.prot_l1	= PMD_TYPE_TABLE,
@@ -576,7 +576,7 @@ static void __init build_mem_type_table(void)
 #endif
 
 	for (i = 0; i < 16; i++) {
-		unsigned long v = pgprot_val(protection_map[i]);
+		pteval_t v = pgprot_val(protection_map[i]);
 		protection_map[i] = __pgprot(v | user_pgprot);
 	}
 
@@ -871,7 +871,6 @@ void __init iotable_init(struct map_desc *io_desc, int nr)
 {
 	struct map_desc *md;
 	struct vm_struct *vm;
-	int rc = 0;
 
 	if (!nr)
 		return;
@@ -882,13 +881,11 @@ void __init iotable_init(struct map_desc *io_desc, int nr)
 		create_mapping(md);
 		vm->addr = (void *)(md->virtual & PAGE_MASK);
 		vm->size = PAGE_ALIGN(md->length + (md->virtual & ~PAGE_MASK));
-		vm->phys_addr = __pfn_to_phys(md->pfn);
-		vm->flags = VM_IOREMAP | VM_ARM_STATIC_MAPPING;
+		vm->phys_addr = __pfn_to_phys(md->pfn); 
+		vm->flags = VM_IOREMAP | VM_ARM_STATIC_MAPPING; 
 		vm->flags |= VM_ARM_MTYPE(md->type);
 		vm->caller = iotable_init;
-		rc = vm_area_check_early(vm);
-		if (!rc)
-			vm_area_add_early(vm++);
+		vm_area_add_early(vm++);
 	}
 }
 
@@ -914,7 +911,7 @@ static void __init pmd_empty_section_gap(unsigned long addr)
 	vm = early_alloc_aligned(sizeof(*vm), __alignof__(*vm));
 	vm->addr = (void *)addr;
 	vm->size = SECTION_SIZE;
-	vm->flags = VM_IOREMAP | VM_ARM_EMPTY_MAPPING;
+	vm->flags = VM_IOREMAP | VM_ARM_STATIC_MAPPING;
 	vm->caller = pmd_empty_section_gap;
 	vm_area_add_early(vm);
 }
@@ -927,7 +924,7 @@ static void __init fill_pmd_gaps(void)
 
 	/* we're still single threaded hence no lock needed here */
 	for (vm = vmlist; vm; vm = vm->next) {
-		if (!(vm->flags & (VM_ARM_STATIC_MAPPING | VM_ARM_EMPTY_MAPPING)))
+		if (!(vm->flags & VM_ARM_STATIC_MAPPING))
 			continue;
 		addr = (unsigned long)vm->addr;
 		if (addr < next)
@@ -1385,21 +1382,12 @@ EXPORT_SYMBOL(mem_text_write_kernel_word);
 static void __init map_lowmem(void)
 {
 	struct memblock_region *reg;
-	struct vm_struct *vm;
-	phys_addr_t start;
-	phys_addr_t end;
-	unsigned long vaddr;
-	unsigned long pfn;
-	unsigned long length;
-	unsigned int type;
-	int nr = 0;
 
 	/* Map all the lowmem memory banks. */
 	for_each_memblock(memory, reg) {
+		phys_addr_t start = reg->base;
+		phys_addr_t end = start + reg->size;
 		struct map_desc map;
-		nr++;
-		start = reg->base;
-		end = start + reg->size;
 
 		if (end > arm_lowmem_limit)
 			end = arm_lowmem_limit;
@@ -1451,32 +1439,6 @@ static void __init map_lowmem(void)
 #endif
 
 		create_mapping(&map);
-	}
-
-	vm = early_alloc_aligned(sizeof(*vm) * nr, __alignof__(*vm));
-
-	for_each_memblock(memory, reg) {
-
-		start = reg->base;
-		end = start + reg->size;
-
-		if (end > arm_lowmem_limit)
-			end = arm_lowmem_limit;
-		if (start >= end)
-			break;
-
-		pfn = __phys_to_pfn(start);
-		vaddr = __phys_to_virt(start);
-		length = end - start;
-		type = MT_MEMORY;
-
-		vm->addr = (void *)(vaddr & PAGE_MASK);
-		vm->size = PAGE_ALIGN(length + (vaddr & ~PAGE_MASK));
-		vm->phys_addr = __pfn_to_phys(pfn);
-		vm->flags = VM_IOREMAP | VM_ARM_STATIC_MAPPING;
-		vm->flags |= VM_ARM_MTYPE(type);
-		vm->caller = map_lowmem;
-		vm_area_add_early(vm++);
 	}
 }
 

@@ -52,16 +52,7 @@ struct page {
 	struct {
 		union {
 			pgoff_t index;		/* Our offset within mapping. */
-			void *freelist;		/* slub/slob first free object */
-			bool pfmemalloc;	/* If set by the page allocator,
-						 * ALLOC_NO_WATERMARKS was set
-						 * and the low watermark was not
-						 * met implying that the system
-						 * is under some pressure. The
-						 * caller should try ensure
-						 * this page is only used to
-						 * free other pages.
-						 */
+			void *freelist;		/* slub first free object */
 		};
 
 		union {
@@ -99,12 +90,11 @@ struct page {
 					 */
 					atomic_t _mapcount;
 
-					struct { /* SLUB */
+					struct {
 						unsigned inuse:16;
 						unsigned objects:15;
 						unsigned frozen:1;
 					};
-					int units;	/* SLOB */
 				};
 				atomic_t _count;		/* Usage count, see below. */
 			};
@@ -126,9 +116,6 @@ struct page {
 			short int pobjects;
 #endif
 		};
-
-		struct list_head list;	/* slobs list of pages */
-		struct slab *slab_page; /* slab fields */
 	};
 
 	/* Remainder is not double word aligned */
@@ -143,7 +130,7 @@ struct page {
 #if USE_SPLIT_PTLOCKS
 		spinlock_t ptl;
 #endif
-		struct kmem_cache *slab_cache;	/* SL[AU]B: Pointer to slab */
+		struct kmem_cache *slab;	/* SLUB: Pointer to slab */
 		struct page *first_page;	/* Compound tail pages */
 	};
 
@@ -280,9 +267,6 @@ struct vm_area_struct {
 #ifdef CONFIG_NUMA
 	struct mempolicy *vm_policy;	/* NUMA policy for the VMA */
 #endif
-#ifdef CONFIG_UKSM
-	struct vma_slot *uksm_vma_slot;
-#endif
 };
 
 struct core_thread {
@@ -374,17 +358,6 @@ struct mm_struct {
 
 	/* Architecture-specific MM context */
 	mm_context_t context;
-
-	/* Swap token stuff */
-	/*
-	 * Last value of global fault stamp as seen by this process.
-	 * In other words, this value gives an indication of how long
-	 * it has been since this task got the token.
-	 * Look at mm/thrash.c
-	 */
-	unsigned int faultstamp;
-	unsigned int token_priority;
-	unsigned int last_interval;
 
 	unsigned long flags; /* Must use atomic bitops to access the bits */
 
