@@ -1203,6 +1203,193 @@ go_proc:
 
 static int _ce_setup_aead_direct(struct qce_device *pce_dev,
 		struct qce_req *q_req, uint32_t totallen_in, uint32_t coffset)
+<<<<<<< HEAD
+=======
+{
+	int32_t authk_size_in_word = q_req->authklen/sizeof(uint32_t);
+	int i;
+	uint32_t mackey32[SHA_HMAC_KEY_SIZE/sizeof(uint32_t)] = {0};
+	uint32_t a_cfg;
+	uint32_t enckey32[(MAX_CIPHER_KEY_SIZE*2)/sizeof(uint32_t)] = {0};
+	uint32_t enciv32[MAX_IV_LENGTH/sizeof(uint32_t)] = {0};
+	uint32_t enck_size_in_word = 0;
+	uint32_t enciv_in_word;
+	uint32_t key_size;
+	uint32_t ivsize = q_req->ivsize;
+	uint32_t encr_cfg;
+
+
+	/* clear status */
+	writel_relaxed(0, pce_dev->iobase + CRYPTO_STATUS_REG);
+
+	writel_relaxed(pce_dev->reg.crypto_cfg_be, (pce_dev->iobase +
+							CRYPTO_CONFIG_REG));
+	/*
+	 * Ensure previous instructions (setting the CONFIG register)
+	 * was completed before issuing starting to set other config register
+	 * This is to ensure the configurations are done in correct endian-ness
+	 * as set in the CONFIG registers
+	 */
+	mb();
+
+	key_size = q_req->encklen;
+	enck_size_in_word = key_size/sizeof(uint32_t);
+
+	switch (q_req->alg) {
+
+	case CIPHER_ALG_DES:
+
+		switch (q_req->mode) {
+		case QCE_MODE_ECB:
+			encr_cfg = pce_dev->reg.encr_cfg_des_ecb;
+			break;
+		case QCE_MODE_CBC:
+			encr_cfg = pce_dev->reg.encr_cfg_des_cbc;
+			break;
+		default:
+			return -EINVAL;
+		}
+
+		enciv_in_word = 2;
+		break;
+
+	case CIPHER_ALG_3DES:
+
+		switch (q_req->mode) {
+		case QCE_MODE_ECB:
+			encr_cfg =  pce_dev->reg.encr_cfg_3des_ecb;
+			break;
+		case QCE_MODE_CBC:
+			encr_cfg = pce_dev->reg.encr_cfg_3des_cbc;
+			break;
+		default:
+			return -EINVAL;
+		}
+
+		enciv_in_word = 2;
+
+		break;
+
+	case CIPHER_ALG_AES:
+
+		switch (q_req->mode) {
+		case QCE_MODE_ECB:
+			if (key_size == AES128_KEY_SIZE)
+				encr_cfg = pce_dev->reg.encr_cfg_aes_ecb_128;
+			else if (key_size  == AES256_KEY_SIZE)
+				encr_cfg = pce_dev->reg.encr_cfg_aes_ecb_256;
+			else
+				return -EINVAL;
+			break;
+		case QCE_MODE_CBC:
+			if (key_size == AES128_KEY_SIZE)
+				encr_cfg = pce_dev->reg.encr_cfg_aes_cbc_128;
+			else if (key_size  == AES256_KEY_SIZE)
+				encr_cfg = pce_dev->reg.encr_cfg_aes_cbc_256;
+			else
+				return -EINVAL;
+			break;
+		default:
+		return -EINVAL;
+		}
+
+		enciv_in_word = 4;
+		break;
+
+	default:
+		return -EINVAL;
+	}
+
+
+	pce_dev->mode = q_req->mode;
+
+
+	/* write CNTR0_IV0_REG */
+	if (q_req->mode !=  QCE_MODE_ECB) {
+		_byte_stream_to_net_words(enciv32, q_req->iv, ivsize);
+		for (i = 0; i < enciv_in_word; i++)
+			writel_relaxed(enciv32[i], pce_dev->iobase +
+				(CRYPTO_CNTR0_IV0_REG + i * sizeof(uint32_t)));
+	}
+
+	/*
+	 * write encr key
+	 * do not use  hw key or pipe key
+	 */
+	_byte_stream_to_net_words(enckey32, q_req->enckey, key_size);
+	for (i = 0; i < enck_size_in_word; i++)
+		writel_relaxed(enckey32[i], pce_dev->iobase +
+				(CRYPTO_ENCR_KEY0_REG + i * sizeof(uint32_t)));
+
+	/* write encr seg cfg */
+	if (q_req->dir == QCE_ENCRYPT)
+		encr_cfg |= (1 << CRYPTO_ENCODE);
+	writel_relaxed(encr_cfg, pce_dev->iobase + CRYPTO_ENCR_SEG_CFG_REG);
+
+	/* we only support sha1-hmac at this point */
+	_byte_stream_to_net_words(mackey32, q_req->authkey,
+					q_req->authklen);
+	for (i = 0; i < authk_size_in_word; i++)
+		writel_relaxed(mackey32[i], pce_dev->iobase +
+			(CRYPTO_AUTH_KEY0_REG + i * sizeof(uint32_t)));
+
+	for (i = 0; i < 5; i++)
+		writel_relaxed(_std_init_vector_sha1[i], pce_dev->iobase +
+				(CRYPTO_AUTH_IV0_REG + i * sizeof(uint32_t)));
+
+	/* write auth_bytecnt 0/1, start with 0 */
+	writel_relaxed(0, pce_dev->iobase + CRYPTO_AUTH_BYTECNT0_REG);
+	writel_relaxed(0, pce_dev->iobase + CRYPTO_AUTH_BYTECNT1_REG);
+
+	/* write encr seg size    */
+	writel_relaxed(q_req->cryptlen, pce_dev->iobase +
+			CRYPTO_ENCR_SEG_SIZE_REG);
+
+	/* write encr start   */
+	writel_relaxed(coffset & 0xffff, pce_dev->iobase +
+			CRYPTO_ENCR_SEG_START_REG);
+
+	a_cfg = (CRYPTO_AUTH_MODE_HMAC << CRYPTO_AUTH_MODE) |
+			(CRYPTO_AUTH_SIZE_SHA1 << CRYPTO_AUTH_SIZE) |
+			(1 << CRYPTO_LAST) | (1 << CRYPTO_FIRST) |
+			(CRYPTO_AUTH_ALG_SHA << CRYPTO_AUTH_ALG);
+
+	if (q_req->dir == QCE_ENCRYPT)
+		a_cfg |= (CRYPTO_AUTH_POS_AFTER << CRYPTO_AUTH_POS);
+	else
+		a_cfg |= (CRYPTO_AUTH_POS_BEFORE << CRYPTO_AUTH_POS);
+
+	/* write auth seg_cfg */
+	writel_relaxed(a_cfg, pce_dev->iobase + CRYPTO_AUTH_SEG_CFG_REG);
+
+	/* write auth seg_size   */
+	writel_relaxed(totallen_in, pce_dev->iobase + CRYPTO_AUTH_SEG_SIZE_REG);
+
+	/* write auth_seg_start   */
+	writel_relaxed(0, pce_dev->iobase + CRYPTO_AUTH_SEG_START_REG);
+
+
+	/* write seg_size   */
+	writel_relaxed(totallen_in, pce_dev->iobase + CRYPTO_SEG_SIZE_REG);
+
+
+	writel_relaxed(pce_dev->reg.crypto_cfg_le, (pce_dev->iobase +
+
+							CRYPTO_CONFIG_REG));
+	/* issue go to crypto   */
+	writel_relaxed(((1 << CRYPTO_GO) | (1 << CRYPTO_RESULTS_DUMP)),
+				pce_dev->iobase + CRYPTO_GOPROC_REG);
+	/*
+	 * Ensure previous instructions (setting the GO register)
+	 * was completed before issuing a DMA transfer request
+	 */
+	mb();
+	return 0;
+};
+
+static int _ce_setup_cipher_direct(struct qce_device *pce_dev,
+		struct qce_req *creq, uint32_t totallen_in, uint32_t coffset)
+>>>>>>> f7339fd... crypto: msm: Add support for aead
 {
 	int32_t authk_size_in_word = q_req->authklen/sizeof(uint32_t);
 	int i;
