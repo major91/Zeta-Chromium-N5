@@ -20,6 +20,7 @@
 #include <linux/timer.h>
 #include <linux/slab.h>
 #include <linux/cpufreq.h>
+#include <linux/lcd_notify.h>
 #include <linux/input.h>
 #include <linux/math64.h>
 
@@ -319,6 +320,16 @@ static void msm_hotplug_resume_work(struct work_struct *work)
 	online_cpu(stats.total_cpus);
 }
 EXPORT_SYMBOL_GPL(msm_hotplug_resume_work);
+
+static int lcd_notifier_callback(struct notifier_block *nb,
+                                 unsigned long event, void *data)
+{
+        if (event == LCD_EVENT_ON_START)
+		schedule_work(&hotplug.resume_work);
+
+        return 0;
+}
+EXPORT_SYMBOL_GPL(lcd_notifier_callback);
 
 static void hotplug_input_event(struct input_handle *handle, unsigned int type,
 				unsigned int code, int value)
@@ -710,6 +721,13 @@ static int __devinit msm_hotplug_probe(struct platform_device *pdev)
 	ret = sysfs_create_group(module_kobj, &attr_group);
 	if (ret) {
 		pr_err("%s: Failed to create sysfs: %d\n", MSM_HOTPLUG, ret);
+		goto err_dev;
+	}
+
+	hotplug.notif.notifier_call = lcd_notifier_callback;
+        if (lcd_register_client(&hotplug.notif) != 0) {
+                pr_err("%s: Failed to register LCD notifier callback\n",
+                       MSM_HOTPLUG);
 		goto err_dev;
 	}
 
