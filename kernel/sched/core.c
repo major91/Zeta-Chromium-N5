@@ -2186,6 +2186,7 @@ unsigned long nr_iowait(void)
 unsigned long avg_nr_running(void)
 {
 	unsigned long i, sum = 0;
+<<<<<<< HEAD
 	unsigned int seqcnt, ave_nr_running;
 
 	for_each_online_cpu(i) {
@@ -2206,6 +2207,11 @@ unsigned long avg_nr_running(void)
 
 		sum += ave_nr_running;
 	}
+=======
+
+	for_each_online_cpu(i)
+		sum += cpu_rq(i)->ave_nr_running;
+>>>>>>> a759fab... scheduler: compute time-average nr_running per run-queue
 
 	return sum;
 }
