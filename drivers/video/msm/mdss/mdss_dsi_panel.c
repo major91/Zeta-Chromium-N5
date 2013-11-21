@@ -34,13 +34,12 @@
 #include <linux/input/doubletap2wake.h>
 #endif
 #endif
-
-#include <asm/system_info.h>
-
 #ifdef CONFIG_PWRKEY_SUSPEND
 #include <linux/qpnp/power-on.h>
 #endif
 #include "mdss_dsi.h"
+
+#include <asm/system_info.h>
 
 #define DT_CMD_HDR 6
 #define GAMMA_COMPAT 11
@@ -340,7 +339,7 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
 
-//Basic color preset
+//Basic color preset 
 	if (color_preset == 1)
 		local_pdata->on_cmds.cmds[1].payload[0] = 0x77;
 	else
@@ -350,9 +349,9 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		mdss_dsi_panel_cmds_send(ctrl, &local_pdata->on_cmds);
 
 #ifdef CONFIG_PWRKEY_SUSPEND
-	pwrkey_pressed = false;
+	pwrkey_pressed = false;	
 #endif
-
+		
 	pr_info("%s\n", __func__);
 	return 0;
 }

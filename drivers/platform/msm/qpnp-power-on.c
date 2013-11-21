@@ -343,7 +343,7 @@ qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
 	default:
 		return -EINVAL;
 	}
-
+	
 #ifdef CONFIG_PWRKEY_SUSPEND
 	if (pwrkey_suspend) {
 		if (cfg->key_code == KEY_POWER && cnt == 0) {
@@ -353,8 +353,8 @@ qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
 			cnt = 0;
 		}
 	}
-#endif
-
+#endif			
+	
 	input_report_key(pon->pon_input, cfg->key_code,
 					(pon_rt_sts & pon_rt_bit));
 	input_sync(pon->pon_input);
