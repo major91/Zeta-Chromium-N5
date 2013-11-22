@@ -979,7 +979,7 @@ int msm_pm_wait_cpu_shutdown(unsigned int cpu)
 		if (acc_sts & msm_pm_slp_sts[cpu].mask)
 			return 0;
 		udelay(100);
-		WARN(++timeout == 50, "CPU%u didn't collapse within 5ms\n",
+		WARN(++timeout == 10, "CPU%u didn't collape within 1ms\n",
 					cpu);
 	}
 
@@ -1630,14 +1630,6 @@ static int __init msm_pm_8x60_init(void)
 {
 	int rc;
 
-	rc = platform_driver_register(&msm_cpu_status_driver);
-
-	if (rc) {
-		pr_err("%s(): failed to register driver %s\n", __func__,
-				msm_cpu_status_driver.driver.name);
-		return rc;
-	}
-
 	rc = platform_driver_register(&msm_cpu_pm_snoc_client_driver);
 
 	if (rc) {
@@ -1661,3 +1653,8 @@ static int __init msm_pm_8x60_init(void)
 	return platform_driver_register(&msm_pm_8x60_driver);
 }
 device_initcall(msm_pm_8x60_init);
+
+void __init msm_pm_sleep_status_init(void)
+{
+	platform_driver_register(&msm_cpu_status_driver);
+}

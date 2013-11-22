@@ -364,18 +364,6 @@ static int kgsl_pwrctrl_min_pwrlevel_show(struct device *dev,
 	return snprintf(buf, PAGE_SIZE, "%d\n", pwr->min_pwrlevel);
 }
 
-static int kgsl_pwrctrl_active_pwrlevel_show(struct device *dev,
-                                        struct device_attribute *attr,
-                                        char *buf)
-{
-	struct kgsl_device *device = kgsl_device_from_dev(dev);
-	struct kgsl_pwrctrl *pwr;
-	if (device == NULL)
-		return 0;
-	pwr = &device->pwrctrl;
-	return snprintf(buf, PAGE_SIZE, "%d\n", pwr->active_pwrlevel);
-}
-
 static int kgsl_pwrctrl_num_pwrlevels_show(struct device *dev,
 					struct device_attribute *attr,
 					char *buf)
@@ -488,17 +476,11 @@ static int kgsl_pwrctrl_gpuclk_show(struct device *dev,
 {
 	struct kgsl_device *device = kgsl_device_from_dev(dev);
 	struct kgsl_pwrctrl *pwr;
-	unsigned int level;
-
 	if (device == NULL)
 		return 0;
 	pwr = &device->pwrctrl;
-	if (device->state == KGSL_STATE_SLUMBER)
-		level = pwr->num_pwrlevels - 1;
-	else
-		level = pwr->active_pwrlevel;
 	return snprintf(buf, PAGE_SIZE, "%d\n",
-			pwr->pwrlevels[level].gpu_freq);
+			pwr->pwrlevels[pwr->active_pwrlevel].gpu_freq);
 }
 
 static int kgsl_pwrctrl_idle_timer_store(struct device *dev,
@@ -778,9 +760,6 @@ DEVICE_ATTR(max_pwrlevel, 0644,
 DEVICE_ATTR(min_pwrlevel, 0644,
 	kgsl_pwrctrl_min_pwrlevel_show,
 	kgsl_pwrctrl_min_pwrlevel_store);
-DEVICE_ATTR(active_pwrlevel, 0444,
-	kgsl_pwrctrl_active_pwrlevel_show,
-	NULL);
 DEVICE_ATTR(thermal_pwrlevel, 0644,
 	kgsl_pwrctrl_thermal_pwrlevel_show,
 	kgsl_pwrctrl_thermal_pwrlevel_store);
@@ -812,7 +791,6 @@ static const struct device_attribute *pwrctrl_attr_list[] = {
 	&dev_attr_gpu_available_frequencies,
 	&dev_attr_max_pwrlevel,
 	&dev_attr_min_pwrlevel,
-	&dev_attr_active_pwrlevel,
 	&dev_attr_thermal_pwrlevel,
 	&dev_attr_num_pwrlevels,
 	&dev_attr_pmqos_latency,
