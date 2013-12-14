@@ -197,7 +197,7 @@ static int bq24192_read_reg(struct i2c_client *client, int reg, u8 *val)
 	return 0;
 }
 
-static int bq24192_write_reg(struct i2c_client *client, int reg, u8 val)
+noinline static int bq24192_write_reg(struct i2c_client *client, int reg, u8 val)
 {
 	s32 ret;
 

@@ -213,7 +213,7 @@ static void lm3630_set_brightness_reg(struct lm3630_device *dev, int level)
 	}
 }
 
-static void lm3630_set_main_current_level(struct i2c_client *client, int level)
+noinline static void lm3630_set_main_current_level(struct i2c_client *client, int level)
 {
 	struct lm3630_device *dev = i2c_get_clientdata(client);
 
