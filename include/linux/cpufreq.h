@@ -377,16 +377,25 @@ extern struct cpufreq_governor cpufreq_gov_interactive;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_interactive)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND)
 extern struct cpufreq_governor cpufreq_gov_intellidemand;
-#define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_intellidemand)
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_intellidemand)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASSH3)
 extern struct cpufreq_governor cpufreq_gov_smartass_h3;
-#define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_smartass_h3)
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_smartass_h3)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_ABYSSPLUG)
 extern struct cpufreq_governor cpufreq_gov_abyssplug;
-#define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_abyssplug)
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_abyssplug)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_ABYSSPLUGV2)
 extern struct cpufreq_governor cpufreq_gov_abyssplugv2;
-#define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_abyssplugv2)
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_abyssplugv2)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_WHEATLEY)
+extern struct cpufreq_governor cpufreq_gov_wheatley;
+#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_wheatley)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_DANCEDANCE)
+extern struct cpufreq_governor cpufreq_gov_dancedance;
+#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_dancedance)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_LAZY)
+extern struct cpufreq_governor cpufreq_gov_lazy;
+#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_lazy)
 #endif
 
 
