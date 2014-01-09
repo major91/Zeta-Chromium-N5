@@ -1497,36 +1497,35 @@ static inline void *acquire_slab(struct kmem_cache *s,
 	 * The old freelist is the list of objects for the
 	 * per cpu allocation list.
 	 */
-	do {
-		freelist = page->freelist;
-		counters = page->counters;
-		new.counters = counters;
-		if (mode) {
-			new.inuse = page->objects;
-			new.freelist = NULL;
-		} else {
-			new.freelist = freelist;
-		}
+	freelist = page->freelist;
+	counters = page->counters;
+	new.counters = counters;
+	if (mode)
+		new.inuse = page->objects;
 
-		VM_BUG_ON(new.frozen);
-		new.frozen = 1;
+	VM_BUG_ON(new.frozen);
+	new.frozen = 1;
 
-	} while (!__cmpxchg_double_slab(s, page,
+	if (!__cmpxchg_double_slab(s, page,
 			freelist, counters,
-			new.freelist, new.counters,
-			"lock and freeze"));
+			NULL, new.counters,
+			"acquire_slab"))
+
+		return NULL;
 
 	remove_partial(n, page);
+	WARN_ON(!freelist);
 	return freelist;
 }
 
 static int put_cpu_partial(struct kmem_cache *s, struct page *page, int drain);
+static inline bool pfmemalloc_match(struct page *page, gfp_t gfpflags);
 
 /*
  * Try to allocate a partial slab from a specific node.
  */
-static void *get_partial_node(struct kmem_cache *s,
-		struct kmem_cache_node *n, struct kmem_cache_cpu *c)
+static void *get_partial_node(struct kmem_cache *s, struct kmem_cache_node *n,
+				struct kmem_cache_cpu *c, gfp_t flags)
 {
 	struct page *page, *page2;
 	void *object = NULL;
@@ -1558,6 +1557,7 @@ static void *get_partial_node(struct kmem_cache *s,
 			object = t;
 			available =  page->objects - page->inuse;
 		} else {
+			page->freelist = t;
 			available = put_cpu_partial(s, page, 0);
 			stat(s, CPU_PARTIAL_NODE);
 		}
