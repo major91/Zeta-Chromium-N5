@@ -10,6 +10,11 @@
  *
  *  v1.2 - make kernel / userspace mode switchable
  *
+ * Modified by Jean-Pierre Rasquin <yank555.lu@gmail.com>
+ *
+ *   make powersuspend not depend on a userspace initiator anymore,
+ *   but use a hook in autosleep instead.
+ *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
@@ -32,6 +37,9 @@
 #define POWER_SUSPEND_KERNEL	0
 #define POWER_SUSPEND_USERSPACE	1
 
+#define POWER_SUSPEND_INACTIVE	0
+#define POWER_SUSPEND_ACTIVE	1
+
 struct power_suspend {
 	struct list_head link;
 	void (*suspend)(struct power_suspend *h);
@@ -40,6 +48,8 @@ struct power_suspend {
 
 void register_power_suspend(struct power_suspend *handler);
 void unregister_power_suspend(struct power_suspend *handler);
+
+void set_power_suspend_state_hook(int new_state);
 
 void set_power_suspend_state_hook(int new_state);
 

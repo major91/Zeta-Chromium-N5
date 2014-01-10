@@ -10,6 +10,11 @@
  *
  *  v1.2 - make kernel / userspace mode switchable
  *
+ * Modified by Jean-Pierre Rasquin <yank555.lu@gmail.com>
+ *
+ *   make powersuspend not depend on a userspace initiator anymore,
+ *   but use a hook in autosleep instead.
+ *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
