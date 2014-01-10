@@ -12,8 +12,10 @@
  *
  * Modified by Jean-Pierre Rasquin <yank555.lu@gmail.com>
  *
- *   make powersuspend not depend on a userspace initiator anymore,
- *   but use a hook in autosleep instead.
+ *  v1.1 - make powersuspend not depend on a userspace initiator anymore,
+ *         but use a hook in autosleep instead.
+ *
+ *  v1.2 - make kernel / userspace mode switchable
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -160,7 +162,7 @@ void set_power_suspend_state(int new_state)
 	spin_unlock_irqrestore(&state_lock, irqflags);
 }
 
-void set_power_suspend_state_hook(int new_state)
+void set_power_suspend_state(int new_state)
 {
 	if (mode == POWER_SUSPEND_KERNEL)
 		set_power_suspend_state(new_state);  // Yank555.lu : Only allow kernel hook changes in kernel mode
@@ -281,6 +283,8 @@ static int __init power_suspend_init(void)
 	}
 
 	mode = POWER_SUSPEND_USERSPACE;
+
+	mode = POWER_SUSPEND_KERNEL; // Yank555.lu : Default to kernel mode
 
 	return 0;
 }
