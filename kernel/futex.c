@@ -61,6 +61,7 @@
 #include <linux/nsproxy.h>
 #include <linux/ptrace.h>
 #include <linux/freezer.h>
+#include <linux/hugetlb.h>
 #include <linux/bootmem.h>
 
 #include <asm/futex.h>
@@ -153,6 +154,7 @@
  * enqueue.
  */
 
+<<<<<<< HEAD
 int __read_mostly futex_cmpxchg_enabled;
 
 /*
@@ -241,14 +243,12 @@ static struct futex_hash_bucket *futex_queues;
 static inline void futex_get_mm(union futex_key *key)
 {
 	atomic_inc(&key->private.mm->mm_count);
-#ifdef CONFIG_SMP
 	/*
 	 * Ensure futex_get_mm() implies a full barrier such that
 	 * get_futex_key() implies a full barrier. This is relied upon
 	 * as full barrier (B), see the ordering comment above.
 	 */
 	smp_mb__after_atomic_inc();
-#endif
 }
 
 static inline bool hb_waiters_pending(struct futex_hash_bucket *hb)
