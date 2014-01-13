@@ -1245,7 +1245,8 @@ static void handle_channel_custom(struct wiphy *wiphy,
 			      "wide channel\n",
 			      chan->center_freq,
 			      KHZ_TO_MHZ(desired_bw_khz));
-		chan->flags = IEEE80211_CHAN_DISABLED;
+		chan->orig_flags |= IEEE80211_CHAN_DISABLED;
+		chan->flags = chan->orig_flags;
 		return;
 	}
 
