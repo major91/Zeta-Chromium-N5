@@ -18,6 +18,7 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 #include <linux/slimport.h>
+#include <linux/fastchg.h>
 
 #include "core.h"
 #include "dwc3_otg.h"

@@ -1,7 +1,6 @@
 #
 # Makefile for USB Network drivers
 #
-ccflags-y  := -Wno-maybe-uninitialized
 
 obj-$(CONFIG_USB_CATC)		+= catc.o
 obj-$(CONFIG_USB_KAWETH)	+= kaweth.o
