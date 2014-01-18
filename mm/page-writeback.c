@@ -35,15 +35,12 @@
 #include <linux/buffer_head.h> /* __set_page_dirty_buffers */
 #include <linux/pagevec.h>
 #include <trace/events/writeback.h>
-<<<<<<< HEAD
 #ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
 #include <linux/lcd_notify.h>
 #endif
-=======
 #include <linux/powersuspend.h>
 
 #include "internal.h"
->>>>>>> 4c1b8ed... fs: tweak page writeback at screen on/off
 
 /*
  * Sleep at most 200ms at a time in balance_dirty_pages().
@@ -102,17 +99,14 @@ unsigned long vm_dirty_bytes;
 /*
  * The default intervals between `kupdate'-style writebacks
  */
-<<<<<<< HEAD
 #define DEFAULT_DIRTY_WRITEBACK_INTERVAL	 0 /* centiseconds */
 #define HIGH_DIRTY_WRITEBACK_INTERVAL		15 * 100 /* centiseconds */
-=======
 #define DEFAULT_DIRTY_WRITEBACK_INTERVAL 600 /* centiseconds */
 #define DEFAULT_SUSPEND_DIRTY_WRITEBACK_INTERVAL 6000 /* centiseconds */
 unsigned int dirty_writeback_interval,
 	resume_dirty_writeback_interval;
 unsigned int sleep_dirty_writeback_interval,
 	suspend_dirty_writeback_interval;
->>>>>>> 4c1b8ed... fs: tweak page writeback at screen on/off
 
 /*
  * The interval between `kupdate'-style writebacks
@@ -1717,7 +1711,6 @@ static struct notifier_block __cpuinitdata ratelimit_nb = {
 	.next		= NULL,
 };
 
-<<<<<<< HEAD
 #ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
 
 struct notifier_block notific;
@@ -1745,7 +1738,6 @@ static int dirty_writeback_suspend(struct notifier_block *this,
         return 0;
 }
 #endif
-=======
 static void dirty_early_suspend(struct power_suspend *handler)
 {
 	if (dirty_writeback_interval != resume_dirty_writeback_interval)
@@ -1772,7 +1764,6 @@ static struct power_suspend dirty_suspend = {
 	.suspend = dirty_early_suspend,
 	.resume = dirty_late_resume,
 };
->>>>>>> 4c1b8ed... fs: tweak page writeback at screen on/off
 
 /*
  * Called early on to tune the page writeback dirty limits.
@@ -1796,7 +1787,6 @@ void __init page_writeback_init(void)
 {
 	int shift;
 
-<<<<<<< HEAD
 #ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
 	/* Register the dirty page writeback management during suspend/resume */
     notific.notifier_call = dirty_writeback_suspend;
@@ -1804,7 +1794,6 @@ void __init page_writeback_init(void)
     if (lcd_register_client(&notific))
             printk("[dynamic_writebacks] error\n");
 #endif
-=======
 	dirty_writeback_interval = resume_dirty_writeback_interval =
 		DEFAULT_DIRTY_WRITEBACK_INTERVAL;
 	dirty_expire_interval = resume_dirty_expire_interval =
@@ -1815,7 +1804,6 @@ void __init page_writeback_init(void)
 		DEFAULT_SUSPEND_DIRTY_EXPIRE_INTERVAL;
 
 	register_power_suspend(&dirty_suspend);
->>>>>>> 4c1b8ed... fs: tweak page writeback at screen on/off
 
 	writeback_set_ratelimit();
 	register_cpu_notifier(&ratelimit_nb);
