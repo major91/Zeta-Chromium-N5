@@ -194,12 +194,13 @@ menuconfig MISC_FILESYSTEMS
 	  If you say N, all options in this submenu will be skipped and
 	  disabled; if unsure, say Y here.
 
+source "fs/sdcardfs/Kconfig"
+
 if MISC_FILESYSTEMS
 
 source "fs/adfs/Kconfig"
 source "fs/affs/Kconfig"
 source "fs/ecryptfs/Kconfig"
-source "fs/sdcardfs/Kconfig"
 source "fs/hfs/Kconfig"
 source "fs/hfsplus/Kconfig"
 source "fs/befs/Kconfig"
