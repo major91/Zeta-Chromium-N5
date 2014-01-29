@@ -516,7 +516,6 @@ fail:
 	return ret;
 }
 
-#if 0
 /* 1:enable, 0:disable */
 static int vdd_restriction_apply_all(int en)
 {
@@ -558,7 +557,6 @@ static int vdd_restriction_apply_all(int en)
 		return -EFAULT;
 	return ret;
 }
-#endif
 
 static int msm_thermal_get_freq_table(void)
 {
@@ -667,64 +665,6 @@ static void do_core_control(long temp)
 }
 #endif
 
-static int do_ocr(void)
-{
-	struct tsens_device tsens_dev;
-	long temp = 0;
-	int ret = 0;
-	int i = 0, j = 0;
-	int auto_cnt = 0;
-
-	if (!ocr_enabled)
-		return ret;
-
-	mutex_lock(&ocr_mutex);
-	for (i = 0; i < max_tsens_num; i++) {
-		tsens_dev.sensor_num = tsens_id_map[i];
-		ret = tsens_get_temp(&tsens_dev, &temp);
-		if (ret) {
-			pr_debug("%s: Unable to read TSENS sensor %d\n",
-					__func__, tsens_dev.sensor_num);
-			auto_cnt++;
-			continue;
-		}
-
-		if (temp > msm_thermal_info.ocr_temp_degC) {
-			if (ocr_rails[0].init != OPTIMUM_CURRENT_NR)
-				for (j = 0; j < ocr_rail_cnt; j++)
-					ocr_rails[j].init = OPTIMUM_CURRENT_NR;
-			ret = ocr_set_mode_all(OPTIMUM_CURRENT_MAX);
-			if (ret)
-				pr_err("Error setting max optimum current\n");
-			goto do_ocr_exit;
-		} else if (temp <= (msm_thermal_info.ocr_temp_degC -
-			msm_thermal_info.ocr_temp_hyst_degC))
-			auto_cnt++;
-	}
-
-	if (auto_cnt == max_tsens_num ||
-		ocr_rails[0].init != OPTIMUM_CURRENT_NR) {
-		/* 'init' not equal to OPTIMUM_CURRENT_NR means this is the
-		** first polling iteration after device probe. During first
-		** iteration, if temperature is less than the set point, clear
-		** the max current request made and reset the 'init'.
-		*/
-		if (ocr_rails[0].init != OPTIMUM_CURRENT_NR)
-			for (j = 0; j < ocr_rail_cnt; j++)
-				ocr_rails[j].init = OPTIMUM_CURRENT_NR;
-		ret = ocr_set_mode_all(OPTIMUM_CURRENT_MIN);
-		if (ret) {
-			pr_err("Error setting min optimum current\n");
-			goto do_ocr_exit;
-		}
-	}
-
-do_ocr_exit:
-	mutex_unlock(&ocr_mutex);
-	return ret;
-}
-
-#if 0
 static int do_vdd_restriction(void)
 {
 	struct tsens_device tsens_dev;
@@ -773,7 +713,6 @@ exit:
 	mutex_unlock(&vdd_rstr_mutex);
 	return ret;
 }
-#endif
 
 static int do_psm(void)
 {
@@ -890,9 +829,7 @@ static void __ref check_temp(struct work_struct *work)
 	}
 
 	do_core_control(temp);
-#if 0
 	do_vdd_restriction();
-#endif
 	do_psm();
 	do_freq_control(temp);
 
