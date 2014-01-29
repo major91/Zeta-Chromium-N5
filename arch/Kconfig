@@ -78,6 +78,7 @@ config OPTPROBES
 
 config HAVE_EFFICIENT_UNALIGNED_ACCESS
 	bool
+	def_bool y
 	help
 	  Some architectures are unable to perform unaligned accesses
 	  without the use of get_unaligned/put_unaligned. Others are
@@ -140,6 +141,9 @@ config HAVE_ARCH_TRACEHOOK
 	bool
 
 config HAVE_DMA_ATTRS
+	bool
+
+config HAVE_DMA_CONTIGUOUS
 	bool
 
 config USE_GENERIC_SMP_HELPERS

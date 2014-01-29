@@ -52,7 +52,16 @@ struct page {
 	struct {
 		union {
 			pgoff_t index;		/* Our offset within mapping. */
-			void *freelist;		/* slub first free object */
+			void *freelist;		/* slub/slob first free object */
+			bool pfmemalloc;	/* If set by the page allocator,
+						 * ALLOC_NO_WATERMARKS was set
+						 * and the low watermark was not
+						 * met implying that the system
+						 * is under some pressure. The
+						 * caller should try ensure
+						 * this page is only used to
+						 * free other pages.
+						 */
 		};
 
 		union {
@@ -90,11 +99,12 @@ struct page {
 					 */
 					atomic_t _mapcount;
 
-					struct {
+					struct { /* SLUB */
 						unsigned inuse:16;
 						unsigned objects:15;
 						unsigned frozen:1;
 					};
+					int units;	/* SLOB */
 				};
 				atomic_t _count;		/* Usage count, see below. */
 			};
@@ -116,6 +126,9 @@ struct page {
 			short int pobjects;
 #endif
 		};
+
+		struct list_head list;	/* slobs list of pages */
+		struct slab *slab_page; /* slab fields */
 	};
 
 	/* Remainder is not double word aligned */
@@ -130,7 +143,7 @@ struct page {
 #if USE_SPLIT_PTLOCKS
 		spinlock_t ptl;
 #endif
-		struct kmem_cache *slab;	/* SLUB: Pointer to slab */
+		struct kmem_cache *slab_cache;	/* SL[AU]B: Pointer to slab */
 		struct page *first_page;	/* Compound tail pages */
 	};
 
@@ -226,6 +239,10 @@ struct vm_area_struct {
 	 * linkage into the address_space->i_mmap prio tree, or
 	 * linkage to the list of like vmas hanging off its node, or
 	 * linkage of vma in the address_space->i_mmap_nonlinear list.
+	 *
+	 * For private anonymous mappings, a pointer to a null terminated string
+	 * in the user process containing the name given to the vma, or NULL
+	 * if unnamed.
 	 */
 	union {
 		struct {
@@ -235,6 +252,7 @@ struct vm_area_struct {
 		} vm_set;
 
 		struct raw_prio_tree_node prio_tree_node;
+		const char __user *anon_name;
 	} shared;
 
 	/*
@@ -261,6 +279,9 @@ struct vm_area_struct {
 #endif
 #ifdef CONFIG_NUMA
 	struct mempolicy *vm_policy;	/* NUMA policy for the VMA */
+#endif
+#ifdef CONFIG_UKSM
+	struct vma_slot *uksm_vma_slot;
 #endif
 };
 
@@ -411,6 +432,16 @@ static inline void mm_init_cpumask(struct mm_struct *mm)
 static inline cpumask_t *mm_cpumask(struct mm_struct *mm)
 {
 	return mm->cpu_vm_mask_var;
+}
+
+
+/* Return the name for an anonymous mapping or NULL for a file-backed mapping */
+static inline const char __user *vma_get_anon_name(struct vm_area_struct *vma)
+{
+	if (vma->vm_file)
+		return NULL;
+
+	return vma->shared.anon_name;
 }
 
 #endif /* _LINUX_MM_TYPES_H */

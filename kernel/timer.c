@@ -588,7 +588,8 @@ static inline void
 debug_activate(struct timer_list *timer, unsigned long expires)
 {
 	debug_timer_activate(timer);
-	trace_timer_start(timer, expires);
+	trace_timer_start(timer, expires,
+			 tbase_get_deferrable(timer->base) > 0 ? 'y' : 'n');
 }
 
 static inline void debug_deactivate(struct timer_list *timer)
@@ -1844,3 +1845,10 @@ void usleep_range(unsigned long min, unsigned long max)
 	do_usleep_range(min, max);
 }
 EXPORT_SYMBOL(usleep_range);
+
+int usleep_range_interruptible(unsigned long min, unsigned long max)
+{
+	__set_current_state(TASK_INTERRUPTIBLE);
+	return do_usleep_range(min, max);
+}
+EXPORT_SYMBOL(usleep_range_interruptible);

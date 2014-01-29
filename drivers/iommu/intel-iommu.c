@@ -2297,6 +2297,12 @@ static int domain_add_dev_info(struct dmar_domain *domain,
 	if (!info)
 		return -ENOMEM;
 
+	ret = domain_context_mapping(domain, pdev, translation);
+	if (ret) {
+		free_devinfo_mem(info);
+		return ret;
+	}
+
 	info->segment = pci_domain_nr(pdev->bus);
 	info->bus = pdev->bus->number;
 	info->devfn = pdev->devfn;
@@ -2308,17 +2314,6 @@ static int domain_add_dev_info(struct dmar_domain *domain,
 	list_add(&info->global, &device_domain_list);
 	pdev->dev.archdata.iommu = info;
 	spin_unlock_irqrestore(&device_domain_lock, flags);
-
-	ret = domain_context_mapping(domain, pdev, translation);
-	if (ret) {
-		spin_lock_irqsave(&device_domain_lock, flags);
-		list_del(&info->link);
-		list_del(&info->global);
-		pdev->dev.archdata.iommu = NULL;
-		spin_unlock_irqrestore(&device_domain_lock, flags);
-		free_devinfo_mem(info);
-		return ret;
-	}
 
 	return 0;
 }
@@ -4134,54 +4129,6 @@ static int intel_iommu_domain_has_cap(struct iommu_domain *domain,
 	return 0;
 }
 
-/*
- * Group numbers are arbitrary.  Device with the same group number
- * indicate the iommu cannot differentiate between them.  To avoid
- * tracking used groups we just use the seg|bus|devfn of the lowest
- * level we're able to differentiate devices
- */
-static int intel_iommu_device_group(struct device *dev, unsigned int *groupid)
-{
-	struct pci_dev *pdev = to_pci_dev(dev);
-	struct pci_dev *bridge;
-	union {
-		struct {
-			u8 devfn;
-			u8 bus;
-			u16 segment;
-		} pci;
-		u32 group;
-	} id;
-
-	if (iommu_no_mapping(dev))
-		return -ENODEV;
-
-	id.pci.segment = pci_domain_nr(pdev->bus);
-	id.pci.bus = pdev->bus->number;
-	id.pci.devfn = pdev->devfn;
-
-	if (!device_to_iommu(id.pci.segment, id.pci.bus, id.pci.devfn))
-		return -ENODEV;
-
-	bridge = pci_find_upstream_pcie_bridge(pdev);
-	if (bridge) {
-		if (pci_is_pcie(bridge)) {
-			id.pci.bus = bridge->subordinate->number;
-			id.pci.devfn = 0;
-		} else {
-			id.pci.bus = bridge->bus->number;
-			id.pci.devfn = bridge->devfn;
-		}
-	}
-
-	if (!pdev->is_virtfn && iommu_group_mf)
-		id.pci.devfn = PCI_DEVFN(PCI_SLOT(id.pci.devfn), 0);
-
-	*groupid = id.group;
-
-	return 0;
-}
-
 static struct iommu_ops intel_iommu_ops = {
 	.domain_init	= intel_iommu_domain_init,
 	.domain_destroy = intel_iommu_domain_destroy,
@@ -4191,7 +4138,6 @@ static struct iommu_ops intel_iommu_ops = {
 	.unmap		= intel_iommu_unmap,
 	.iova_to_phys	= intel_iommu_iova_to_phys,
 	.domain_has_cap = intel_iommu_domain_has_cap,
-	.device_group	= intel_iommu_device_group,
 	.pgsize_bitmap	= INTEL_IOMMU_PGSIZES,
 };
 

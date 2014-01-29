@@ -10,6 +10,11 @@
  */
 #include <linux/linkage.h>
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+  #include <asm/kexec.h>
+  #include <asm/memory.h>
+#endif
+
 /*
  * Debugging stuff
  *
@@ -134,6 +139,64 @@ start:
  THUMB(		.thumb			)
 1:		mov	r7, r1			@ save architecture ID
 		mov	r8, r2			@ save atags pointer
+
+#ifdef CONFIG_KEXEC_HARDBOOT
+		/* Check hardboot page for a kexec kernel. */
+		ldr	r3, =KEXEC_HB_PAGE_ADDR
+		ldr	r0, [r3]
+		ldr	r1, =KEXEC_HB_PAGE_MAGIC
+		teq	r0, r1
+		bne	not_booting_other
+
+		/* Clear hardboot page magic to avoid boot loop. */
+		mov	r0, #0
+		str	r0, [r3]
+
+		/*
+		 * Copy dtb from location up high in memory to default location.
+		 * Kernel freezes if this is not done.
+		 */
+		ldr	r1, [r3, #12]			@ kexec_boot_atags
+		ldr	r2, [r3, #16]			@ kexec_boot_atags_len
+		mov	r5, #0					@ iterator
+catags_cpy:
+		ldr	r0, [r1, r5]			@ from kexec_boot_atags
+		str	r0, [r8, r5]			@ to atags_pointer
+		add	r5, r5, #4
+		cmp	r5, r2
+		blo	catags_cpy
+
+#ifdef KEXEC_HB_KERNEL_LOC
+		/*
+		 * Copy kernel from location up high in memory to location in first 128MB.
+		 * Bootloader on hammerhead erases first 128MB of ram on reboot, so it can't
+		 * be in there before reboot, but decompressing in location above 128MB takes
+		 * a long time. This memcpy is much quicker, for some reason.
+		 */
+		ldr	r2, [r3, #4]				@ kexec_start_address
+		ldr	r4, [r3, #20]				@ kexec_kernel_len
+		ldr	r6, =KEXEC_HB_KERNEL_LOC    @ target
+		mov	r5, #0						@ iterator
+kernel_cpy:
+		ldr	r0, [r2, r5]				@ from kexec_start_address
+		str	r0, [r6, r5]				@ to KEXEC_HB_KERNEL_LOC
+		add	r5, r5, #4
+		cmp	r5, r4
+		blo	kernel_cpy
+#else
+		ldr	r6, [r3, #4]				@ kexec_start_address
+#endif
+
+		/* set registers and boot kexecd' kernel */
+		mov	r0, #0
+		ldr	r1, [r3, #8]				@ kexec_mach_type
+		mov	r2, r8						@ atags pointer
+		mov	pc, r6
+
+		.ltorg
+
+not_booting_other:
+#endif
 
 #ifndef __ARM_ARCH_2__
 		/*
@@ -567,6 +630,12 @@ __armv3_mpu_cache_on:
 		mcr	p15, 0, r0, c7, c0, 0	@ invalidate whole cache v3
 		mov	pc, lr
 
+#ifdef CONFIG_CPU_DCACHE_WRITETHROUGH
+#define CB_BITS 0x08
+#else
+#define CB_BITS 0x0c
+#endif
+
 __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
 		bic	r3, r3, #0xff		@ Align the pointer
 		bic	r3, r3, #0x3f00
@@ -578,17 +647,14 @@ __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
 		mov	r9, r0, lsr #18
 		mov	r9, r9, lsl #18		@ start of RAM
 		add	r10, r9, #0x10000000	@ a reasonable RAM size
-		mov	r1, #0x12
-		orr	r1, r1, #3 << 10
+		mov	r1, #0x12		@ XN|U + section mapping
+		orr	r1, r1, #3 << 10	@ AP=11
 		add	r2, r3, #16384
 1:		cmp	r1, r9			@ if virt > start of RAM
-#ifdef CONFIG_CPU_DCACHE_WRITETHROUGH
-		orrhs	r1, r1, #0x08		@ set cacheable
-#else
-		orrhs	r1, r1, #0x0c		@ set cacheable, bufferable
-#endif
-		cmp	r1, r10			@ if virt > end of RAM
-		bichs	r1, r1, #0x0c		@ clear cacheable, bufferable
+		cmphs	r10, r1			@   && end of RAM > virt
+		bic	r1, r1, #0x1c		@ clear XN|U + C + B
+		orrlo	r1, r1, #0x10		@ Set XN|U for non-RAM
+		orrhs	r1, r1, r6		@ set RAM section settings
 		str	r1, [r0], #4		@ 1:1 mapping
 		add	r1, r1, #1048576
 		teq	r0, r2
@@ -599,7 +665,7 @@ __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
  * so there is no map overlap problem for up to 1 MB compressed kernel.
  * If the execution is in RAM then we would only be duplicating the above.
  */
-		mov	r1, #0x1e
+		orr	r1, r6, #0x04		@ ensure B is set for this
 		orr	r1, r1, #3 << 10
 		mov	r2, pc
 		mov	r2, r2, lsr #20
@@ -611,6 +677,15 @@ __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
 		mov	pc, lr
 ENDPROC(__setup_mmu)
 
+@ Enable unaligned access on v6, to allow better code generation
+@ for the decompressor C code:
+__armv6_mmu_cache_on:
+		mrc	p15, 0, r0, c1, c0, 0	@ read SCTLR
+		bic	r0, r0, #2		@ A (no unaligned access fault)
+		orr	r0, r0, #1 << 22	@ U (v6 unaligned access model)
+		mcr	p15, 0, r0, c1, c0, 0	@ write SCTLR
+		b	__armv4_mmu_cache_on
+
 __arm926ejs_mmu_cache_on:
 #ifdef CONFIG_CPU_DCACHE_WRITETHROUGH
 		mov	r0, #4			@ put dcache in WT mode
@@ -620,6 +695,7 @@ __arm926ejs_mmu_cache_on:
 __armv4_mmu_cache_on:
 		mov	r12, lr
 #ifdef CONFIG_MMU
+		mov	r6, #CB_BITS | 0x12	@ U
 		bl	__setup_mmu
 		mov	r0, #0
 		mcr	p15, 0, r0, c7, c10, 4	@ drain write buffer
@@ -641,6 +717,7 @@ __armv7_mmu_cache_on:
 #ifdef CONFIG_MMU
 		mrc	p15, 0, r11, c0, c1, 4	@ read ID_MMFR0
 		tst	r11, #0xf		@ VMSA
+		movne	r6, #CB_BITS | 0x02	@ !XN
 		blne	__setup_mmu
 		mov	r0, #0
 		mcr	p15, 0, r0, c7, c10, 4	@ drain write buffer
@@ -648,15 +725,17 @@ __armv7_mmu_cache_on:
 		mcrne	p15, 0, r0, c8, c7, 0	@ flush I,D TLBs
 #endif
 		mrc	p15, 0, r0, c1, c0, 0	@ read control reg
-		bic	r0, r0, #1 << 28	@ clear SCTLR.TRE
 		orr	r0, r0, #0x5000		@ I-cache enable, RR cache replacement
 		orr	r0, r0, #0x003c		@ write buffer
+		bic	r0, r0, #2		@ A (no unaligned access fault)
+		orr	r0, r0, #1 << 22	@ U (v6 unaligned access model)
+						@ (needed for ARM1176)
 #ifdef CONFIG_MMU
 #ifdef CONFIG_CPU_ENDIAN_BE8
 		orr	r0, r0, #1 << 25	@ big-endian page tables
 #endif
 		orrne	r0, r0, #1		@ MMU enabled
-		movne	r1, #-1
+		movne	r1, #0xfffffffd		@ domain 0 = client
 		mcrne	p15, 0, r3, c2, c0, 0	@ load page table pointer
 		mcrne	p15, 0, r1, c3, c0, 0	@ load domain access control
 #endif
@@ -669,6 +748,7 @@ __armv7_mmu_cache_on:
 
 __fa526_cache_on:
 		mov	r12, lr
+		mov	r6, #CB_BITS | 0x12	@ U
 		bl	__setup_mmu
 		mov	r0, #0
 		mcr	p15, 0, r0, c7, c7, 0	@ Invalidate whole cache
@@ -683,6 +763,7 @@ __fa526_cache_on:
 
 __arm6_mmu_cache_on:
 		mov	r12, lr
+		mov	r6, #CB_BITS | 0x12	@ U
 		bl	__setup_mmu
 		mov	r0, #0
 		mcr	p15, 0, r0, c7, c0, 0	@ invalidate whole cache v3
@@ -767,6 +848,8 @@ proc_types:
 @		b	__arm6_mmu_cache_off
 @		b	__armv3_mmu_cache_flush
 
+#if !defined(CONFIG_CPU_V7)
+		/* This collides with some V7 IDs, preventing correct detection */
 		.word	0x00000000		@ old ARM ID
 		.word	0x0000f000
 		mov	pc, lr
@@ -775,6 +858,7 @@ proc_types:
  THUMB(		nop				)
 		mov	pc, lr
  THUMB(		nop				)
+#endif
 
 		.word	0x41007000		@ ARM7/710
 		.word	0xfff8fe00
@@ -886,7 +970,7 @@ proc_types:
 
 		.word	0x0007b000		@ ARMv6
 		.word	0x000ff000
-		W(b)	__armv4_mmu_cache_on
+		W(b)	__armv6_mmu_cache_on
 		W(b)	__armv4_mmu_cache_off
 		W(b)	__armv6_mmu_cache_flush
 
