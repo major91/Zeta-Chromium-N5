@@ -86,18 +86,18 @@ struct row_queue_params {
  */
 static const struct row_queue_params row_queues_def[] = {
 /* idling_enabled, quantum, is_urgent */
-	{true, 100, true},	/* ROWQ_PRIO_HIGH_READ */
-	{false, 5, false},	/* ROWQ_PRIO_HIGH_SWRITE */
-	{true,  75, true},	/* ROWQ_PRIO_REG_READ */
-	{false, 4, false},	/* ROWQ_PRIO_REG_SWRITE */
-	{false, 4, false},	/* ROWQ_PRIO_REG_WRITE */
-	{false, 3, false},	/* ROWQ_PRIO_LOW_READ */
-	{false, 2, false}	/* ROWQ_PRIO_LOW_SWRITE */
+	{true, 10, true},	/* ROWQ_PRIO_HIGH_READ */
+	{false, 1, false},	/* ROWQ_PRIO_HIGH_SWRITE */
+	{true, 100, true},	/* ROWQ_PRIO_REG_READ */
+	{false, 1, false},	/* ROWQ_PRIO_REG_SWRITE */
+	{false, 1, false},	/* ROWQ_PRIO_REG_WRITE */
+	{false, 1, false},	/* ROWQ_PRIO_LOW_READ */
+	{false, 1, false}	/* ROWQ_PRIO_LOW_SWRITE */
 };
 
 /* Default values for idling on read queues (in msec) */
-#define ROW_IDLE_TIME_MSEC 10
-#define ROW_READ_FREQ_MSEC 25
+#define ROW_IDLE_TIME_MSEC 5
+#define ROW_READ_FREQ_MSEC 5
 
 /**
  * struct rowq_idling_data -  parameters for idling on the queue
@@ -396,6 +396,7 @@ static void row_add_request(struct request_queue *q,
 				"added urgent request (total on queue=%d)",
 				rqueue->nr_req);
 			rq->cmd_flags |= REQ_URGENT;
+			WARN_ON(rqueue->nr_req > 1);
 			rd->pending_urgent_rq = rq;
 		}
 	} else
