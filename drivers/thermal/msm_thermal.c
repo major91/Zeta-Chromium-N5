@@ -667,8 +667,6 @@ static void do_core_control(long temp)
 }
 #endif
 
-<<<<<<< HEAD
-=======
 static int do_ocr(void)
 {
 	struct tsens_device tsens_dev;
@@ -727,7 +725,6 @@ do_ocr_exit:
 }
 
 #if 0
->>>>>>> 278009d... msm: thermal: Disable vdd restriction
 static int do_vdd_restriction(void)
 {
 	struct tsens_device tsens_dev;
