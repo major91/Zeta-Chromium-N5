@@ -204,6 +204,7 @@ static inline struct device *snd_card_get_device_link(struct snd_card *card)
 
 /* sound.c */
 
+extern void snd_card_unref(struct snd_card *card);
 extern int snd_major;
 extern int snd_ecards_limit;
 extern struct class *sound_class;
