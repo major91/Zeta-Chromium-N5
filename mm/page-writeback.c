@@ -35,12 +35,6 @@
 #include <linux/buffer_head.h> /* __set_page_dirty_buffers */
 #include <linux/pagevec.h>
 #include <trace/events/writeback.h>
-#ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
-#include <linux/lcd_notify.h>
-#endif
-#include <linux/powersuspend.h>
-
-#include "internal.h"
 
 /*
  * Sleep at most 200ms at a time in balance_dirty_pages().
@@ -97,52 +91,16 @@ int vm_dirty_ratio = 20;
 unsigned long vm_dirty_bytes;
 
 /*
- * The default intervals between `kupdate'-style writebacks
- */
-#define DEFAULT_DIRTY_WRITEBACK_INTERVAL	 0 /* centiseconds */
-#define HIGH_DIRTY_WRITEBACK_INTERVAL		15 * 100 /* centiseconds */
-#define DEFAULT_DIRTY_WRITEBACK_INTERVAL 600 /* centiseconds */
-#define DEFAULT_SUSPEND_DIRTY_WRITEBACK_INTERVAL 6000 /* centiseconds */
-unsigned int dirty_writeback_interval,
-	resume_dirty_writeback_interval;
-unsigned int sleep_dirty_writeback_interval,
-	suspend_dirty_writeback_interval;
-
-/*
  * The interval between `kupdate'-style writebacks
  */
-unsigned int dirty_writeback_interval = DEFAULT_DIRTY_WRITEBACK_INTERVAL; /* centiseconds */
+unsigned int dirty_writeback_interval = 5 * 100; /* centiseconds */
+
 EXPORT_SYMBOL_GPL(dirty_writeback_interval);
-
-#ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
-/*
- * The dynamic writeback activation status
- */
-int dyn_dirty_writeback_enabled = 1;
-EXPORT_SYMBOL_GPL(dyn_dirty_writeback_enabled);
-
-/*
- * The interval between `kupdate'-style writebacks when the system is active
- */
-unsigned int dirty_writeback_active_interval = HIGH_DIRTY_WRITEBACK_INTERVAL; /* centiseconds */
-EXPORT_SYMBOL_GPL(dirty_writeback_active_interval);
-
-/*
- * The interval between `kupdate'-style writebacks when the system is suspended
- */
-unsigned int dirty_writeback_suspend_interval = DEFAULT_DIRTY_WRITEBACK_INTERVAL; /* centiseconds */
-EXPORT_SYMBOL_GPL(dirty_writeback_suspend_interval);
-#endif
 
 /*
  * The longest time for which data is allowed to remain dirty
  */
-#define DEFAULT_DIRTY_EXPIRE_INTERVAL 3000 /* centiseconds */
-#define DEFAULT_SUSPEND_DIRTY_EXPIRE_INTERVAL 12000 /* centiseconds */
-unsigned int dirty_expire_interval,
-	resume_dirty_expire_interval;
-unsigned int sleep_dirty_expire_interval,
-	suspend_dirty_expire_interval;
+unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -222,24 +180,19 @@ static unsigned long highmem_dirtyable_memory(unsigned long total)
 	unsigned long x = 0;
 
 	for_each_node_state(node, N_HIGH_MEMORY) {
+		unsigned long nr_pages;
 		struct zone *z =
 			&NODE_DATA(node)->node_zones[ZONE_HIGHMEM];
 
-		x += zone_page_state(z, NR_FREE_PAGES) +
-		     zone_reclaimable_pages(z) - z->dirty_balance_reserve;
+		nr_pages = zone_page_state(z, NR_FREE_PAGES) +
+		  zone_reclaimable_pages(z);
+		/*
+		 * make sure that the number of pages for this node
+		 * is never "negative".
+		 */
+		nr_pages -= min(nr_pages, z->dirty_balance_reserve);
+		x += nr_pages;
 	}
-	/*
-	 * Unreclaimable memory (kernel memory or anonymous memory
-	 * without swap) can bring down the dirtyable pages below
-	 * the zone's dirty balance reserve and the above calculation
-	 * will underflow.  However we still want to add in nodes
-	 * which are below threshold (negative values) to get a more
-	 * accurate calculation but make sure that the total never
-	 * underflows.
-	 */
-	if ((long)x < 0)
-		x = 0;
-
 	/*
 	 * Make sure that the number of highmem pages is never larger
 	 * than the number of the total dirtyable memory. This can only
@@ -266,7 +219,7 @@ unsigned long global_dirtyable_memory(void)
 	x -= min(x, dirty_balance_reserve);
 
 	if (!vm_highmem_is_dirtyable)
-		x -= highmem_dirtyable_memory(x);
+		x -= min(x, highmem_dirtyable_memory(x));
 
 	return x + 1;	/* Ensure that we never return 0 */
 }
@@ -330,12 +283,9 @@ static unsigned long zone_dirtyable_memory(struct zone *zone)
 	 * highmem zone can hold its share of dirty pages, so we don't
 	 * care about vm_highmem_is_dirtyable here.
 	 */
-	unsigned long nr_pages = zone_page_state(zone, NR_FREE_PAGES) +
-		zone_reclaimable_pages(zone);
-
-	/* don't allow this to underflow */
-	nr_pages -= min(nr_pages, zone->dirty_balance_reserve);
-	return nr_pages;
+	return zone_page_state(zone, NR_FREE_PAGES) +
+	       zone_reclaimable_pages(zone) -
+	       zone->dirty_balance_reserve;
 }
 
 /**
@@ -497,7 +447,7 @@ static void bdi_writeout_fraction(struct backing_dev_info *bdi,
  * registered backing devices, which, for obvious reasons, can not
  * exceed 100%.
  */
-static unsigned int bdi_min_ratio = 5;
+static unsigned int bdi_min_ratio;
 
 int bdi_set_min_ratio(struct backing_dev_info *bdi, unsigned int min_ratio)
 {
@@ -1098,7 +1048,7 @@ static void bdi_update_bandwidth(struct backing_dev_info *bdi,
 }
 
 /*
- * After a task dirtied this many pages, balance_dirty_pages_ratelimited()
+ * After a task dirtied this many pages, balance_dirty_pages_ratelimited_nr()
  * will look to see if it needs to start dirty throttling.
  *
  * If dirty_poll_interval is too low, big NUMA machines will call the expensive
@@ -1465,8 +1415,9 @@ static DEFINE_PER_CPU(int, bdp_ratelimits);
 DEFINE_PER_CPU(int, dirty_throttle_leaks) = 0;
 
 /**
- * balance_dirty_pages_ratelimited - balance dirty memory state
+ * balance_dirty_pages_ratelimited_nr - balance dirty memory state
  * @mapping: address_space which was dirtied
+ * @nr_pages_dirtied: number of pages which the caller has just dirtied
  *
  * Processes which are dirtying memory should call in here once for each page
  * which was newly dirtied.  The function will periodically check the system's
@@ -1477,7 +1428,8 @@ DEFINE_PER_CPU(int, dirty_throttle_leaks) = 0;
  * limit we decrease the ratelimiting by a lot, to prevent individual processes
  * from overshooting the limit by (ratelimit_pages) each.
  */
-void balance_dirty_pages_ratelimited(struct address_space *mapping)
+void balance_dirty_pages_ratelimited_nr(struct address_space *mapping,
+					unsigned long nr_pages_dirtied)
 {
 	struct backing_dev_info *bdi = mapping->backing_dev_info;
 	int ratelimit;
@@ -1511,7 +1463,6 @@ void balance_dirty_pages_ratelimited(struct address_space *mapping)
 	 */
 	p = &__get_cpu_var(dirty_throttle_leaks);
 	if (*p > 0 && current->nr_dirtied < ratelimit) {
-		unsigned long nr_pages_dirtied;
 		nr_pages_dirtied = min(*p, ratelimit - current->nr_dirtied);
 		*p -= nr_pages_dirtied;
 		current->nr_dirtied += nr_pages_dirtied;
@@ -1521,7 +1472,7 @@ void balance_dirty_pages_ratelimited(struct address_space *mapping)
 	if (unlikely(current->nr_dirtied >= ratelimit))
 		balance_dirty_pages(mapping, current->nr_dirtied);
 }
-EXPORT_SYMBOL(balance_dirty_pages_ratelimited);
+EXPORT_SYMBOL(balance_dirty_pages_ratelimited_nr);
 
 void throttle_vm_writeout(gfp_t gfp_mask)
 {
@@ -1563,68 +1514,6 @@ int dirty_writeback_centisecs_handler(ctl_table *table, int write,
 	bdi_arm_supers_timer();
 	return 0;
 }
-
-#ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
-/*
- * Manages the dirty page writebacks activation status
- */
-static void set_dirty_writeback_status(bool active) {
-	/* Change the current dirty writeback interval according to the
-	 * status provided */
-	dirty_writeback_interval = (active) ?
-								dirty_writeback_active_interval :
-								dirty_writeback_suspend_interval;
-
-	/* Update the timer related to dirty writebacks interval */
-	bdi_arm_supers_timer();
-
-	/* Print debug info */
-	pr_debug("%s: Set dirty_writeback_interval = %d centisecs\n",
-				__func__, dirty_writeback_interval);
-}
-
-/*
- * sysctl handler for /proc/sys/vm/dyn_dirty_writeback_enabled
- */
-int dynamic_dirty_writeback_handler(struct ctl_table *table, int write,
-	void __user *buffer, size_t *lenp, loff_t *ppos)
-{
-	int ret;
-	int old_status = dyn_dirty_writeback_enabled;
-
-	/* Get and store the new status */
-	ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
-
-	/* If the dynamic writeback has been enabled then set the active
-	 * dirty writebacks interval, otherwise if the feature has been
-	 * disabled, set the suspend interval (the default interval)
-	 * to restore the standard functionality */
-	if (ret == 0 && write && dyn_dirty_writeback_enabled != old_status)
-		set_dirty_writeback_status(!!dyn_dirty_writeback_enabled);
-
-	return ret;
-}
-
-/*
- * sysctl handler for /proc/sys/vm/dirty_writeback_active_centisecs
- */
-int dirty_writeback_active_centisecs_handler(ctl_table *table, int write,
-	void __user *buffer, size_t *length, loff_t *ppos)
-{
-	proc_dointvec_minmax(table, write, buffer, length, ppos);
-	return 0;
-}
-
-/*
- * sysctl handler for /proc/sys/vm/dirty_writeback_suspend_centisecs
- */
-int dirty_writeback_suspend_centisecs_handler(ctl_table *table, int write,
-	void __user *buffer, size_t *length, loff_t *ppos)
-{
-	proc_dointvec_minmax(table, write, buffer, length, ppos);
-	return 0;
-}
-#endif
 
 #ifdef CONFIG_BLOCK
 void laptop_mode_timer_fn(unsigned long data)
@@ -1692,77 +1581,15 @@ void writeback_set_ratelimit(void)
 }
 
 static int __cpuinit
-ratelimit_handler(struct notifier_block *self, unsigned long action,
-		  void *hcpu)
+ratelimit_handler(struct notifier_block *self, unsigned long u, void *v)
 {
-
-	switch (action & ~CPU_TASKS_FROZEN) {
-	case CPU_ONLINE:
-	case CPU_DEAD:
-		writeback_set_ratelimit();
-		return NOTIFY_OK;
-	default:
-		return NOTIFY_DONE;
-	}
+	writeback_set_ratelimit();
+	return NOTIFY_DONE;
 }
 
 static struct notifier_block __cpuinitdata ratelimit_nb = {
 	.notifier_call	= ratelimit_handler,
 	.next		= NULL,
-};
-
-#ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
-
-struct notifier_block notific;
-
-static int dirty_writeback_suspend(struct notifier_block *this,
-                                unsigned long event, void *data)
-{
-        switch (event) {
-        case LCD_EVENT_ON_START:
-                if (dyn_dirty_writeback_enabled)
-                        set_dirty_writeback_status(true);
-                break;
-        case LCD_EVENT_ON_END:
-                break;
-        case LCD_EVENT_OFF_START:
-                if (dyn_dirty_writeback_enabled)
-                    set_dirty_writeback_status(false);
-                break;
-        case LCD_EVENT_OFF_END:
-                break;
-        default:
-                break;
-        }
-
-        return 0;
-}
-#endif
-static void dirty_early_suspend(struct power_suspend *handler)
-{
-	if (dirty_writeback_interval != resume_dirty_writeback_interval)
-		resume_dirty_writeback_interval = dirty_writeback_interval;
-	if (dirty_expire_interval != resume_dirty_expire_interval)
-		resume_dirty_expire_interval = dirty_expire_interval;
-
-	dirty_writeback_interval = suspend_dirty_writeback_interval;
-	dirty_expire_interval = suspend_dirty_expire_interval;
-}
-
-static void dirty_late_resume(struct power_suspend *handler)
-{
-	if (dirty_writeback_interval != suspend_dirty_writeback_interval)
-		suspend_dirty_writeback_interval = dirty_writeback_interval;
-	if (dirty_expire_interval != suspend_dirty_expire_interval)
-		suspend_dirty_expire_interval = dirty_expire_interval;
-
-	dirty_writeback_interval = resume_dirty_writeback_interval;
-	dirty_expire_interval = resume_dirty_expire_interval;
-}
-
-static struct power_suspend dirty_suspend = {
-	.suspend = dirty_early_suspend,
-	.resume = dirty_late_resume,
 };
 
 /*
@@ -1786,24 +1613,6 @@ static struct power_suspend dirty_suspend = {
 void __init page_writeback_init(void)
 {
 	int shift;
-
-#ifdef CONFIG_DYNAMIC_PAGE_WRITEBACK
-	/* Register the dirty page writeback management during suspend/resume */
-    notific.notifier_call = dirty_writeback_suspend;
-
-    if (lcd_register_client(&notific))
-            printk("[dynamic_writebacks] error\n");
-#endif
-	dirty_writeback_interval = resume_dirty_writeback_interval =
-		DEFAULT_DIRTY_WRITEBACK_INTERVAL;
-	dirty_expire_interval = resume_dirty_expire_interval =
-		DEFAULT_DIRTY_EXPIRE_INTERVAL;
-	sleep_dirty_writeback_interval = suspend_dirty_writeback_interval =
-		DEFAULT_SUSPEND_DIRTY_WRITEBACK_INTERVAL;
-	sleep_dirty_expire_interval = suspend_dirty_expire_interval =
-		DEFAULT_SUSPEND_DIRTY_EXPIRE_INTERVAL;
-
-	register_power_suspend(&dirty_suspend);
 
 	writeback_set_ratelimit();
 	register_cpu_notifier(&ratelimit_nb);
