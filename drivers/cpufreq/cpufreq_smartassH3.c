@@ -44,7 +44,7 @@
  * towards the ideal frequency and slower after it has passed it. Similarly,
  * lowering the frequency towards the ideal frequency is faster than below it.
  */
-#define DEFAULT_AWAKE_IDEAL_FREQ 268800
+#define DEFAULT_AWAKE_IDEAL_FREQ 300000
 static unsigned int awake_ideal_freq;
 
 /*
@@ -53,7 +53,7 @@ static unsigned int awake_ideal_freq;
  * that practically when sleep_ideal_freq==0 the awake_ideal_freq is used
  * also when suspended).
  */
-#define DEFAULT_SLEEP_IDEAL_FREQ 268800
+#define DEFAULT_SLEEP_IDEAL_FREQ 300000
 static unsigned int sleep_ideal_freq;
 
 /*
@@ -61,11 +61,7 @@ static unsigned int sleep_ideal_freq;
  * Zero disables and causes to always jump straight to max frequency.
  * When below the ideal freqeuncy we always ramp up to the ideal freq.
  */
-<<<<<<< HEAD
-#define DEFAULT_RAMP_UP_STEP 153600
-=======
 #define DEFAULT_RAMP_UP_STEP 100000
->>>>>>> c859509... cpufreq: SmartassH3 tune defaults
 static unsigned int ramp_up_step;
 
 /*
@@ -73,31 +69,19 @@ static unsigned int ramp_up_step;
  * Zero disables and will calculate ramp down according to load heuristic.
  * When above the ideal freqeuncy we always ramp down to the ideal freq.
  */
-<<<<<<< HEAD
-#define DEFAULT_RAMP_DOWN_STEP 153600
-=======
 #define DEFAULT_RAMP_DOWN_STEP 100000
->>>>>>> c859509... cpufreq: SmartassH3 tune defaults
 static unsigned int ramp_down_step;
 
 /*
  * CPU freq will be increased if measured load > max_cpu_load;
  */
-<<<<<<< HEAD
-#define DEFAULT_MAX_CPU_LOAD 75
-=======
 #define DEFAULT_MAX_CPU_LOAD 90
->>>>>>> c859509... cpufreq: SmartassH3 tune defaults
 static unsigned long max_cpu_load;
 
 /*
  * CPU freq will be decreased if measured load < min_cpu_load;
  */
-<<<<<<< HEAD
-#define DEFAULT_MIN_CPU_LOAD 60
-=======
 #define DEFAULT_MIN_CPU_LOAD 85
->>>>>>> c859509... cpufreq: SmartassH3 tune defaults
 static unsigned long min_cpu_load;
 
 /*
@@ -184,7 +168,7 @@ static
 struct cpufreq_governor cpufreq_gov_smartass_h3 = {
 	.name = "smartassH3",
 	.governor = cpufreq_governor_smartass_h3,
-	.max_transition_latency = 10000000,
+	.max_transition_latency = 9000000,
 	.owner = THIS_MODULE,
 };
 
@@ -281,7 +265,7 @@ inline static int target_freq(struct cpufreq_policy *policy, struct smartass_inf
 
 	__cpufreq_driver_target(policy, target, prefered_relation);
 
-	dprintk(SMARTASS_DEBUG_JUMPS,"SmartassH3: jumping from %d to %d => %d (%d)\n",
+	dprintk(SMARTASS_DEBUG_JUMPS,"SmartassQ: jumping from %d to %d => %d (%d)\n",
 		old_freq,new_freq,target,policy->cur);
 
 	return target;
@@ -452,7 +436,7 @@ static void cpufreq_smartass_freq_change_time_work(struct work_struct *work)
 				new_freq = policy->max;
 				relation = CPUFREQ_RELATION_H;
 			}
-			dprintk(SMARTASS_DEBUG_ALG,"smartassH3 @ %d ramp up: ramp_dir=%d ideal=%d\n",
+			dprintk(SMARTASS_DEBUG_ALG,"smartassQ @ %d ramp up: ramp_dir=%d ideal=%d\n",
 				old_freq,ramp_dir,this_smartass->ideal_speed);
 		}
 		else if (ramp_dir < 0) {
@@ -471,14 +455,14 @@ static void cpufreq_smartass_freq_change_time_work(struct work_struct *work)
 				if (new_freq > old_freq) // min_cpu_load > max_cpu_load ?!
 					new_freq = old_freq -1;
 			}
-			dprintk(SMARTASS_DEBUG_ALG,"smartassH3 @ %d ramp down: ramp_dir=%d ideal=%d\n",
+			dprintk(SMARTASS_DEBUG_ALG,"smartassQ @ %d ramp down: ramp_dir=%d ideal=%d\n",
 				old_freq,ramp_dir,this_smartass->ideal_speed);
 		}
 		else { // ramp_dir==0 ?! Could the timer change its mind about a queued ramp up/down
 		       // before the work task gets to run?
 		       // This may also happen if we refused to ramp up because the nr_running()==1
 			new_freq = old_freq;
-			dprintk(SMARTASS_DEBUG_ALG,"smartassH3 @ %d nothing: ramp_dir=%d nr_running=%lu\n",
+			dprintk(SMARTASS_DEBUG_ALG,"smartassQ @ %d nothing: ramp_dir=%d nr_running=%lu\n",
 				old_freq,ramp_dir,nr_running());
 		}
 
