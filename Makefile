@@ -372,7 +372,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks
 
 # arter97's optimizations
-KBUILD_CFLAGS	+= -s -pipe -Ofast -mcpu=cortex-a15 -mtune=cortex-a15 -mfloat-abi=hard -mfpu=vfpv4 -fno-tree-vectorize -fno-schedule-insns2 -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-inline-functions
+KBUILD_CFLAGS	+= -s -pipe -Ofast -mno-unaligned-access -mcpu=cortex-a15 -mtune=cortex-a15 -mfloat-abi=hard -mfpu=vfpv4 -fno-tree-vectorize -fno-schedule-insns2 -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-inline-functions
 # -Wno-unused
 KBUILD_CFLAGS	+= -Wno-unused
 
