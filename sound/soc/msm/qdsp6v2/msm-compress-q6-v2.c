@@ -73,8 +73,9 @@ struct msm_compr_audio {
 	uint32_t app_pointer;
 	uint32_t buffer_size;
 	uint32_t byte_offset;
-	uint32_t copied_total;
-	uint32_t bytes_received;
+	uint32_t copied_total; /* bytes consumed by DSP */
+	uint32_t bytes_received; /* from userspace */
+	uint32_t bytes_sent; /* to DSP */
 
 	uint16_t session_id;
 
@@ -165,8 +166,11 @@ static int msm_compr_send_buffer(struct msm_compr_audio *prtd)
 
 	pr_debug("%s: sending %d bytes to DSP byte_offset = %d\n",
 		__func__, buffer_length, prtd->byte_offset);
-	if (q6asm_async_write(prtd->audio_client, &param) < 0)
+	if (q6asm_async_write(prtd->audio_client, &param) < 0) {
 		pr_err("%s:q6asm_async_write failed\n", __func__);
+	} else {
+		prtd->bytes_sent += buffer_length;
+	}
 
 	return 0;
 }
@@ -256,7 +260,7 @@ static void compr_event_handler(uint32_t opcode,
 
 			spin_lock(&prtd->lock);
 			/* FIXME: A state is a much better way of dealing with this */
-			if (!prtd->copied_total) {
+			if (prtd->bytes_sent == 0) {
 				bytes_available = prtd->bytes_received - prtd->copied_total;
 				if (bytes_available < cstream->runtime->fragment_size) {
 					pr_debug("CMD_RUN_V2 Insufficient data to send. break out\n");
@@ -404,6 +408,7 @@ static int msm_compr_configure_dsp(struct snd_compr_stream *cstream)
 	prtd->copied_total = 0;
 	prtd->app_pointer  = 0;
 	prtd->bytes_received = 0;
+	prtd->bytes_sent = 0;
 	prtd->buffer       = prtd->audio_client->port[dir].buf[0].data;
 	prtd->buffer_paddr = prtd->audio_client->port[dir].buf[0].phys;
 	prtd->buffer_size  = runtime->fragments * runtime->fragment_size;
@@ -447,6 +452,7 @@ static int msm_compr_open(struct snd_compr_stream *cstream)
 	prtd->session_id = prtd->audio_client->session;
 	prtd->codec = FORMAT_MP3;
 	prtd->bytes_received = 0;
+	prtd->bytes_sent = 0;
 	prtd->copied_total = 0;
 	prtd->byte_offset = 0;
 	prtd->sample_rate = 44100;
@@ -654,6 +660,8 @@ static int msm_compr_trigger(struct snd_compr_stream *cstream, int cmd)
 		prtd->copied_total = 0;
 		prtd->app_pointer  = 0;
 		prtd->bytes_received = 0;
+		prtd->bytes_sent = 0;
+
 		atomic_set(&prtd->xrun, 0);
 		spin_unlock_irqrestore(&prtd->lock, flags);
 		break;
