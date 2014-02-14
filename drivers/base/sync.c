@@ -83,8 +83,8 @@ static void sync_timeline_free(struct kref *kref)
 	list_del(&obj->sync_timeline_list);
 	spin_unlock_irqrestore(&sync_timeline_list_lock, flags);
 
-        if (obj->ops->release_obj)
-                 obj->ops->release_obj(obj);
+	if (obj->ops->release_obj)
+		obj->ops->release_obj(obj);
 
 	kfree(obj);
 }

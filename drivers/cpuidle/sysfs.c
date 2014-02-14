@@ -218,7 +218,7 @@ struct cpuidle_state_attr {
 	ssize_t (*show)(struct cpuidle_state *, \
 					struct cpuidle_state_usage *, char *);
 	ssize_t (*store)(struct cpuidle_state *, \
-                                        struct cpuidle_state_usage *, const char *, size_t);
+			struct cpuidle_state_usage *, const char *, size_t);
 };
 
 #define define_one_state_ro(_name, show) \
@@ -236,7 +236,7 @@ static ssize_t show_state_##_name(struct cpuidle_state *state, \
 
 #define define_store_state_ull_function(_name) \
 static ssize_t store_state_##_name(struct cpuidle_state *state, \
-                struct cpuidle_state_usage *state_usage, \
+		struct cpuidle_state_usage *state_usage, \
 		const char *buf, size_t size) \
 { \
 	unsigned long long value; \
@@ -320,7 +320,7 @@ static ssize_t cpuidle_state_store(struct kobject *kobj,
 {
 	int ret = -EIO;
 	struct cpuidle_state *state = kobj_to_state(kobj);
-        struct cpuidle_state_usage *state_usage = kobj_to_state_usage(kobj);
+	struct cpuidle_state_usage *state_usage = kobj_to_state_usage(kobj);
 	struct cpuidle_state_attr *cattr = attr_to_stateattr(attr);
 
 	if (cattr->store)
