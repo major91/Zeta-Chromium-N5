@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -216,47 +216,6 @@ struct wcd9xxx_mbhc_config {
 	unsigned long micbias_enable_flags;
 	/* swap_gnd_mic returns true if extern GND/MIC swap switch toggled */
 	bool (*swap_gnd_mic) (struct snd_soc_codec *);
-	unsigned long cs_enable_flags;
-	bool use_int_rbias;
-	bool do_recalibration;
-	bool use_vddio_meas;
-};
-
-struct wcd9xxx_cfilt_mode {
-	u8 reg_mode_val;
-	u8 cur_mode_val;
-	u8 reg_mask;
-};
-
-struct wcd9xxx_mbhc_intr {
-	int poll_plug_rem;
-	int shortavg_complete;
-	int potential_button_press;
-	int button_release;
-	int dce_est_complete;
-	int insertion;
-	int hph_left_ocp;
-	int hph_right_ocp;
-	int hs_jack_switch;
-};
-
-struct wcd9xxx_mbhc_cb {
-	void (*enable_mux_bias_block) (struct snd_soc_codec *);
-	void (*cfilt_fast_mode) (struct snd_soc_codec *, struct wcd9xxx_mbhc *);
-	void (*codec_specific_cal) (struct snd_soc_codec *,
-				    struct wcd9xxx_mbhc *);
-	struct wcd9xxx_cfilt_mode (*switch_cfilt_mode) (struct wcd9xxx_mbhc *,
-							bool);
-	void (*select_cfilt) (struct snd_soc_codec *, struct wcd9xxx_mbhc *);
-	enum wcd9xxx_cdc_type (*get_cdc_type) (void);
-	void (*enable_clock_gate) (struct snd_soc_codec *, bool);
-	int (*setup_zdet) (struct wcd9xxx_mbhc *,
-			   enum mbhc_impedance_detect_stages stage);
-	void (*compute_impedance) (s16 *, s16 *, uint32_t *, uint32_t *);
-	void (*enable_mbhc_txfe) (struct snd_soc_codec *, bool);
-	int (*enable_mb_source) (struct snd_soc_codec *, bool, bool);
-	void (*setup_int_rbias) (struct snd_soc_codec *, bool);
-	void (*pull_mb_to_vddio) (struct snd_soc_codec *, bool);
 };
 
 struct wcd9xxx_mbhc {
