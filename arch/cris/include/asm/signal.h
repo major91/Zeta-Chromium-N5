@@ -97,7 +97,7 @@ typedef unsigned long sigset_t;
 
 #define SA_RESTORER	0x04000000
 
-/* 
+/*
  * sigaltstack controls
  */
 #define SS_ONSTACK	1
@@ -154,7 +154,7 @@ typedef struct sigaltstack {
 #ifdef __KERNEL__
 #include <asm/sigcontext.h>
 
-/* here we could define asm-optimized sigaddset, sigdelset etc. operations. 
+/* here we could define asm-optimized sigaddset, sigdelset etc. operations.
  * if we don't, generic ones are used from linux/signal.h
  */
 #define ptrace_signal_deliver(regs, cookie) do { } while (0)

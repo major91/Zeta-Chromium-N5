@@ -86,7 +86,7 @@ static inline void put_icache_data(int setnum, int tagnum, int subblock,
 	__asm__ __volatile__("or %%g0, %0, %%g2\n\t"
 			     "or %%g0, %1, %%g3\n\t"
 			     "stda %%g2, [%2] %3\n\t" : :
-			     "r" (value1), "r" (value2), 
+			     "r" (value1), "r" (value2),
 			     "r" (vaddr), "i" (ASI_M_TXTC_DATA) :
 			     "g2", "g3", "memory" /* no joke */);
 }

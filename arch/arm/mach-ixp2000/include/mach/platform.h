@@ -5,10 +5,10 @@
  *
  * Author: Deepak Saxena <dsaxena@plexity.net>
  *
- * Copyright 2004 (c) MontaVista Software, Inc. 
- * 
- * This file is licensed under  the terms of the GNU General Public 
- * License version 2. This program is licensed "as is" without any 
+ * Copyright 2004 (c) MontaVista Software, Inc.
+ *
+ * This file is licensed under  the terms of the GNU General Public
+ * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
 
@@ -51,12 +51,12 @@ static inline void ixp2000_reg_wrb(volatile void *reg, unsigned long val)
 }
 
 /*
- * Boards may multiplex different devices on the 2nd channel of 
- * the slowport interface that each need different configuration 
- * settings.  For example, the IXDP2400 uses channel 2 on the interface 
+ * Boards may multiplex different devices on the 2nd channel of
+ * the slowport interface that each need different configuration
+ * settings.  For example, the IXDP2400 uses channel 2 on the interface
  * to access the CPLD, the switch fabric card, and the media card.  Each
- * one needs a different mode so drivers must save/restore the mode 
- * before and after each operation.  
+ * one needs a different mode so drivers must save/restore the mode
+ * before and after each operation.
  *
  * acquire_slowport(&your_config);
  * ...
@@ -68,7 +68,7 @@ static inline void ixp2000_reg_wrb(volatile void *reg, unsigned long val)
  * so your code should be written as if you explicitly acquired a lock.
  *
  * The configuration only affects device 2 on the slowport, so the
- * MTD map driver does not acquire/release the slowport.  
+ * MTD map driver does not acquire/release the slowport.
  */
 struct slowport_cfg {
 	unsigned long CCR;	/* Clock divide */

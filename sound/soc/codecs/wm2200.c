@@ -1478,7 +1478,7 @@ static int wm2200_bclk_rates_dat[WM2200_NUM_BCLK_RATES] = {
 	128000,
 	96000,
 	64000,
-};	
+};
 
 static int wm2200_bclk_rates_cd[WM2200_NUM_BCLK_RATES] = {
 	5644800,
@@ -1948,7 +1948,7 @@ static irqreturn_t wm2200_irq(int irq, void *data)
 
 	if (val) {
 		regmap_write(wm2200->regmap, WM2200_INTERRUPT_STATUS_2, val);
-		
+
 		return IRQ_HANDLED;
 	} else {
 		return IRQ_NONE;

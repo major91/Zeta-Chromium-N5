@@ -141,7 +141,7 @@ struct rpc_audmgr_enable_client_args {
 	uint32_t cb_func;
 	uint32_t client_data;
 };
-	
+
 #define AUDMGR_ENABLE_CLIENT			2
 #define AUDMGR_DISABLE_CLIENT			3
 #define AUDMGR_SUSPEND_EVENT_RSP		4

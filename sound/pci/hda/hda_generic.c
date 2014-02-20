@@ -588,7 +588,7 @@ static int parse_input_path(struct hda_codec *codec, struct hda_gnode *adc_node)
 
 	// awk added - fixed no recording due to muted widget
 	unmute_input(codec, adc_node, 0);
-	
+
 	/*
 	 * check each connection of the ADC
 	 * if it reaches to a proper input PIN, add the path as the

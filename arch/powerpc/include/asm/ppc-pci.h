@@ -64,10 +64,10 @@ struct device_node *eeh_find_device_pe(struct device_node *dn);
 void eeh_sysfs_add_device(struct pci_dev *pdev);
 void eeh_sysfs_remove_device(struct pci_dev *pdev);
 
-static inline const char *eeh_pci_name(struct pci_dev *pdev) 
-{ 
+static inline const char *eeh_pci_name(struct pci_dev *pdev)
+{
 	return pdev ? pci_name(pdev) : "<null>";
-} 
+}
 
 static inline const char *eeh_driver_name(struct pci_dev *pdev)
 {

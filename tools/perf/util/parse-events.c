@@ -898,7 +898,7 @@ void print_tracepoint_events(const char *subsys_glob, const char *event_glob)
 		return;
 
 	for_each_subsystem(sys_dir, sys_dirent, sys_next) {
-		if (subsys_glob != NULL && 
+		if (subsys_glob != NULL &&
 		    !strglobmatch(sys_dirent.d_name, subsys_glob))
 			continue;
 
@@ -909,7 +909,7 @@ void print_tracepoint_events(const char *subsys_glob, const char *event_glob)
 			continue;
 
 		for_each_event(sys_dirent, evt_dir, evt_dirent, evt_next) {
-			if (event_glob != NULL && 
+			if (event_glob != NULL &&
 			    !strglobmatch(evt_dirent.d_name, event_glob))
 				continue;
 
@@ -1032,7 +1032,7 @@ void print_events(const char *event_glob)
 			ntypes_printed++;
 		}
 
-		if (event_glob != NULL && 
+		if (event_glob != NULL &&
 		    !(strglobmatch(syms->symbol, event_glob) ||
 		      (syms->alias && strglobmatch(syms->alias, event_glob))))
 			continue;

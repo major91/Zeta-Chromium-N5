@@ -398,7 +398,7 @@ retry:
 out:
 	putname(fs_names);
 }
- 
+
 #ifdef CONFIG_ROOT_NFS
 
 #define NFSROOT_TIMEOUT_MIN	5

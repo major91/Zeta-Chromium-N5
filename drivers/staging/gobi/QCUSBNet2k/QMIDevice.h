@@ -4,7 +4,7 @@ FILE:
 
 DESCRIPTION:
    Functions related to the QMI interface device
-   
+
 FUNCTIONS:
    Generic functions
       IsDeviceValid
@@ -142,7 +142,7 @@ int ReadAsync(
    void *         pData );
 
 // Notification function for synchronous read
-void UpSem( 
+void UpSem(
    sQCUSBNet *    pDev,
    u16            clientID,
    void *         pData );
@@ -170,7 +170,7 @@ int WriteSync(
 /*=========================================================================*/
 
 // Create client and allocate memory
-int GetClientID( 
+int GetClientID(
    sQCUSBNet *      pDev,
    u8               serviceType );
 
@@ -185,16 +185,16 @@ sClientMemList * FindClientMem(
    u16              clientID );
 
 // Add Data to this client's ReadMem list
-bool AddToReadMemList( 
+bool AddToReadMemList(
    sQCUSBNet *      pDev,
    u16              clientID,
    u16              transactionID,
    void *           pData,
    u16              dataSize );
 
-// Remove data from this client's ReadMem list if it matches 
+// Remove data from this client's ReadMem list if it matches
 // the specified transaction ID.
-bool PopFromReadMemList( 
+bool PopFromReadMemList(
    sQCUSBNet *      pDev,
    u16              clientID,
    u16              transactionID,
@@ -202,28 +202,28 @@ bool PopFromReadMemList(
    u16 *            pDataSize );
 
 // Add Notify entry to this client's notify List
-bool AddToNotifyList( 
+bool AddToNotifyList(
    sQCUSBNet *      pDev,
    u16              clientID,
    u16              transactionID,
    void             (* pNotifyFunct)(sQCUSBNet *, u16, void *),
    void *           pData );
 
-// Remove first Notify entry from this client's notify list 
+// Remove first Notify entry from this client's notify list
 //    and Run function
-bool NotifyAndPopNotifyList( 
+bool NotifyAndPopNotifyList(
    sQCUSBNet *      pDev,
    u16              clientID,
    u16              transactionID );
 
 // Add URB to this client's URB list
-bool AddToURBList( 
+bool AddToURBList(
    sQCUSBNet *      pDev,
    u16              clientID,
    struct urb *     pURB );
 
 // Remove URB from this client's URB list
-struct urb * PopFromURBList( 
+struct urb * PopFromURBList(
    sQCUSBNet *      pDev,
    u16              clientID );
 
@@ -232,33 +232,33 @@ struct urb * PopFromURBList(
 /*=========================================================================*/
 
 // Userspace open
-int UserspaceOpen( 
-   struct inode *   pInode, 
+int UserspaceOpen(
+   struct inode *   pInode,
    struct file *    pFilp );
 
 // Userspace ioctl
-int UserspaceIOCTL( 
-   struct inode *    pUnusedInode, 
+int UserspaceIOCTL(
+   struct inode *    pUnusedInode,
    struct file *     pFilp,
-   unsigned int      cmd, 
+   unsigned int      cmd,
    unsigned long     arg );
 
 // Userspace close
-int UserspaceClose( 
+int UserspaceClose(
    struct file *       pFilp,
    fl_owner_t          unusedFileTable );
 
 // Userspace read (synchronous)
-ssize_t UserspaceRead( 
+ssize_t UserspaceRead(
    struct file *        pFilp,
-   char __user *        pBuf, 
+   char __user *        pBuf,
    size_t               size,
    loff_t *             pUnusedFpos );
 
 // Userspace write (synchronous)
 ssize_t UserspaceWrite(
-   struct file *        pFilp, 
-   const char __user *  pBuf, 
+   struct file *        pFilp,
+   const char __user *  pBuf,
    size_t               size,
    loff_t *             pUnusedFpos );
 

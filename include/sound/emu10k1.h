@@ -83,7 +83,7 @@
 						/* the relevant bits and zero to the other bits	*/
 #define IPR_P16V		0x80000000	/* Bit set when the CA0151 P16V chip wishes
 						   to interrupt */
-#define IPR_GPIOMSG		0x20000000	/* GPIO message interrupt (RE'd, still not sure 
+#define IPR_GPIOMSG		0x20000000	/* GPIO message interrupt (RE'd, still not sure
 						   which INTE bits enable it)			*/
 
 /* The next two interrupts are for the midi port on the Audigy Drive (A_MPU1)			*/
@@ -476,7 +476,7 @@
 /* 0x0e, 0x0f: Not used */
 
 #define ENVVOL			0x10		/* Volume envelope register				*/
-#define ENVVOL_MASK		0x0000ffff	/* Current value of volume envelope state variable	*/  
+#define ENVVOL_MASK		0x0000ffff	/* Current value of volume envelope state variable	*/
 						/* 0x8000-n == 666*n usec delay	       			*/
 
 #define ATKHLDV 		0x11		/* Volume envelope hold and attack register		*/
@@ -859,7 +859,7 @@
 /* This is the MPU port on the Audigy Drive 							*/
 #define A_MUDATA2		0x72
 #define A_MUCMD2		0x73
-#define A_MUSTAT2		A_MUCMD2	
+#define A_MUSTAT2		A_MUCMD2
 
 /* The next two are the Audigy equivalent of FXWC						*/
 /* the Audigy can record any output (16bit, 48kHz, up to 64 channel simultaneously) 		*/
@@ -917,7 +917,7 @@
 #define A_FXSENDAMOUNT_G_MASK	0x0000FF00
 #define A_FXSENDAMOUNT_H_MASK	0x000000FF
 /* 0x7c, 0x7e "high bit is used for filtering" */
- 
+
 /* The send amounts for this one are the same as used with the emu10k1 */
 #define A_FXRT1			0x7e
 #define A_FXRT_CHANNELA		0x0000003f
@@ -1731,7 +1731,7 @@ struct snd_emu10k1 {
 
 	struct snd_emu10k1_fx8010 fx8010;		/* FX8010 info */
 	int gpr_base;
-	
+
 	struct snd_ac97 *ac97;
 
 	struct pci_dev *pci;
@@ -2054,7 +2054,7 @@ int snd_emu10k1_fx8010_unregister_irq_handler(struct snd_emu10k1 *emu,
 #define A_EXTIN_SPDIF_CD_L	0x02	/* digital CD left */
 #define A_EXTIN_SPDIF_CD_R	0x03	/* digital CD left */
 #define A_EXTIN_OPT_SPDIF_L     0x04    /* audigy drive Optical SPDIF - left */
-#define A_EXTIN_OPT_SPDIF_R     0x05    /*                              right */ 
+#define A_EXTIN_OPT_SPDIF_R     0x05    /*                              right */
 #define A_EXTIN_LINE2_L		0x08	/* audigy drive line2/mic2 - left */
 #define A_EXTIN_LINE2_R		0x09	/*                           right */
 #define A_EXTIN_ADC_L		0x0a    /* Philips ADC - left */

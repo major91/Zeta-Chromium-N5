@@ -77,7 +77,7 @@ void __init btfixup(void)
 	unsigned *addr;
 	int fmangled = 0;
 	void (*flush_cacheall)(void);
-	
+
 	if (!visited) {
 		visited++;
 		printk(version);
@@ -95,10 +95,10 @@ void __init btfixup(void)
 		count = p[2];
 		q = p + 3;
 		switch (type = *(unsigned char *)p) {
-		case 'f': 
+		case 'f':
 			count = p[3];
 			q = p + 4;
-			if (((p[0] & 1) || p[1]) 
+			if (((p[0] & 1) || p[1])
 			    && ((p[1] & 3) || (unsigned *)(p[1]) < _stext || (unsigned *)(p[1]) >= _end)) {
 				prom_printf(wrong_f, p, p[1]);
 				prom_halt();
@@ -139,7 +139,7 @@ void __init btfixup(void)
 					prom_halt();
 				}
 				insn = *addr;
-#ifdef BTFIXUP_OPTIMIZE_OTHER				
+#ifdef BTFIXUP_OPTIMIZE_OTHER
 				if (type != 'f' && q[1]) {
 					insn = *(unsigned int *)q[1];
 					if (!insn || insn == 1)
@@ -166,7 +166,7 @@ void __init btfixup(void)
 					} else if (q[1] != 1)
 						addr[1] = q[1];
 					if (p[2] == BTFIXUPCALL_NORM) {
-				norm_f:	
+				norm_f:
 						*addr = 0x40000000 | ((p[1] - (unsigned)addr) >> 2);
 						q[1] = 0;
 						break;
@@ -188,7 +188,7 @@ void __init btfixup(void)
 						if ((addr[1] & 0xffffe003) == 0x9e03e000) {
 							/* ADD %O7, XX, %o7 */
 							int displac = (addr[1] << 19);
-							
+
 							displac = (displac >> 21) + 2;
 							*addr = (0x10800000) + (displac & 0x3fffff);
 							q[1] = addr[1];
@@ -263,7 +263,7 @@ void __init btfixup(void)
 						prom_halt();
 					} else {
 						void (*do_fixup)(unsigned *);
-						
+
 						do_fixup = (void (*)(unsigned *))p[1];
 						do_fixup(addr);
 					}
@@ -292,10 +292,10 @@ void __init btfixup(void)
 						prom_halt();
 					}
 					if (p[1] & 0x3ff)
-						set_addr(addr, q[1], fmangled, 
+						set_addr(addr, q[1], fmangled,
 							(insn & 0x3e000000) | 0x80102000 | (p[1] & 0x1fff));
 					else
-						set_addr(addr, q[1], fmangled, 
+						set_addr(addr, q[1], fmangled,
 							(insn & 0x3e000000) | 0x01000000 | (p[1] >> 10));
 					break;
 				case 'i':	/* INT */

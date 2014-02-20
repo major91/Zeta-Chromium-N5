@@ -386,7 +386,7 @@ retry:
  * gfs2_jdata_writepages - Write a bunch of dirty pages back to disk
  * @mapping: The mapping to write
  * @wbc: The writeback control
- * 
+ *
  */
 
 static int gfs2_jdata_writepages(struct address_space *mapping,
@@ -900,7 +900,7 @@ failed:
  *
  * Returns: 1 if it dirtyed the page, or 0 otherwise
  */
- 
+
 static int gfs2_set_page_dirty(struct page *page)
 {
 	SetPageChecked(page);

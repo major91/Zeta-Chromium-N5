@@ -81,7 +81,7 @@ static int tpmd_connect(char *socket_name)
   }
   addr.sun_family = AF_UNIX;
   strncpy(addr.sun_path, socket_name, sizeof(addr.sun_path));
-  res = tpmd_sock->ops->connect(tpmd_sock, 
+  res = tpmd_sock->ops->connect(tpmd_sock,
     (struct sockaddr*)&addr, sizeof(struct sockaddr_un), 0);
   if (res != 0) {
     error("sock_connect() failed: %d\n", res);
@@ -194,7 +194,7 @@ static ssize_t tpm_write(struct file *file, const char *buf, size_t count, loff_
     kfree(tpm_response.data);
     tpm_response.data = NULL;
   }
-  if (tpmd_handle_command(buf, count) != 0) { 
+  if (tpmd_handle_command(buf, count) != 0) {
     count = -EILSEQ;
     tpm_response.data = NULL;
   }
@@ -239,8 +239,8 @@ struct file_operations fops = {
 };
 
 static struct miscdevice tpm_dev = {
-  .minor      = TPM_DEVICE_MINOR, 
-  .name       = TPM_DEVICE_ID, 
+  .minor      = TPM_DEVICE_MINOR,
+  .name       = TPM_DEVICE_ID,
   .fops       = &fops,
 };
 

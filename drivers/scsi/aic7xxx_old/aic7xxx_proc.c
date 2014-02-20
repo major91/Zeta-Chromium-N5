@@ -79,7 +79,7 @@ aic7xxx_set_info(char *buffer, int length, struct Scsi_Host *HBAptr)
  *   Return information to handle /proc support for the driver.
  *-F*************************************************************************/
 int
-aic7xxx_proc_info ( struct Scsi_Host *HBAptr, char *buffer, char **start, off_t offset, int length, 
+aic7xxx_proc_info ( struct Scsi_Host *HBAptr, char *buffer, char **start, off_t offset, int length,
                     int inout)
 {
   struct aic7xxx_host *p;
@@ -105,7 +105,7 @@ aic7xxx_proc_info ( struct Scsi_Host *HBAptr, char *buffer, char **start, off_t 
     }
   }
 
-  if (inout == TRUE) /* Has data been written to the file? */ 
+  if (inout == TRUE) /* Has data been written to the file? */
   {
     return (aic7xxx_set_info(buffer, length, HBAptr));
   }
@@ -129,7 +129,7 @@ aic7xxx_proc_info ( struct Scsi_Host *HBAptr, char *buffer, char **start, off_t 
     size += 512;
   if (aic7xxx_buffer_size != size)
   {
-    if (aic7xxx_buffer != NULL) 
+    if (aic7xxx_buffer != NULL)
     {
       kfree(aic7xxx_buffer);
       aic7xxx_buffer_size = 0;

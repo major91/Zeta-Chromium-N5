@@ -240,7 +240,7 @@ static void intel_panel_actually_set_backlight(struct drm_device *dev, u32 level
 	}
 
 	tmp = I915_READ(BLC_PWM_CTL);
-	if (INTEL_INFO(dev)->gen < 4) 
+	if (INTEL_INFO(dev)->gen < 4)
 		level <<= 1;
 	tmp &= ~BACKLIGHT_DUTY_CYCLE_MASK;
 	I915_WRITE(BLC_PWM_CTL, tmp | level);

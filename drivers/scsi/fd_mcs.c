@@ -10,7 +10,7 @@
  * This driver also supports Reply SB16/SCSI card (the SCSI part).
  *
  * What makes this driver different is that this driver is MCA only
- * and it supports multiple adapters in the same system, IRQ 
+ * and it supports multiple adapters in the same system, IRQ
  * sharing, some driver statistics, and maps highest SCSI id to sda.
  * All cards are auto-detected.
  *
@@ -529,13 +529,13 @@ static const char *fd_mcs_info(struct Scsi_Host *shpnt)
 static int TOTAL_INTR = 0;
 
 /*
- * inout : decides on the direction of the dataflow and the meaning of the 
+ * inout : decides on the direction of the dataflow and the meaning of the
  *         variables
  * buffer: If inout==FALSE data is being written to it else read from it
  * *start: If inout==FALSE start of the valid data in the buffer
- * offset: If inout==FALSE offset from the beginning of the imaginary file 
+ * offset: If inout==FALSE offset from the beginning of the imaginary file
  *         from which we start writing into the buffer
- * length: If inout==FALSE max number of bytes to be written into the buffer 
+ * length: If inout==FALSE max number of bytes to be written into the buffer
  *         else number of bytes in the buffer
  */
 static int fd_mcs_proc_info(struct Scsi_Host *shpnt, char *buffer, char **start, off_t offset, int length, int inout)
@@ -778,7 +778,7 @@ static irqreturn_t fd_mcs_intr(int irq, void *dev_id)
 		   COMPARE                      39 DATA OUT
 		   COPY                         18 DATA OUT
 		   COPY AND VERIFY              3a DATA OUT
-		   INQUIRY                      12 
+		   INQUIRY                      12
 		   LOG SELECT                   4c DATA OUT
 		   LOG SENSE                    4d
 		   MODE SELECT (6)              15 DATA OUT
@@ -1270,7 +1270,7 @@ static int fd_mcs_bus_reset(Scsi_Cmnd * SCpnt) {
 #include <scsi/scsi_ioctl.h>
 
 static int fd_mcs_biosparam(struct scsi_device * disk, struct block_device *bdev,
-			    sector_t capacity, int *info_array) 
+			    sector_t capacity, int *info_array)
 {
 	unsigned char *p = scsi_bios_ptable(bdev);
 	int size = capacity;
@@ -1315,7 +1315,7 @@ static int fd_mcs_biosparam(struct scsi_device * disk, struct block_device *bdev
 		/* Note that this new method guarantees that there will always be
 		   less than 1024 cylinders on a platter.  This is good for drives
 		   up to approximately 7.85GB (where 1GB = 1024 * 1024 kB). */
-		if ((unsigned int) size >= 0x7e0000U) 
+		if ((unsigned int) size >= 0x7e0000U)
 		{
 			info_array[0] = 0xff;	/* heads   = 255 */
 			info_array[1] = 0x3f;	/* sectors =  63 */
@@ -1339,7 +1339,7 @@ static struct scsi_host_template driver_template = {
 	.detect				= fd_mcs_detect,
 	.release			= fd_mcs_release,
 	.info				= fd_mcs_info,
-	.queuecommand   		= fd_mcs_queue, 
+	.queuecommand   		= fd_mcs_queue,
 	.eh_abort_handler		= fd_mcs_abort,
 	.eh_bus_reset_handler		= fd_mcs_bus_reset,
 	.bios_param     		= fd_mcs_biosparam,

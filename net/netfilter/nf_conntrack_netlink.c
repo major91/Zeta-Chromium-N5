@@ -1404,7 +1404,7 @@ ctnetlink_create_conntrack(struct net *net, u16 zone,
 	rcu_read_lock();
  	if (cda[CTA_HELP]) {
 		char *helpname = NULL;
- 
+
  		err = ctnetlink_parse_help(cda[CTA_HELP], &helpname);
  		if (err < 0)
 			goto err2;

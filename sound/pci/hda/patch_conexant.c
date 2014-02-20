@@ -60,7 +60,7 @@ struct pin_dac_pair {
 
 struct imux_info {
 	hda_nid_t pin;		/* input pin NID */
-	hda_nid_t adc;		/* connected ADC NID */	
+	hda_nid_t adc;		/* connected ADC NID */
 	hda_nid_t boost;	/* optional boost volume NID */
 	int index;		/* corresponding to autocfg.input */
 };
@@ -493,7 +493,7 @@ static int conexant_build_controls(struct hda_codec *codec)
 		if (err < 0)
 			return err;
 		spec->multiout.share_spdif = 1;
-	} 
+	}
 	if (spec->dig_in_nid) {
 		err = snd_hda_create_spdif_in_ctls(codec,spec->dig_in_nid);
 		if (err < 0)
@@ -611,7 +611,7 @@ static int cxt_eapd_put(struct snd_kcontrol *kcontrol,
 		eapd = !eapd;
 	if (eapd == spec->cur_eapd)
 		return 0;
-	
+
 	spec->cur_eapd = eapd;
 	snd_hda_codec_write_cache(codec, nid,
 				  0, AC_VERB_SET_EAPD_BTLENABLE,
@@ -774,7 +774,7 @@ static void cxt5045_hp_automute(struct hda_codec *codec)
 
 	spec->hp_present = snd_hda_jack_detect(codec, 0x11);
 
-	bits = (spec->hp_present || !spec->cur_eapd) ? HDA_AMP_MUTE : 0; 
+	bits = (spec->hp_present || !spec->cur_eapd) ? HDA_AMP_MUTE : 0;
 	snd_hda_codec_amp_stereo(codec, 0x10, HDA_OUTPUT, 0,
 				 HDA_AMP_MUTE, bits);
 }
@@ -868,7 +868,7 @@ static const struct hda_verb cxt5045_init_verbs[] = {
 	{0x13, AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_OUT},
 	{ 0x13, AC_VERB_SET_CONNECT_SEL, 0x0 },
 	/* EAPD */
-	{0x10, AC_VERB_SET_EAPD_BTLENABLE, 0x2 }, /* default on */ 
+	{0x10, AC_VERB_SET_EAPD_BTLENABLE, 0x2 }, /* default on */
 	{ } /* end */
 };
 
@@ -934,7 +934,7 @@ static const struct snd_kcontrol_new cxt5045_test_mixer[] = {
 	HDA_CODEC_MUTE("HP-OUT Playback Switch", 0x11, 0x0, HDA_OUTPUT),
 	HDA_CODEC_VOLUME("LINE1 Playback Volume", 0x12, 0x0, HDA_OUTPUT),
 	HDA_CODEC_MUTE("LINE1 Playback Switch", 0x12, 0x0, HDA_OUTPUT),
-	
+
 	/* Modes for retasking pin widgets */
 	CXT_PIN_MODE("HP-OUT pin mode", 0x11, CXT_PIN_DIR_INOUT),
 	CXT_PIN_MODE("LINE1 pin mode", 0x12, CXT_PIN_DIR_INOUT),
@@ -1155,8 +1155,8 @@ static int patch_cxt5045(struct hda_codec *codec)
 		spec->mixers[0] = cxt5045_test_mixer;
 		spec->init_verbs[0] = cxt5045_test_init_verbs;
 		break;
-		
-#endif	
+
+#endif
 	}
 
 	switch (codec->subsystem_id >> 16) {
@@ -1424,7 +1424,7 @@ static const struct hda_verb cxt5047_test_init_verbs[] = {
 	 */
 	{0x18, AC_VERB_SET_DIGI_CONVERT_1, 0},
 
-	/* Ensure mic1, mic2, line1 pin widgets take input from the 
+	/* Ensure mic1, mic2, line1 pin widgets take input from the
 	 * OUT1 sum bus when acting as an output.
 	 */
 	{0x1a, AC_VERB_SET_CONNECT_SEL, 0},
@@ -1566,7 +1566,7 @@ static int patch_cxt5047(struct hda_codec *codec)
 		spec->mixers[0] = cxt5047_test_mixer;
 		spec->init_verbs[0] = cxt5047_test_init_verbs;
 		codec->patch_ops.unsol_event = cxt5047_hp_unsol_event;
-#endif	
+#endif
 	}
 	spec->vmaster_nid = 0x13;
 
@@ -1756,7 +1756,7 @@ static const struct hda_verb cxt5051_init_verbs[] = {
 	/* HP, Amp  */
 	{0x16, AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_HP},
 	{0x16, AC_VERB_SET_CONNECT_SEL, 0x00},
-	/* DAC1 */	
+	/* DAC1 */
 	{0x10, AC_VERB_SET_AMP_GAIN_MUTE, AMP_OUT_UNMUTE},
 	/* Record selector: Internal mic */
 	{0x14, AC_VERB_SET_AMP_GAIN_MUTE, AMP_IN_UNMUTE(0) | 0x44},
@@ -1766,7 +1766,7 @@ static const struct hda_verb cxt5051_init_verbs[] = {
 	{0x1c, AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_OUT},
 	{0x1c, AC_VERB_SET_CONNECT_SEL, 0x0},
 	/* EAPD */
-	{0x1a, AC_VERB_SET_EAPD_BTLENABLE, 0x2}, /* default on */ 
+	{0x1a, AC_VERB_SET_EAPD_BTLENABLE, 0x2}, /* default on */
 	{0x16, AC_VERB_SET_UNSOLICITED_ENABLE, AC_USRSP_EN|CONEXANT_HP_EVENT},
 	{ } /* end */
 };
@@ -3253,7 +3253,7 @@ static int fill_cx_auto_dacs(struct hda_codec *codec, hda_nid_t *dacs)
 /* fill pin_dac_pair list from the pin and dac list */
 static int fill_dacs_for_pins(struct hda_codec *codec, hda_nid_t *pins,
 			      int num_pins, hda_nid_t *dacs, int *rest,
-			      struct pin_dac_pair *filled, int nums, 
+			      struct pin_dac_pair *filled, int nums,
 			      int type)
 {
 	int i, start = nums;
@@ -3262,7 +3262,7 @@ static int fill_dacs_for_pins(struct hda_codec *codec, hda_nid_t *pins,
 		filled[nums].pin = pins[i];
 		filled[nums].type = type;
 		filled[nums].dac = get_unassigned_dac(codec, pins[i], dacs, rest);
-		if (filled[nums].dac) 
+		if (filled[nums].dac)
 			continue;
 		if (filled[start].dac && get_connection_index(codec, pins[i], filled[start].dac) >= 0) {
 			filled[nums].dac = filled[start].dac | DAC_SLAVE_FLAG;
@@ -4180,7 +4180,7 @@ static int cx_auto_build_output_controls(struct hda_codec *codec)
 		if (err < 0)
 			return err;
 	}
-	
+
 	return 0;
 }
 

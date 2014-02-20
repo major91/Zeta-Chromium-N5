@@ -1,10 +1,10 @@
-/* 
+/*
  * File...........: linux/include/asm-s390x/idals.h
  * Author(s)......: Holger Smolinski <Holger.Smolinski@de.ibm.com>
  *		    Martin Schwidefsky <schwidefsky@de.ibm.com>
  * Bugreports.to..: <Linux390@de.ibm.com>
  * (C) IBM Corporation, IBM Deutschland Entwicklung GmbH, 2000a
- 
+
  * History of changes
  * 07/24/00 new file
  * 05/04/02 code restructuring.
@@ -60,7 +60,7 @@ static inline unsigned long *idal_create_words(unsigned long *idaws,
 	unsigned int cidaw;
 
 	paddr = __pa(vaddr);
-	cidaw = ((paddr & (IDA_BLOCK_SIZE-1)) + length + 
+	cidaw = ((paddr & (IDA_BLOCK_SIZE-1)) + length +
 		 (IDA_BLOCK_SIZE-1)) >> IDA_SIZE_LOG;
 	*idaws++ = paddr;
 	paddr &= -IDA_BLOCK_SIZE;

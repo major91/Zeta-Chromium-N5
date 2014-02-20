@@ -15,7 +15,7 @@ struct cyclades_monitor {
 
 /*
  * This is our internal structure for each serial port's state.
- * 
+ *
  * Many fields are paralleled by the structure used by the serial_struct
  * structure.
  *

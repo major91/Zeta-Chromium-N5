@@ -131,7 +131,7 @@ void __init ixdp2x01_init_irq(void)
  * IXDP2x01 memory map
  *************************************************************************/
 static struct map_desc ixdp2x01_io_desc __initdata = {
-	.virtual	= IXDP2X01_VIRT_CPLD_BASE, 
+	.virtual	= IXDP2X01_VIRT_CPLD_BASE,
 	.pfn		= __phys_to_pfn(IXDP2X01_PHYS_CPLD_BASE),
 	.length		= IXDP2X01_CPLD_REGION_SIZE,
 	.type		= MT_DEVICE
@@ -185,7 +185,7 @@ static struct plat_serial8250_port ixdp2x01_serial_port2[] = {
 		.iotype		= UPIO_MEM32,
 		.regshift	= 2,
 		.uartclk	= IXDP2X01_UART_CLK,
-	}, 
+	},
 	{ }
 };
 
@@ -403,7 +403,7 @@ static void __init ixdp2x01_init_machine(void)
 {
 	ixp2000_reg_wrb(IXDP2X01_CPLD_FLASH_REG,
 		(IXDP2X01_CPLD_FLASH_BANK_MASK | IXDP2X01_CPLD_FLASH_INTERN));
-	
+
 	ixdp2x01_flash_data.nr_banks =
 		((*IXDP2X01_CPLD_FLASH_REG & IXDP2X01_CPLD_FLASH_BANK_MASK) + 1);
 

@@ -77,7 +77,7 @@ config QETH
 	  This driver supports the IBM System z OSA Express adapters
 	  in QDIO mode (all media types), HiperSockets interfaces and VM GuestLAN
 	  interfaces in QDIO and HIPER mode.
-	
+
 	  For details please refer to the documentation provided by IBM at
 	  <http://www.ibm.com/developerworks/linux/linux390>
 

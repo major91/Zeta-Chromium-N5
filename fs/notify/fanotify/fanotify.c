@@ -120,7 +120,7 @@ static int fanotify_get_response_from_access(struct fsnotify_group *group,
 
 	pr_debug("%s: group=%p event=%p about to return ret=%d\n", __func__,
 		 group, event, ret);
-	
+
 	return ret;
 }
 #endif

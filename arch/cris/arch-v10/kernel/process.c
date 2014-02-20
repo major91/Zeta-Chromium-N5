@@ -122,19 +122,19 @@ int copy_thread(unsigned long clone_flags, unsigned long usp,
 {
 	struct pt_regs * childregs;
 	struct switch_stack *swstack;
-	
+
 	/* put the pt_regs structure at the end of the new kernel stack page and fix it up
 	 * remember that the task_struct doubles as the kernel stack for the task
 	 */
 
 	childregs = task_pt_regs(p);
-        
+
 	*childregs = *regs;  /* struct copy of pt_regs */
-        
+
         p->set_child_tid = p->clear_child_tid = NULL;
 
         childregs->r10 = 0;  /* child returns 0 after a fork/clone */
-	
+
 	/* put the switch stack right below the pt_regs */
 
 	swstack = ((struct switch_stack *)childregs) - 1;
@@ -144,10 +144,10 @@ int copy_thread(unsigned long clone_flags, unsigned long usp,
 	/* we want to return into ret_from_sys_call after the _resume */
 
 	swstack->return_ip = (unsigned long) ret_from_fork; /* Will call ret_from_sys_call */
-	
+
 	/* fix the user-mode stackpointer */
 
-	p->thread.usp = usp;	
+	p->thread.usp = usp;
 
 	/* and the kernel-mode one */
 
@@ -161,7 +161,7 @@ int copy_thread(unsigned long clone_flags, unsigned long usp,
 	return 0;
 }
 
-/* 
+/*
  * Be aware of the "magic" 7th argument in the four system-calls below.
  * They need the latest stackframe, which is put as the 7th argument by
  * entry.S. The previous arguments are dummies or actually used, but need
@@ -208,7 +208,7 @@ asmlinkage int sys_vfork(long r10, long r11, long r12, long r13, long mof, long 
 asmlinkage int sys_execve(const char *fname,
 			  const char *const *argv,
 			  const char *const *envp,
-			  long r13, long mof, long srp, 
+			  long r13, long mof, long srp,
 			  struct pt_regs *regs)
 {
 	int error;

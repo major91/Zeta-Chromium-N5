@@ -1267,7 +1267,7 @@ do_cvt_mode(struct detailed_timing *timing, void *c)
 
 static int
 add_cvt_modes(struct drm_connector *connector, struct edid *edid)
-{	
+{
 	struct detailed_mode_closure closure = {
 		connector, edid, 0, 0, 0
 	};
@@ -1489,7 +1489,7 @@ void drm_edid_to_eld(struct drm_connector *connector, struct edid *edid)
 	if (cea[1] >= 3)
 		for (db = cea + 4; db < cea + cea[2]; db += dbl + 1) {
 			dbl = db[0] & 0x1f;
-			
+
 			switch ((db[0] & 0xe0) >> 5) {
 			case AUDIO_BLOCK:
 				/* Audio Data Block, contains SADs */

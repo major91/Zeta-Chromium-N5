@@ -172,7 +172,7 @@ if (offset == PhyAddr)	{
 		*/
 /*		NdisAcquireSpinLock( &(pDevice->IoSpinLock) );	*/
 
-		for (idx = 0; idx < 30; idx++)	{ 
+		for (idx = 0; idx < 30; idx++)	{
 		/* Make sure command bit is clear before access it.	*/
 			u1bTmp = PlatformIORead1Byte(dev, PhyAddr);
 			if ((u1bTmp & BIT7) == 0)

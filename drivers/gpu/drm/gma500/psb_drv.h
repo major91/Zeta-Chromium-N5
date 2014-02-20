@@ -610,7 +610,7 @@ struct drm_psb_private {
 
 	/* Oaktrail HDMI state */
 	struct oaktrail_hdmi_dev *hdmi_priv;
-	
+
 	/*
 	 * Register state
 	 */
@@ -675,7 +675,7 @@ struct drm_psb_private {
 /*
  *	Operations for each board type
  */
- 
+
 struct psb_ops {
 	const char *name;
 	unsigned int accel_2d:1;

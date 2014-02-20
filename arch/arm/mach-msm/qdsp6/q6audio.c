@@ -192,13 +192,13 @@ int q6_device_volume(uint32_t device_id, int level)
 	return hw->min_gain + ((hw->max_gain - hw->min_gain) * level) / 100;
 }
 
-static inline int adie_open(struct dal_client *client) 
+static inline int adie_open(struct dal_client *client)
 {
 	pr_debug("[%s:%s]\n", __MM_FILE__, __func__);
 	return dal_call_f0(client, DAL_OP_OPEN, 0);
 }
 
-static inline int adie_close(struct dal_client *client) 
+static inline int adie_close(struct dal_client *client)
 {
 	pr_debug("[%s:%s]\n", __MM_FILE__, __func__);
 	return dal_call_f0(client, DAL_OP_CLOSE, 0);
@@ -213,7 +213,7 @@ static inline int adie_set_path(struct dal_client *client,
 }
 
 static inline int adie_set_path_freq_plan(struct dal_client *client,
-					  uint32_t path_type, uint32_t plan) 
+					  uint32_t path_type, uint32_t plan)
 {
 	pr_debug("[%s:%s] path_type = %d, plan = %d\n",	__MM_FILE__,
 		__func__, path_type, plan);

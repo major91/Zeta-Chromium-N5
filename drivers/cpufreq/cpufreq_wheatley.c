@@ -553,7 +553,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	if (deepidle_state) {
 	    deepidle_time = deepidle_state->time;
 	    deepidle_usage = deepidle_state->usage;
-		    
+
 	    total_idletime += (unsigned long)(deepidle_time - j_dbs_info->prev_idletime);
 	    total_usage += (unsigned long)(deepidle_usage - j_dbs_info->prev_idleusage);
 
@@ -563,7 +563,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 */
     }
 
-    if (total_usage > 0 && total_idletime / total_usage >= dbs_tuners_ins.target_residency) { 
+    if (total_usage > 0 && total_idletime / total_usage >= dbs_tuners_ins.target_residency) {
 	if (num_misses > 0)
 	    num_misses--;
     } else {
@@ -572,7 +572,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
     }
 
     /* Check for frequency increase */
-    if (max_load_freq > dbs_tuners_ins.up_threshold * policy->cur 
+    if (max_load_freq > dbs_tuners_ins.up_threshold * policy->cur
 	|| num_misses <= dbs_tuners_ins.allowed_misses) {
 	/* If switching to max speed, apply sampling_down_factor */
 	if (policy->cur < policy->max)

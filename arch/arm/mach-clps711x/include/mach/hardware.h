@@ -102,10 +102,10 @@
 #if defined (CONFIG_ARCH_EDB7211)
 
 /*
- * The extra 8 lines of the keyboard matrix are wired to chip select 3 (nCS3) 
+ * The extra 8 lines of the keyboard matrix are wired to chip select 3 (nCS3)
  * and repeat across it. This is the mapping for it.
  *
- * In jumpered boot mode, nCS3 is mapped to 0x4000000, not 0x3000000. This 
+ * In jumpered boot mode, nCS3 is mapped to 0x4000000, not 0x3000000. This
  * was cause for much consternation and headscratching. This should probably
  * be made a compile/run time kernel option.
  */
@@ -115,10 +115,10 @@
 
 
 /*
- * The CS8900A ethernet chip has its I/O registers wired to chip select 2 
+ * The CS8900A ethernet chip has its I/O registers wired to chip select 2
  * (nCS2). This is the mapping for it.
  *
- * In jumpered boot mode, nCS2 is mapped to 0x5000000, not 0x2000000. This 
+ * In jumpered boot mode, nCS2 is mapped to 0x5000000, not 0x2000000. This
  * was cause for much consternation and headscratching. This should probably
  * be made a compile/run time kernel option.
  */

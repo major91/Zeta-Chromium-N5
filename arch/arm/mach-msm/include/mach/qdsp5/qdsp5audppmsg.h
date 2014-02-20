@@ -32,7 +32,7 @@
 
 This section contains comments describing changes made to this file.
 Notice that changes are listed in reverse chronological order.
-  
+
  $Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audppmsg.h#4 $
 
 ===========================================================================*/
@@ -41,7 +41,7 @@ Notice that changes are listed in reverse chronological order.
  * AUDPPTASK uses audPPuPRlist to send messages to the ARM
  * Location : MEMA
  * Buffer Size : 45
- * No of Buffers in a queue : 5 for gaming audio and 1 for other images 
+ * No of Buffers in a queue : 5 for gaming audio and 1 for other images
  */
 
 /*
@@ -273,7 +273,7 @@ typedef struct{
  * MSG to AUDPP enable or disable feedback form DSP to ARM
  */
 
-#define AUDPP_MSG_CFG_MSG	0x0007  
+#define AUDPP_MSG_CFG_MSG	0x0007
 #define AUDPP_MSG_CFG_MSG_LEN	\
     sizeof(audpp_msg_cfg_msg)
 
@@ -281,7 +281,7 @@ typedef struct{
 #define AUDPP_MSG_ENA_DIS	0x0000
 
 typedef struct{
-  /*   Enabled  - 0xffff 
+  /*   Enabled  - 0xffff
    **  Disabled - 0
    */
   unsigned short enabled;

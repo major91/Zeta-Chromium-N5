@@ -1949,7 +1949,7 @@ static void release_wakelock(void)
 {
 	int wakelock_count = atomic_read(&wakelock_reference_count);
 
-	if (!wakelock_count) 
+	if (!wakelock_count)
 	{
 		DMUX_LOG_KERR("%s: bam_dmux wakelock not locked\n", __func__);
 		return;

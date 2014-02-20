@@ -147,7 +147,7 @@ common_shutdown_1(void *generic_ptr)
 
 	if (! alpha_using_srm && how->mode != LINUX_REBOOT_CMD_RESTART) {
 		/* Unfortunately, since MILO doesn't currently understand
-		   the hwrpb bits above, we can't reliably halt the 
+		   the hwrpb bits above, we can't reliably halt the
 		   processor and keep it halted.  So just loop.  */
 		return;
 	}
@@ -289,7 +289,7 @@ copy_thread(unsigned long clone_flags, unsigned long usp,
 		stack_offset = (PAGE_SIZE-1) & (unsigned long) regs;
 	childregs = (struct pt_regs *)
 	  (stack_offset + PAGE_SIZE + task_stack_page(p));
-		
+
 	*childregs = *regs;
 	settls = regs->r20;
 	childregs->r0 = 0;

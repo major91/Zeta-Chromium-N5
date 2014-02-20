@@ -32,7 +32,7 @@
 #define PHONE_NUM_DEVICES	256
 
 /*
- *    Active devices 
+ *    Active devices
  */
 
 static struct phone_device *phone_device[PHONE_NUM_DEVICES];
@@ -98,7 +98,7 @@ int phone_register_device(struct phone_device *p, int unit)
 		base = unit;
 		end = unit + 1;  /* enter the loop at least one time */
 	}
-	
+
 	mutex_lock(&phone_lock);
 	for (i = base; i < end; i++) {
 		if (phone_device[i] == NULL) {
@@ -135,7 +135,7 @@ static const struct file_operations phone_fops =
 /*
  *	Board init functions
  */
- 
+
 
 /*
  *    Initialise Telephony for linux

@@ -8,7 +8,7 @@
  * (C) 2002 James Bottomley <James.Bottomley@HansenPartnership.com>
  *
 **-----------------------------------------------------------------------------
-**  
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -97,7 +97,7 @@ int mca_find_adapter(int id, int start)
 		info.slot = info.mca_dev->slot + 1;
 		info.mca_dev = NULL;
 	}
-		
+
 	return info.mca_dev->slot;
 }
 EXPORT_SYMBOL(mca_find_adapter);
@@ -147,7 +147,7 @@ int mca_find_unused_adapter(int id, int start)
 		info.slot = info.mca_dev->slot + 1;
 		info.mca_dev = NULL;
 	}
-		
+
 	return info.mca_dev->slot;
 }
 EXPORT_SYMBOL(mca_find_unused_adapter);
@@ -224,7 +224,7 @@ unsigned char mca_read_pos(int slot, int reg)
 }
 EXPORT_SYMBOL(mca_read_pos);
 
-		
+
 /**
  *	mca_write_pos - read POS register from card
  *	@slot: slot number to read from

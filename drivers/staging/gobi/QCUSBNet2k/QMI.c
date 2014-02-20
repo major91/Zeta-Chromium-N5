@@ -4,12 +4,12 @@ FILE:
 
 DESCRIPTION:
    Qualcomm QMI driver code
-   
+
 FUNCTIONS:
    Generic QMUX functions
       ParseQMUX
       FillQMUX
-   
+
    Generic QMI functions
       GetTLV
       ValidQMIMessage
@@ -22,7 +22,7 @@ FUNCTIONS:
       QMIWDSSetEventReportReq
       QMIWDSGetPKGSRVCStatusReq
       QMIDMSGetMEIDReq
-      
+
    Parse data from QMI responses
       QMICTLGetClientIDResp
       QMICTLReleaseClientIDResp
@@ -63,7 +63,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX
- 
+
 RETURN VALUE:
    u16 - size of buffer
 ===========================================================================*/
@@ -78,7 +78,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX + QMICTLGetClientIDReq
- 
+
 RETURN VALUE:
    u16 - size of buffer
 ===========================================================================*/
@@ -93,7 +93,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX + QMICTLReleaseClientIDReq
- 
+
 RETURN VALUE:
    u16 - size of header
 ===========================================================================*/
@@ -108,7 +108,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX + QMICTLReadyReq
- 
+
 RETURN VALUE:
    u16 - size of buffer
 ===========================================================================*/
@@ -123,7 +123,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX + QMIWDSSetEventReportReq
- 
+
 RETURN VALUE:
    u16 - size of buffer
 ===========================================================================*/
@@ -138,7 +138,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX + QMIWDSGetPKGSRVCStatusReq
- 
+
 RETURN VALUE:
    u16 - size of buffer
 ===========================================================================*/
@@ -153,7 +153,7 @@ METHOD:
 
 DESCRIPTION:
    Get size of buffer needed for QMUX + QMIDMSGetMEIDReq
- 
+
 RETURN VALUE:
    u16 - size of buffer
 ===========================================================================*/
@@ -188,7 +188,7 @@ int ParseQMUX(
    u16      buffSize )
 {
    sQMUX * pQMUXHeader;
-   
+
    if (pBuffer == 0 || buffSize < 12)
    {
       return -ENOMEM;
@@ -204,10 +204,10 @@ int ParseQMUX(
       return -EINVAL;
    }
 
-   // Client ID   
-   *pClientID = (pQMUXHeader->mQMIClientID << 8) 
+   // Client ID
+   *pClientID = (pQMUXHeader->mQMIClientID << 8)
               + pQMUXHeader->mQMIService;
-   
+
    return sizeof( sQMUX );
 }
 
@@ -246,7 +246,7 @@ int FillQMUX(
    pQMUXHeader->mLength = buffSize - 1;
    pQMUXHeader->mCtrlFlag = 0;
 
-   // Service and Client ID   
+   // Service and Client ID
    pQMUXHeader->mQMIService = clientID & 0xff;
    pQMUXHeader->mQMIClientID = clientID >> 8;
 
@@ -265,7 +265,7 @@ DESCRIPTION:
    Get data bufffer of a specified TLV from a QMI message
 
    QMI Message shall NOT include SDU
-   
+
 PARAMETERS
    pQMIMessage    [ I ] - QMI Message buffer
    messageLen     [ I ] - Size of QMI Message buffer
@@ -287,14 +287,14 @@ u16 GetTLV(
    u16 pos;
    u16 tlvSize = 0;
    u16 cpyCount;
-   
+
    if (pQMIMessage == 0 || pOutDataBuf == 0)
    {
       return -ENOMEM;
-   }   
-   
-   for (pos = 4; 
-        pos + 3 < messageLen; 
+   }
+
+   for (pos = 4;
+        pos + 3 < messageLen;
         pos += tlvSize + 3)
    {
       tlvSize = *(u16 *)(pQMIMessage + pos + 1);
@@ -304,21 +304,21 @@ u16 GetTLV(
          {
             return -ENOMEM;
          }
-        
+
          /* replacement memcpy
             memcpy( pOutDataBuf,
                     pQMIMessage + pos + 3,
                     tlvSize ); */
-         
+
          for (cpyCount = 0; cpyCount < tlvSize; cpyCount++)
          {
             *((char*)(pOutDataBuf + cpyCount)) = *((char*)(pQMIMessage + pos + 3 + cpyCount));
          }
-         
+
          return tlvSize;
       }
    }
-   
+
    return -ENOMSG;
 }
 
@@ -362,7 +362,7 @@ int ValidQMIMessage(
    {
       return -ENOMSG;
    }
-}      
+}
 
 /*===========================================================================
 METHOD:
@@ -370,7 +370,7 @@ METHOD:
 
 DESCRIPTION:
    Get the message ID of a QMI message
-   
+
    QMI Message shall NOT include SDU
 
 PARAMETERS
@@ -490,7 +490,7 @@ int QMICTLReleaseClientIDReq(
       *(u16 *)(pBuffer + sizeof( sQMUX ) + 7) = 0x0002;
       // QMI svs type / Client ID
       *(u16 *)(pBuffer + sizeof( sQMUX ) + 9)  = clientID;
-      
+
   // success
   return sizeof( sQMUX ) + 11;
 }
@@ -689,7 +689,7 @@ int QMICTLGetClientIDResp(
    u16 *  pClientID )
 {
    int result;
-   
+
    // Ignore QMUX and SDU
    //    QMI CTL SDU is 2 bytes, not 3
    u8 offset = sizeof( sQMUX ) + 2;
@@ -743,7 +743,7 @@ int QMICTLReleaseClientIDResp(
    u16      buffSize )
 {
    int result;
-   
+
    // Ignore QMUX and SDU
    //    QMI CTL SDU is 2 bytes, not 3
    u8 offset = sizeof( sQMUX ) + 2;
@@ -819,7 +819,7 @@ int QMIWDSEventResp(
    // Ignore QMUX and SDU
    u8 offset = sizeof( sQMUX ) + 3;
 
-   if (pBuffer == 0 
+   if (pBuffer == 0
    || buffSize < offset
    || pTXOk == 0
    || pRXOk == 0
@@ -881,7 +881,7 @@ int QMIWDSEventResp(
             *pbReconfigure = false;
          }
       }
-      
+
       if (result < 0)
       {
          return result;

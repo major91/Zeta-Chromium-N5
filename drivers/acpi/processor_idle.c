@@ -618,7 +618,7 @@ static int acpi_processor_power_verify(struct acpi_processor *pr)
 		case ACPI_STATE_C2:
 			if (!cx->address)
 				break;
-			cx->valid = 1; 
+			cx->valid = 1;
 			cx->latency_ticks = cx->latency; /* Normalize latency */
 			break;
 

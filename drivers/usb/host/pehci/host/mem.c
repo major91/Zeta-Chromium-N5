@@ -1,24 +1,24 @@
-/* 
-* Copyright (C) ST-Ericsson AP Pte Ltd 2010 
+/*
+* Copyright (C) ST-Ericsson AP Pte Ltd 2010
 *
 * ISP1763 Linux OTG Controller driver : host
-* 
-* This program is free software; you can redistribute it and/or modify it under the terms of 
-* the GNU General Public License as published by the Free Software Foundation; version 
-* 2 of the License. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY  
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS  
-* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more  
-* details. 
-* 
-* You should have received a copy of the GNU General Public License 
-* along with this program; if not, write to the Free Software 
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
-* 
-* This is a host controller driver file. Memory initialization, allocation, and 
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; version
+* 2 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*
+* This is a host controller driver file. Memory initialization, allocation, and
 * deallocation are handled here.
-* 
+*
 * Author : wired support <wired.support@stericsson.com>
 *
 */
@@ -77,7 +77,7 @@ phci_hcd_mem_init(void)
 	}
 	/* initialize block of 4kbytes */
 	for (i = (BLK_128_ + BLK_256_ + BLK_1024_ + BLK_2048_);
-		i < (BLK_128_ + BLK_256_ + BLK_1024_ + BLK_2048_ + BLK_4096_); 
+		i < (BLK_128_ + BLK_256_ + BLK_1024_ + BLK_2048_ + BLK_4096_);
 		i++){
 		memaddr = &memalloc[i];
 		memaddr->blk_num = i;

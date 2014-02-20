@@ -269,7 +269,7 @@ n:
 
 #endif
 
-/* 
+/*
  * LOAD_REG_IMMEDIATE(rn, expr)
  *   Loads the value of the constant expression 'expr' into register 'rn'
  *   using immediate instructions only.  Use this when it's important not
@@ -369,7 +369,7 @@ BEGIN_FTR_SECTION			\
 END_FTR_SECTION_IFCLR(CPU_FTR_601)
 #endif
 
-	
+
 /*
  * This instruction is not implemented on the PPC 603 or 601; however, on
  * the 403GCX and 405GP tlbia IS defined and tlbie is not.

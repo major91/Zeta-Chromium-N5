@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  *                   Takashi Iwai <tiwai@suse.de>
- * 
+ *
  *  Generic memory allocators
  *
  *
@@ -175,7 +175,7 @@ static void snd_free_dev_pages(struct device *dev, size_t size, void *ptr,
  *
  * Calls the memory-allocator function for the corresponding
  * buffer type.
- * 
+ *
  * Returns zero if the buffer with the given size is allocated successfully,
  * other a negative value at error.
  */
@@ -229,7 +229,7 @@ int snd_dma_alloc_pages(int type, struct device *device, size_t size,
  * buffer type.  When no space is left, this function reduces the size and
  * tries to allocate again.  The size actually allocated is stored in
  * res_size argument.
- * 
+ *
  * Returns zero if the buffer with the given size is allocated successfully,
  * other a negative value at error.
  */
@@ -326,7 +326,7 @@ size_t snd_dma_get_reserved_buf(struct snd_dma_buffer *dmab, unsigned int id)
  * @id: the buffer id
  *
  * Reserves the given buffer as a reserved buffer.
- * 
+ *
  * Returns zero if successful, or a negative code at error.
  */
 int snd_dma_reserve_buf(struct snd_dma_buffer *dmab, unsigned int id)

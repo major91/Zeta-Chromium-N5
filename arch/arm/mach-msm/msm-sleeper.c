@@ -1,6 +1,6 @@
 /*
  * ElementalX msm-sleeper by flar2 <asegaert@gmail.com>
- * 
+ *
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -39,7 +39,7 @@ static void msm_sleeper_suspend(void)
 	}
 	limit_set = 1;
 
-	return; 
+	return;
 }
 
 static void msm_sleeper_resume(void)
@@ -52,7 +52,7 @@ static void msm_sleeper_resume(void)
 	}
 	limit_set = 0;
 
-	return; 
+	return;
 }
 
 static int lcd_notifier_callback(struct notifier_block *this,

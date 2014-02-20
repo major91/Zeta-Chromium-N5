@@ -541,7 +541,7 @@ int ceph_flags_to_mode(int flags);
 #define CEPH_CAP_SLINK      4
 #define CEPH_CAP_SXATTR     6
 #define CEPH_CAP_SFILE      8
-#define CEPH_CAP_SFLOCK    20 
+#define CEPH_CAP_SFLOCK    20
 
 #define CEPH_CAP_BITS       22
 

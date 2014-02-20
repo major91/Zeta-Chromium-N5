@@ -126,11 +126,11 @@ static ssize_t htc_battery_show_property(struct device *dev,
 					  struct device_attribute *attr,
 					  char *buf);
 
-static int htc_power_get_property(struct power_supply *psy, 
+static int htc_power_get_property(struct power_supply *psy,
 				    enum power_supply_property psp,
 				    union power_supply_propval *val);
 
-static int htc_battery_get_property(struct power_supply *psy, 
+static int htc_battery_get_property(struct power_supply *psy,
 				    enum power_supply_property psp,
 				    union power_supply_propval *val);
 
@@ -205,12 +205,12 @@ static int init_batt_gpio(void)
 
 	return 0;
 
-gpio_failed:	
+gpio_failed:
 	return -EINVAL;
-	
+
 }
 
-/* 
+/*
  *	battery_charging_ctrl - battery charing control.
  * 	@ctl:			battery control command
  *
@@ -240,17 +240,17 @@ static int battery_charging_ctrl(batt_ctl_t ctl)
 		result = -EINVAL;
 		break;
 	}
-	
+
 	return result;
 }
 
 int htc_battery_set_charging(batt_ctl_t ctl)
 {
 	int rc;
-	
+
 	if ((rc = battery_charging_ctrl(ctl)) < 0)
 		goto result;
-	
+
 	if (!htc_battery_initial) {
 		htc_batt_info.rep.charging_enabled = ctl & 0x3;
 	} else {
@@ -258,7 +258,7 @@ int htc_battery_set_charging(batt_ctl_t ctl)
 		htc_batt_info.rep.charging_enabled = ctl & 0x3;
 		mutex_unlock(&htc_batt_info.lock);
 	}
-result:	
+result:
 	return rc;
 }
 
@@ -285,7 +285,7 @@ int htc_cable_status_update(int status)
 
 	if (!htc_battery_initial)
 		return 0;
-	
+
 	mutex_lock(&htc_batt_info.lock);
 	switch(status) {
 	case CHARGER_BATTERY:
@@ -329,24 +329,24 @@ int htc_cable_status_update(int status)
 static int htc_get_batt_info(struct battery_info_reply *buffer)
 {
 	struct rpc_request_hdr req;
-	
+
 	struct htc_get_batt_info_rep {
 		struct rpc_reply_hdr hdr;
 		struct battery_info_reply info;
 	} rep;
-	
+
 	int rc;
 
-	if (buffer == NULL) 
+	if (buffer == NULL)
 		return -EINVAL;
 
 	rc = msm_rpc_call_reply(endpoint, HTC_PROCEDURE_GET_BATT_INFO,
 				&req, sizeof(req),
 				&rep, sizeof(rep),
 				5 * HZ);
-	if ( rc < 0 ) 
+	if ( rc < 0 )
 		return rc;
-	
+
 	mutex_lock(&htc_batt_info.lock);
 	buffer->batt_id 		= be32_to_cpu(rep.info.batt_id);
 	buffer->batt_vol 		= be32_to_cpu(rep.info.batt_vol);
@@ -364,9 +364,9 @@ static int htc_get_batt_info(struct battery_info_reply *buffer)
 #if 0
 static int htc_get_cable_status(void)
 {
-	
+
 	struct rpc_request_hdr req;
-	
+
 	struct htc_get_cable_status_rep {
 		struct rpc_reply_hdr hdr;
 		int status;
@@ -378,7 +378,7 @@ static int htc_get_cable_status(void)
 				&req, sizeof(req),
 				&rep, sizeof(rep),
 				5 * HZ);
-	if (rc < 0) 
+	if (rc < 0)
 		return rc;
 
 	return be32_to_cpu(rep.status);
@@ -386,12 +386,12 @@ static int htc_get_cable_status(void)
 #endif
 
 /* -------------------------------------------------------------------------- */
-static int htc_power_get_property(struct power_supply *psy, 
+static int htc_power_get_property(struct power_supply *psy,
 				    enum power_supply_property psp,
 				    union power_supply_propval *val)
 {
 	charger_type_t charger;
-	
+
 	mutex_lock(&htc_batt_info.lock);
 	charger = htc_batt_info.rep.charging_source;
 	mutex_unlock(&htc_batt_info.lock);
@@ -408,19 +408,19 @@ static int htc_power_get_property(struct power_supply *psy,
 	default:
 		return -EINVAL;
 	}
-	
+
 	return 0;
 }
 
 static int htc_battery_get_charging_status(void)
 {
 	u32 level;
-	charger_type_t charger;	
+	charger_type_t charger;
 	int ret;
-	
+
 	mutex_lock(&htc_batt_info.lock);
 	charger = htc_batt_info.rep.charging_source;
-	
+
 	switch (charger) {
 	case CHARGER_BATTERY:
 		ret = POWER_SUPPLY_STATUS_NOT_CHARGING;
@@ -440,7 +440,7 @@ static int htc_battery_get_charging_status(void)
 	return ret;
 }
 
-static int htc_battery_get_property(struct power_supply *psy, 
+static int htc_battery_get_property(struct power_supply *psy,
 				    enum power_supply_property psp,
 				    union power_supply_propval *val)
 {
@@ -462,10 +462,10 @@ static int htc_battery_get_property(struct power_supply *psy,
 		val->intval = htc_batt_info.rep.level;
 		mutex_unlock(&htc_batt_info.lock);
 		break;
-	default:		
+	default:
 		return -EINVAL;
 	}
-	
+
 	return 0;
 }
 
@@ -515,7 +515,7 @@ static ssize_t htc_battery_set_delta(struct device *dev,
 {
 	int rc;
 	unsigned long delta = 0;
-	
+
 	delta = simple_strtoul(buf, NULL, 10);
 
 	if (delta > 100)
@@ -536,7 +536,7 @@ static struct device_attribute htc_set_delta_attrs[] = {
 static int htc_battery_create_attrs(struct device * dev)
 {
 	int i, j, rc;
-	
+
 	for (i = 0; i < ARRAY_SIZE(htc_battery_attrs); i++) {
 		rc = device_create_file(dev, &htc_battery_attrs[i]);
 		if (rc)
@@ -548,16 +548,16 @@ static int htc_battery_create_attrs(struct device * dev)
 		if (rc)
 			goto htc_delta_attrs_failed;
 	}
-	
+
 	goto succeed;
-	
+
 htc_attrs_failed:
 	while (i--)
 		device_remove_file(dev, &htc_battery_attrs[i]);
 htc_delta_attrs_failed:
 	while (j--)
 		device_remove_file(dev, &htc_set_delta_attrs[i]);
-succeed:	
+succeed:
 	return rc;
 }
 
@@ -567,7 +567,7 @@ static ssize_t htc_battery_show_property(struct device *dev,
 {
 	int i = 0;
 	const ptrdiff_t off = attr - htc_battery_attrs;
-	
+
 	/* rpc lock is used to prevent two threads from calling
 	 * into the get info rpc at the same time
 	 */
@@ -578,7 +578,7 @@ static ssize_t htc_battery_show_property(struct device *dev,
             time_before(jiffies, htc_batt_info.update_time +
                                 msecs_to_jiffies(cache_time)))
                 goto dont_need_update;
-	
+
 	if (htc_get_batt_info(&htc_batt_info.rep) < 0)
 		printk(KERN_ERR "%s: rpc failed!!!\n", __FUNCTION__);
 	else
@@ -611,16 +611,16 @@ dont_need_update:
 	case CHARGING_ENABLED:
 		i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
 			       htc_batt_info.rep.charging_enabled);
-		break;		
+		break;
 	case FULL_BAT:
 		i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
 			       htc_batt_info.rep.full_bat);
 		break;
 	default:
 		i = -EINVAL;
-	}	
+	}
 	mutex_unlock(&htc_batt_info.lock);
-	
+
 	return i;
 }
 
@@ -640,7 +640,7 @@ static int htc_battery_probe(struct platform_device *pdev)
 	/* init structure data member */
 	htc_batt_info.update_time 	= jiffies;
 	htc_batt_info.present 		= gpio_get_value(GPIO_BATTERY_DETECTION);
-	
+
 	/* init rpc */
 	endpoint = msm_rpc_connect(APP_BATT_PROG, APP_BATT_VER, 0);
 	if (IS_ERR(endpoint)) {
@@ -653,7 +653,7 @@ static int htc_battery_probe(struct platform_device *pdev)
 	for (i = 0; i < ARRAY_SIZE(htc_power_supplies); i++) {
 		rc = power_supply_register(&pdev->dev, &htc_power_supplies[i]);
 		if (rc)
-			printk(KERN_ERR "Failed to register power supply (%d)\n", rc);	
+			printk(KERN_ERR "Failed to register power supply (%d)\n", rc);
 	}
 
 	/* create htc detail attributes */
@@ -679,7 +679,7 @@ static int htc_battery_probe(struct platform_device *pdev)
 
 	if (htc_batt_info.rep.charging_enabled == 0)
 		battery_charging_ctrl(DISABLE);
-	
+
 	return 0;
 }
 
@@ -713,7 +713,7 @@ struct rpc_dem_battery_update_args {
 
 static int handle_battery_call(struct msm_rpc_server *server,
 			       struct rpc_request_hdr *req, unsigned len)
-{	
+{
 	switch (req->procedure) {
 	case RPC_BATT_MTOA_NULL:
 		return 0;

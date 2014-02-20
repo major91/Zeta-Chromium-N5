@@ -124,12 +124,12 @@ EXPORT_SYMBOL(acpi_pci_unregister_driver);
 acpi_handle acpi_get_pci_rootbridge_handle(unsigned int seg, unsigned int bus)
 {
 	struct acpi_pci_root *root;
-	
+
 	list_for_each_entry(root, &acpi_pci_roots, node)
 		if ((root->segment == (u16) seg) &&
 		    (root->secondary.start == (u16) bus))
 			return root->device->handle;
-	return NULL;		
+	return NULL;
 }
 
 EXPORT_SYMBOL_GPL(acpi_get_pci_rootbridge_handle);
@@ -527,7 +527,7 @@ static int __devinit acpi_pci_root_add(struct acpi_device *device)
 	 * Scan the Root Bridge
 	 * --------------------
 	 * Must do this prior to any attempt to bind the root device, as the
-	 * PCI namespace does not get created until this call is made (and 
+	 * PCI namespace does not get created until this call is made (and
 	 * thus the root bridge's pci_dev does not exist).
 	 */
 	root->bus = pci_acpi_scan_root(root);

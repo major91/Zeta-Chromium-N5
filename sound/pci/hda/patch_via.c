@@ -504,7 +504,7 @@ static void activate_output_path(struct hda_codec *codec, struct nid_path *path,
 	for (i = 0; i < path->depth; i++) {
 		hda_nid_t src, dst;
 		int idx = path->idx[i];
-		src = path->path[i];			
+		src = path->path[i];
 		if (i < path->depth - 1)
 			dst = path->path[i + 1];
 		else

@@ -819,7 +819,7 @@ static void sierra_close(struct usb_serial_port *port)
 				sierra_send_setup(port);
 			else
 				usb_autopm_get_interface_no_resume(serial->interface);
-				
+
 		}
 		mutex_unlock(&serial->disc_mutex);
 		spin_lock_irq(&intfdata->susp_lock);

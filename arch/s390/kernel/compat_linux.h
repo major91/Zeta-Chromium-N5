@@ -23,7 +23,7 @@ struct old_sigaction32 {
        __u32			sa_flags;
        __u32			sa_restorer;	/* Another 32 bit pointer */
 };
- 
+
 typedef struct compat_siginfo {
 	int	si_signo;
 	int	si_errno;
@@ -66,7 +66,7 @@ typedef struct compat_siginfo {
 		struct {
 			__u32	_addr;	/* faulting insn/memory ref. - pointer */
 		} _sigfault;
-                          
+
 		/* SIGPOLL */
 		struct {
 			int	_band;	/* POLL_IN, POLL_OUT, POLL_MSG */
@@ -88,7 +88,7 @@ typedef struct compat_siginfo {
 #define si_ptr		_sifields._rt._sigval.sival_ptr
 #define si_addr		_sifields._sigfault._addr
 #define si_band		_sifields._sigpoll._band
-#define si_fd		_sifields._sigpoll._fd    
+#define si_fd		_sifields._sigpoll._fd
 #define si_tid		_sifields._timer._tid
 #define si_overrun	_sifields._timer._overrun
 
@@ -96,16 +96,16 @@ typedef struct compat_siginfo {
 typedef union
 {
 	__u64   d;
-	__u32   f; 
+	__u32   f;
 } freg_t32;
 
 typedef struct
 {
 	unsigned int	fpc;
-	freg_t32	fprs[__NUM_FPRS];              
+	freg_t32	fprs[__NUM_FPRS];
 } _s390_fp_regs32;
 
-typedef struct 
+typedef struct
 {
         __u32   mask;
         __u32	addr;
@@ -152,7 +152,7 @@ typedef struct {
 /* asm/ucontext.h */
 struct ucontext32 {
 	__u32			uc_flags;
-	__u32			uc_link;	/* pointer */	
+	__u32			uc_link;	/* pointer */
 	stack_t32		uc_stack;
 	_sigregs32		uc_mcontext;
 	compat_sigset_t		uc_sigmask;	/* mask last for extensibility */

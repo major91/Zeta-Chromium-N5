@@ -311,7 +311,7 @@ get_sigframe(struct k_sigaction *ka, unsigned long sp, size_t frame_size)
 }
 
 static long
-setup_sigcontext(struct sigcontext __user *sc, struct pt_regs *regs, 
+setup_sigcontext(struct sigcontext __user *sc, struct pt_regs *regs,
 		 struct switch_stack *sw, unsigned long mask, unsigned long sp)
 {
 	long i, err = 0;
@@ -405,7 +405,7 @@ setup_frame(int sig, struct k_sigaction *ka, sigset_t *set,
 	regs->r17 = 0;				/* a1: exception code */
 	regs->r18 = (unsigned long) &frame->sc;	/* a2: sigcontext pointer */
 	wrusp((unsigned long) frame);
-	
+
 #if DEBUG_SIG
 	printk("SIG deliver (%s:%d): sp=%p pc=%p ra=%p\n",
 		current->comm, current->pid, frame, regs->pc, regs->r26);
@@ -572,7 +572,7 @@ do_signal(struct pt_regs * regs, struct switch_stack * sw,
 			if (test_thread_flag(TIF_RESTORE_SIGMASK))
 				clear_thread_flag(TIF_RESTORE_SIGMASK);
 		}
-		if (single_stepping) 
+		if (single_stepping)
 			ptrace_set_bpt(current); /* re-set bpt */
 		return;
 	}

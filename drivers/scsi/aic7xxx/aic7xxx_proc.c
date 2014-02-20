@@ -280,7 +280,7 @@ ahc_proc_write_seeprom(struct ahc_softc *ahc, char *buffer, int length)
 	if ((ahc->chip & AHC_VL) != 0) {
 		sd.sd_control_offset = SEECTL_2840;
 		sd.sd_status_offset = STATUS_2840;
-		sd.sd_dataout_offset = STATUS_2840;		
+		sd.sd_dataout_offset = STATUS_2840;
 		sd.sd_chip = C46;
 		sd.sd_MS = 0;
 		sd.sd_RDY = EEPROM_TF;
@@ -342,7 +342,7 @@ ahc_linux_proc_info(struct Scsi_Host *shost, char *buffer, char **start,
 	u_int	i;
 	int	retval;
 
-	 /* Has data been written to the file? */ 
+	 /* Has data been written to the file? */
 	if (inout == TRUE) {
 		retval = ahc_proc_write_seeprom(ahc, buffer, length);
 		goto done;

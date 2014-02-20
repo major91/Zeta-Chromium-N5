@@ -10,9 +10,9 @@
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <linux/capability.h>
-#include <linux/fs.h> 
-#include <linux/mm.h> 
-#include <linux/file.h> 
+#include <linux/fs.h>
+#include <linux/mm.h>
+#include <linux/file.h>
 #include <linux/signal.h>
 #include <linux/resource.h>
 #include <linux/times.h>
@@ -49,7 +49,7 @@
 #include <asm/mmu_context.h>
 #include <asm/compat_signal.h>
 
-#ifdef CONFIG_SYSVIPC                                                        
+#ifdef CONFIG_SYSVIPC
 asmlinkage long compat_sys_ipc(u32 call, u32 first, u32 second, u32 third, compat_uptr_t ptr, u32 fifth)
 {
 	int version;
@@ -216,7 +216,7 @@ asmlinkage long compat_sys_sched_rr_get_interval(compat_pid_t pid, struct compat
 	struct timespec t;
 	int ret;
 	mm_segment_t old_fs = get_fs ();
-	
+
 	set_fs (KERNEL_DS);
 	ret = sys_sched_rr_get_interval(pid, (struct timespec __user *) &t);
 	set_fs (old_fs);
@@ -234,7 +234,7 @@ asmlinkage long compat_sys_rt_sigprocmask(int how,
 	compat_sigset_t s32;
 	int ret;
 	mm_segment_t old_fs = get_fs();
-	
+
 	if (set) {
 		if (copy_from_user (&s32, set, sizeof(compat_sigset_t)))
 			return -EFAULT;
@@ -272,7 +272,7 @@ asmlinkage long sys32_rt_sigpending(compat_sigset_t __user *set,
 	compat_sigset_t s32;
 	int ret;
 	mm_segment_t old_fs = get_fs();
-		
+
 	set_fs (KERNEL_DS);
 	ret = sys_rt_sigpending((sigset_t __user *) &s, sigsetsize);
 	set_fs (old_fs);
@@ -295,7 +295,7 @@ asmlinkage long compat_sys_rt_sigqueueinfo(int pid, int sig,
 	siginfo_t info;
 	int ret;
 	mm_segment_t old_fs = get_fs();
-	
+
 	if (copy_siginfo_from_user32(&info, uinfo))
 		return -EFAULT;
 
@@ -317,7 +317,7 @@ asmlinkage long compat_sys_sigaction(int sig, struct old_sigaction32 __user *act
         if (act) {
 		compat_old_sigset_t mask;
 		u32 u_handler, u_restorer;
-		
+
 		ret = get_user(u_handler, &act->sa_handler);
 		new_ka.sa.sa_handler =  compat_ptr(u_handler);
 		ret |= __get_user(u_restorer, &act->sa_restorer);
@@ -513,19 +513,19 @@ asmlinkage long compat_sys_sendfile(int out_fd, int in_fd,
 	mm_segment_t old_fs = get_fs();
 	int ret;
 	off_t of;
-	
+
 	if (offset && get_user(of, offset))
 		return -EFAULT;
-		
+
 	set_fs(KERNEL_DS);
 	ret = sys_sendfile(out_fd, in_fd,
 			   offset ? (off_t __user *) &of : NULL,
 			   count);
 	set_fs(old_fs);
-	
+
 	if (offset && put_user(of, offset))
 		return -EFAULT;
-		
+
 	return ret;
 }
 
@@ -536,19 +536,19 @@ asmlinkage long compat_sys_sendfile64(int out_fd, int in_fd,
 	mm_segment_t old_fs = get_fs();
 	int ret;
 	loff_t lof;
-	
+
 	if (offset && get_user(lof, offset))
 		return -EFAULT;
-		
+
 	set_fs(KERNEL_DS);
 	ret = sys_sendfile64(out_fd, in_fd,
 			     offset ? (loff_t __user *) &lof : NULL,
 			     count);
 	set_fs(old_fs);
-	
+
 	if (offset && put_user(lof, offset))
 		return -EFAULT;
-		
+
 	return ret;
 }
 

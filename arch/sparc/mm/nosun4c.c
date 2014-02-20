@@ -1,5 +1,5 @@
 /*
- * nosun4c.c: This file is a bunch of dummies for SMP compiles, 
+ * nosun4c.c: This file is a bunch of dummies for SMP compiles,
  *         so that it does not need sun4c and avoid ifdefs.
  *
  * Copyright (C) 1998 Jakub Jelinek (jj@sunsite.mff.cuni.cz)

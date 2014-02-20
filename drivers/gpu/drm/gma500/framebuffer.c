@@ -749,7 +749,7 @@ static void psb_setup_outputs(struct drm_device *dev)
 		case INTEL_OUTPUT_HDMI:
 			if (IS_MFLD(dev))
 				crtc_mask = (1 << 1);
-			else	
+			else
 				crtc_mask = (1 << 0);
 			clone_mask = (1 << INTEL_OUTPUT_HDMI);
 			break;

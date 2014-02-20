@@ -68,7 +68,7 @@ static struct inode *debugfs_get_inode(struct super_block *sb, umode_t mode, dev
 			break;
 		}
 	}
-	return inode; 
+	return inode;
 }
 
 /* SMP-safe */
@@ -302,7 +302,7 @@ static int debugfs_create_by_name(const char *name, umode_t mode,
 	int error = 0;
 
 	/* If the parent is not specified, we create it in the root.
-	 * We need the root dentry to do this, which is in the super 
+	 * We need the root dentry to do this, which is in the super
 	 * block. A pointer to that is in the struct vfsmount that we
 	 * have around.
 	 */
@@ -407,7 +407,7 @@ EXPORT_SYMBOL_GPL(debugfs_create_file);
  */
 struct dentry *debugfs_create_dir(const char *name, struct dentry *parent)
 {
-	return debugfs_create_file(name, 
+	return debugfs_create_file(name,
 				   S_IFDIR | S_IRWXU | S_IRUGO | S_IXUGO,
 				   parent, NULL, NULL);
 }

@@ -2354,7 +2354,7 @@ static void mgslpc_close(struct tty_struct *tty, struct file * filp)
 
 	tty_ldisc_flush(tty);
 	shutdown(info, tty);
-	
+
 	tty_port_close_end(port, tty);
 	tty_port_tty_set(port, NULL);
 cleanup:

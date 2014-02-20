@@ -12,9 +12,9 @@
 #include <linux/compat.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
-#include <linux/fs.h> 
-#include <linux/mm.h> 
-#include <linux/file.h> 
+#include <linux/fs.h>
+#include <linux/mm.h>
+#include <linux/file.h>
 #include <linux/signal.h>
 #include <linux/resource.h>
 #include <linux/times.h>
@@ -78,7 +78,7 @@ out:
 asmlinkage long sys32_unimplemented(int r26, int r25, int r24, int r23,
 	int r22, int r21, int r20)
 {
-    printk(KERN_ERR "%s(%d): Unimplemented 32 on 64 syscall #%d!\n", 
+    printk(KERN_ERR "%s(%d): Unimplemented 32 on 64 syscall #%d!\n",
     	current->comm, current->pid, r20);
     return -ENOSYS;
 }
@@ -176,17 +176,17 @@ asmlinkage int sys32_sendfile64(int out_fd, int in_fd, compat_loff_t __user *off
 	mm_segment_t old_fs = get_fs();
 	int ret;
 	loff_t lof;
-	
+
 	if (offset && get_user(lof, offset))
 		return -EFAULT;
-		
+
 	set_fs(KERNEL_DS);
 	ret = sys_sendfile64(out_fd, in_fd, offset ? (loff_t __user *)&lof : NULL, count);
 	set_fs(old_fs);
-	
+
 	if (offset && put_user(lof, offset))
 		return -EFAULT;
-		
+
 	return ret;
 }
 
@@ -203,7 +203,7 @@ asmlinkage int sys32_lseek(unsigned int fd, int offset, unsigned int origin)
 asmlinkage long sys32_semctl(int semid, int semnum, int cmd, union semun arg)
 {
         union semun u;
-	
+
         if (cmd == SETVAL) {
                 /* Ugh.  arg is a union of int,ptr,ptr,ptr, so is 8 bytes.
                  * The int should be in the first 4, but our argument

@@ -15,9 +15,9 @@
 struct kioctx;
 
 /* Notes on cancelling a kiocb:
- *	If a kiocb is cancelled, aio_complete may return 0 to indicate 
- *	that cancel has not yet disposed of the kiocb.  All cancel 
- *	operations *must* call aio_put_req to dispose of the kiocb 
+ *	If a kiocb is cancelled, aio_complete may return 0 to indicate
+ *	that cancel has not yet disposed of the kiocb.  All cancel
+ *	operations *must* call aio_put_req to dispose of the kiocb
  *	to guard against races with the completion code.
  */
 #define KIOCB_C_CANCELLED	0x01

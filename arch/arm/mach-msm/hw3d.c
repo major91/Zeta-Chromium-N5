@@ -385,7 +385,7 @@ static int __init hw3d_init(void)
 	grp_clk = clk_get(NULL, "grp_clk");
 	if (IS_ERR(grp_clk))
 		return PTR_ERR(grp_clk);
-	
+
 	imem_clk = clk_get(NULL, "imem_clk");
 	if (IS_ERR(imem_clk)) {
 		clk_put(grp_clk);

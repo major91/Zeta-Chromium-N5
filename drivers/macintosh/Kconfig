@@ -208,7 +208,7 @@ config THERM_PM72
 	depends on I2C && I2C_POWERMAC && PPC_PMAC64
 	help
 	  This driver provides thermostat and fan control for the desktop
-	  G5 machines. 
+	  G5 machines.
 
 config WINDFARM
 	tristate "New PowerMac thermal control infrastructure"

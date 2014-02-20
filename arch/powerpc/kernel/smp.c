@@ -343,7 +343,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 
 	DBG("smp_prepare_cpus\n");
 
-	/* 
+	/*
 	 * setup_cpu may need to be called on the boot cpu. We havent
 	 * spun any cpus up but lets be paranoid.
 	 */
@@ -473,7 +473,7 @@ static int __cpuinit create_idle(unsigned int cpu)
 		wait_for_completion(&c_idle.done);
 	} else
 		init_idle(c_idle.idle, cpu);
-	if (IS_ERR(c_idle.idle)) {		
+	if (IS_ERR(c_idle.idle)) {
 		pr_err("Failed fork for CPU %u: %li", cpu, PTR_ERR(c_idle.idle));
 		return PTR_ERR(c_idle.idle);
 	}
@@ -697,7 +697,7 @@ void __init smp_cpus_done(unsigned int max_cpus)
 	alloc_cpumask_var(&old_mask, GFP_NOWAIT);
 	cpumask_copy(old_mask, tsk_cpus_allowed(current));
 	set_cpus_allowed_ptr(current, cpumask_of(boot_cpuid));
-	
+
 	if (smp_ops && smp_ops->setup_cpu)
 		smp_ops->setup_cpu(boot_cpuid);
 

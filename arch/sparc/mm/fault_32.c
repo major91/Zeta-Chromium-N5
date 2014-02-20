@@ -101,14 +101,14 @@ static void unhandled_fault(unsigned long address, struct task_struct *tsk,
 	die_if_kernel("Oops", regs);
 }
 
-asmlinkage int lookup_fault(unsigned long pc, unsigned long ret_pc, 
+asmlinkage int lookup_fault(unsigned long pc, unsigned long ret_pc,
 			    unsigned long address)
 {
 	struct pt_regs regs;
 	unsigned long g2;
 	unsigned int insn;
 	int i;
-	
+
 	i = search_extables_range(ret_pc, &g2);
 	switch (i) {
 	case 3:
@@ -128,8 +128,8 @@ asmlinkage int lookup_fault(unsigned long pc, unsigned long ret_pc,
 		/* for _from_ macros */
 		insn = *((unsigned int *) pc);
 		if (!((insn >> 21) & 1) || ((insn>>19)&0x3f) == 15)
-			return 2; 
-		break; 
+			return 2;
+		break;
 
 	default:
 		break;
@@ -373,7 +373,7 @@ no_context:
 			return;
 		}
 	}
-	
+
 	unhandled_fault (address, tsk, regs);
 	do_exit(SIGKILL);
 

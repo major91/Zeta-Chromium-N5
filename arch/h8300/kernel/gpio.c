@@ -48,7 +48,7 @@ static volatile unsigned char *ddrs[] = {
 #define MAX_PORT 17
 #endif
 #undef _
- 
+
 #if !defined(P1DDR)
 #error Unsuppoted CPU Selection
 #endif
@@ -125,7 +125,7 @@ static char *port_status(int portno)
 	char *rp;
 	int c;
 	unsigned char used,ddr;
-	
+
 	used = gpio_regs[portno].used;
 	ddr  = gpio_regs[portno].ddr;
 	result[8]='\0';
@@ -133,12 +133,12 @@ static char *port_status(int portno)
 	for (c = 8; c > 0; c--,rp--,used >>= 1, ddr >>= 1)
 		if (used & 0x01)
 			*rp = io[ ddr & 0x01];
-		else	
+		else
 			*rp = '-';
 	return result;
 }
 
-static int gpio_proc_read(char *buf, char **start, off_t offset, 
+static int gpio_proc_read(char *buf, char **start, off_t offset,
                           int len, int *unused_i, void *unused_v)
 {
 	int c,outlen;
@@ -159,7 +159,7 @@ static __init int register_proc(void)
 	struct proc_dir_entry *proc_gpio;
 
 	proc_gpio = create_proc_entry("gpio", S_IRUGO, NULL);
-	if (proc_gpio) 
+	if (proc_gpio)
 		proc_gpio->read_proc = gpio_proc_read;
 	return proc_gpio != NULL;
 }

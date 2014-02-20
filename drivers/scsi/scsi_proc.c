@@ -3,13 +3,13 @@
  *
  * The functions in this file provide an interface between
  * the PROC file system and the SCSI device drivers
- * It is mainly used for debugging, statistics and to pass 
+ * It is mainly used for debugging, statistics and to pass
  * information directly to the lowlevel driver.
  *
- * (c) 1995 Michael Neuffer neuffer@goofy.zdv.uni-mainz.de 
+ * (c) 1995 Michael Neuffer neuffer@goofy.zdv.uni-mainz.de
  * Version: 0.99.8   last change: 95/09/13
- * 
- * generic command parser provided by: 
+ *
+ * generic command parser provided by:
  * Andreas Heilwagen <crashcar@informatik.uni-koblenz.de>
  *
  * generic_proc_info() support of xxxx_info() by:
@@ -81,7 +81,7 @@ static int proc_scsi_write_proc(struct file *file, const char __user *buf,
 	ssize_t ret = -ENOMEM;
 	char *page;
 	char *start;
-    
+
 	if (count > PROC_BLOCK_SIZE)
 		return -EOVERFLOW;
 
@@ -158,7 +158,7 @@ void scsi_proc_host_add(struct Scsi_Host *shost)
 		       "%s\n", __func__, shost->host_no,
 		       sht->proc_name);
 		return;
-	} 
+	}
 
 	p->write_proc = proc_scsi_write_proc;
 }
@@ -370,7 +370,7 @@ static ssize_t proc_scsi_write(struct file *file, const char __user *buf,
 	}
 
 	/*
-	 * convert success returns so that we return the 
+	 * convert success returns so that we return the
 	 * number of bytes consumed.
 	 */
 	if (!err)

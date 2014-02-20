@@ -72,7 +72,7 @@ void hw_timer_init(void)
   /* Set prescaler (Divide 32KHz by 32)*/
   TPRER = 31;
   /* Set compare register  32Khz / 32 / 10 = 100 */
-  TCMP = 10;                                                              
+  TCMP = 10;
 
   request_irq(IRQ_MACHSPEC | 1, timer_routine, 0, "timer", NULL);
 #endif
@@ -87,7 +87,7 @@ void hw_timer_init(void)
   prescaler = 8;
   pquicc->timer_tmr1 = 0x001a | /* or=1, frr=1, iclk=01b */
                            (unsigned short)((prescaler - 1) << 8);
-    
+
   pquicc->timer_tcn1 = 0x0000; /* initial count */
   /* calculate interval for 100Hz based on the _system_clock: */
   pquicc->timer_trr1 = (system_clock/ prescaler) / HZ; /* reference count */
@@ -174,6 +174,6 @@ void config_BSP(char *command, int len)
 #else
   scc1_hwaddr = "\00\01\02\03\04\05";
 #endif
- 
+
   mach_reset = BSP_reset;
 }

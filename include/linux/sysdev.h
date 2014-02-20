@@ -1,20 +1,20 @@
 /**
- * System devices follow a slightly different driver model. 
- * They don't need to do dynammic driver binding, can't be probed, 
- * and don't reside on any type of peripheral bus. 
+ * System devices follow a slightly different driver model.
+ * They don't need to do dynammic driver binding, can't be probed,
+ * and don't reside on any type of peripheral bus.
  * So, we represent and treat them a little differently.
- * 
+ *
  * We still have a notion of a driver for a system device, because we still
- * want to perform basic operations on these devices. 
+ * want to perform basic operations on these devices.
  *
  * We also support auxiliary drivers binding to devices of a certain class.
- * 
+ *
  * This allows configurable drivers to register themselves for devices of
  * a certain type. And, it allows class definitions to reside in generic
  * code while arch-specific code can register specific drivers.
  *
  * Auxiliary drivers registered with a NULL cls are registered as drivers
- * for all system devices, and get notification calls for each device. 
+ * for all system devices, and get notification calls for each device.
  */
 
 
@@ -80,7 +80,7 @@ extern void sysdev_driver_unregister(struct sysdev_class *, struct sysdev_driver
 
 /**
  * sys_devices can be simplified a lot from regular devices, because they're
- * simply not as versatile. 
+ * simply not as versatile.
  */
 
 struct sys_device {
@@ -93,7 +93,7 @@ extern int sysdev_register(struct sys_device *);
 extern void sysdev_unregister(struct sys_device *);
 
 
-struct sysdev_attribute { 
+struct sysdev_attribute {
 	struct attribute	attr;
 	ssize_t (*show)(struct sys_device *, struct sysdev_attribute *, char *);
 	ssize_t (*store)(struct sys_device *, struct sysdev_attribute *,

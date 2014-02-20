@@ -188,7 +188,7 @@ static int verify_vfe_command_table(struct msm_adsp_module *module,
 		vfe_cmd_axi_op_cfg *cmd = (vfe_cmd_axi_op_cfg *)cmd_data;
 		void **addr1_y, **addr2_y, **addr1_cbcr, **addr2_cbcr;
 
-		if (cmd_size != sizeof(vfe_cmd_axi_op_cfg)) { 
+		if (cmd_size != sizeof(vfe_cmd_axi_op_cfg)) {
 			MM_ERR("module %s: invalid VFE TABLE \
 				(VFE_CMD_AXI_OP_CFG) command size %d\n",
 				module->name, cmd_size);

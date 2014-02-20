@@ -51,7 +51,7 @@ extern int uli_exclude_device(struct pci_controller *hose,
 static int mpc86xx_exclude_device(struct pci_controller *hose,
 				   u_char bus, u_char devfn)
 {
-	struct device_node* node;	
+	struct device_node* node;
 	struct resource rsrc;
 
 	node = hose->dn;

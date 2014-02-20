@@ -201,7 +201,7 @@ typedef union
 typedef struct
 {
 	__u32   fpc;
-	freg_t  fprs[NUM_FPRS];              
+	freg_t  fprs[NUM_FPRS];
 } s390_fp_regs;
 
 #define FPC_EXCEPTION_MASK      0xF8000000
@@ -211,7 +211,7 @@ typedef struct
 #define FPC_VALID_MASK          0xF8F8FF03
 
 /* this typedef defines how a Program Status Word looks like */
-typedef struct 
+typedef struct
 {
         unsigned long mask;
         unsigned long addr;
@@ -318,7 +318,7 @@ typedef struct
  * The pt_regs struct defines the way the registers are stored on
  * the stack during a system call.
  */
-struct pt_regs 
+struct pt_regs
 {
 	unsigned long args[1];
 	psw_t psw;
@@ -462,7 +462,7 @@ typedef struct
 	union {
 		per_lowcore_words words;
 		per_lowcore_bits  bits;
-	} lowcore; 
+	} lowcore;
 } per_struct;
 
 typedef struct
@@ -504,7 +504,7 @@ typedef struct
 	unsigned long lowaddr;
 	unsigned long hiaddr;
 	ptprot_flags prot;
-} ptprot_area;                     
+} ptprot_area;
 
 /* Sequence of bytes for breakpoint illegal instruction.  */
 #define S390_BREAKPOINT     {0x0,0x1}

@@ -68,7 +68,7 @@ struct wifi_platform_data trout_wifi_control = {
 	.mem_prealloc		= trout_wifi_mem_prealloc,
 #else
 	.mem_prealloc		= NULL,
-#endif	
+#endif
 };
 
 #endif

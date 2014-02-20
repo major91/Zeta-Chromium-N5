@@ -22,7 +22,7 @@
 #define TIOCGDEV	_IOR('T',0x32, unsigned int) /* Get primary device node of /dev/console */
 #define TIOCVHANGUP	_IO('T', 0x37)
 
-/* Note that all the ioctls that are not available in Linux have a 
+/* Note that all the ioctls that are not available in Linux have a
  * double underscore on the front to: a) avoid some programs to
  * think we support some ioctls under Linux (autoconfiguration stuff)
  */

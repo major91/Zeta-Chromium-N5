@@ -201,7 +201,7 @@ void do_sigreturn32(struct pt_regs *regs)
 	sigset_t set;
 	unsigned seta[_COMPAT_NSIG_WORDS];
 	int err, i;
-	
+
 	/* Always make any pending restarted system calls return -EINTR */
 	current_thread_info()->restart_block.fn = do_no_restart_syscall;
 
@@ -292,7 +292,7 @@ asmlinkage void do_rt_sigreturn32(struct pt_regs *regs)
 	compat_sigset_t seta;
 	stack_t st;
 	int err, i;
-	
+
 	/* Always make any pending restarted system calls return -EINTR */
 	current_thread_info()->restart_block.fn = do_no_restart_syscall;
 
@@ -321,7 +321,7 @@ asmlinkage void do_rt_sigreturn32(struct pt_regs *regs)
 	/* 2. Restore the state */
 	err = __get_user(regs->y, &sf->regs.y);
 	err |= __get_user(psr, &sf->regs.psr);
-	
+
 	for (i = UREG_G1; i <= UREG_I7; i++)
 		err |= __get_user(regs->u_regs[i], &sf->regs.u_regs[i]);
 	if ((psr & (PSR_VERS|PSR_IMPL)) == PSR_V8PLUS) {
@@ -354,14 +354,14 @@ asmlinkage void do_rt_sigreturn32(struct pt_regs *regs)
 	err |= __get_user(st.ss_size, &sf->stack.ss_size);
 	if (err)
 		goto segv;
-		
+
 	/* It is more difficult to avoid calling this function than to
 	   call it and ignore errors.  */
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	do_sigaltstack((stack_t __user *) &st, NULL, (unsigned long)sf);
 	set_fs(old_fs);
-	
+
 	err |= __get_user(rwin_save, &sf->rwin_save);
 	if (!err && rwin_save) {
 		if (restore_rwin_state(compat_ptr(rwin_save)))
@@ -392,10 +392,10 @@ static int invalid_frame_pointer(void __user *fp, int fplen)
 static void __user *get_sigframe(struct sigaction *sa, struct pt_regs *regs, unsigned long framesize)
 {
 	unsigned long sp;
-	
+
 	regs->u_regs[UREG_FP] &= 0x00000000ffffffffUL;
 	sp = regs->u_regs[UREG_FP];
-	
+
 	/*
 	 * If we are on the alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
@@ -493,7 +493,7 @@ static int setup_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 	/* 1. Make sure everything is clean */
 	synchronize_user_stack();
 	save_and_clear_fpu();
-	
+
 	wsaved = get_thread_wsaved();
 
 	sigframe_size = sizeof(*sf);
@@ -504,7 +504,7 @@ static int setup_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 
 	sf = (struct signal_frame32 __user *)
 		get_sigframe(&ka->sa, regs, sigframe_size);
-	
+
 	if (invalid_frame_pointer(sf, sigframe_size))
 		goto sigill;
 
@@ -578,7 +578,7 @@ static int setup_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 			err |= __put_user(rp->ins[i], &sf->ss.ins[i]);
 		err |= __put_user(rp->ins[6], &sf->ss.fp);
 		err |= __put_user(rp->ins[7], &sf->ss.callers_pc);
-	}	
+	}
 	if (err)
 		goto sigsegv;
 
@@ -603,7 +603,7 @@ static int setup_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 		unsigned long address = ((unsigned long)&(sf->insns[0]));
 
 		regs->u_regs[UREG_I7] = (unsigned long) (&(sf->insns[0]) - 2);
-	
+
 		err  = __put_user(0x821020d8, &sf->insns[0]); /*mov __NR_sigreturn, %g1*/
 		err |= __put_user(0x91d02010, &sf->insns[1]); /*t 0x10*/
 		if (err)
@@ -635,7 +635,7 @@ static int setup_rt_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 	/* 1. Make sure everything is clean */
 	synchronize_user_stack();
 	save_and_clear_fpu();
-	
+
 	wsaved = get_thread_wsaved();
 
 	sigframe_size = sizeof(*sf);
@@ -646,7 +646,7 @@ static int setup_rt_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 
 	sf = (struct rt_signal_frame32 __user *)
 		get_sigframe(&ka->sa, regs, sigframe_size);
-	
+
 	if (invalid_frame_pointer(sf, sigframe_size))
 		goto sigill;
 
@@ -694,7 +694,7 @@ static int setup_rt_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 
 	/* Update the siginfo structure.  */
 	err |= copy_siginfo_to_user32(&sf->info, info);
-	
+
 	/* Setup sigaltstack */
 	err |= __put_user(current->sas_ss_sp, &sf->stack.ss_sp);
 	err |= __put_user(sas_ss_flags(regs->u_regs[UREG_FP]), &sf->stack.ss_flags);
@@ -729,7 +729,7 @@ static int setup_rt_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 	}
 	if (err)
 		goto sigsegv;
-	
+
 	/* 3. signal handler back-trampoline and parameters */
 	regs->u_regs[UREG_FP] = (unsigned long) sf;
 	regs->u_regs[UREG_I0] = signr;
@@ -751,7 +751,7 @@ static int setup_rt_frame32(struct k_sigaction *ka, struct pt_regs *regs,
 		unsigned long address = ((unsigned long)&(sf->insns[0]));
 
 		regs->u_regs[UREG_I7] = (unsigned long) (&(sf->insns[0]) - 2);
-	
+
 		/* mov __NR_rt_sigreturn, %g1 */
 		err |= __put_user(0x82102065, &sf->insns[0]);
 
@@ -825,7 +825,7 @@ void do_signal32(sigset_t *oldset, struct pt_regs * regs)
 	int restart_syscall;
 	siginfo_t info;
 	int signr;
-	
+
 	signr = get_signal_to_deliver(&info, &ka, regs, NULL);
 
 	restart_syscall = 0;
@@ -896,7 +896,7 @@ asmlinkage int do_sys32_sigstack(u32 u_ssptr, u32 u_ossptr, unsigned long sp)
 		    __put_user(on_sig_stack(sp), &ossptr->cur_status))
 			goto out;
 	}
-	
+
 	/* Now see if we want to update the new state. */
 	if (ssptr) {
 		u32 ss_sp;
@@ -910,7 +910,7 @@ asmlinkage int do_sys32_sigstack(u32 u_ssptr, u32 u_ossptr, unsigned long sp)
 		ret = -EPERM;
 		if (current->sas_ss_sp && on_sig_stack(sp))
 			goto out;
-			
+
 		/* Since we don't know the extent of the stack, and we don't
 		 * track onstack-ness, but rather calculate it, we must
 		 * presume a size.  Ho hum this interface is lossy.
@@ -918,7 +918,7 @@ asmlinkage int do_sys32_sigstack(u32 u_ssptr, u32 u_ossptr, unsigned long sp)
 		current->sas_ss_sp = (unsigned long)ss_sp - SIGSTKSZ;
 		current->sas_ss_size = SIGSTKSZ;
 	}
-	
+
 	ret = 0;
 out:
 	return ret;
@@ -932,7 +932,7 @@ asmlinkage long do_sys32_sigaltstack(u32 ussa, u32 uossa, unsigned long sp)
 	mm_segment_t old_fs;
 	stack_t32 __user *uss32 = compat_ptr(ussa);
 	stack_t32 __user *uoss32 = compat_ptr(uossa);
-	
+
 	if (ussa && (get_user(u_ss_sp, &uss32->ss_sp) ||
 		    __get_user(uss.ss_flags, &uss32->ss_flags) ||
 		    __get_user(uss.ss_size, &uss32->ss_size)))

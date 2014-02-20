@@ -11,13 +11,13 @@ GENERAL DESCRIPTION
 REFERENCES
   None
 
-  
+
 Copyright (c) 1992-2009, The Linux Foundation. All rights reserved.
 
 This software is licensed under the terms of the GNU General Public
 License version 2, as published by the Free Software Foundation, and
 may be copied, distributed, and modified under those terms.
- 
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,7 +30,7 @@ GNU General Public License for more details.
 
 This section contains comments describing changes made to this file.
 Notice that changes are listed in reverse chronological order.
-  
+
 $Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audplaymsg.h#3 $
 
 ===========================================================================*/
@@ -40,15 +40,15 @@ $Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/
 
 typedef struct{
    /* reserved*/
-  unsigned int dec_id;           
+  unsigned int dec_id;
 
-  /*The read pointer offset of external memory till which bitstream 
+  /*The read pointer offset of external memory till which bitstream
     has been dme’d in*/
-  unsigned int adecDataReadPtrOffset;  
+  unsigned int adecDataReadPtrOffset;
 
   /*	The buffer size of external memory. */
   unsigned int adecDataBufSize;
-  
+
   unsigned int 	bitstream_free_len;
   unsigned int	bitstream_write_ptr;
   unsigned int	bitstarem_buf_start;

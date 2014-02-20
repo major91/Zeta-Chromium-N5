@@ -723,7 +723,7 @@ __SYSCALL(308, sys_setns, 2)
 #define __ARCH_WANT_SYS_RT_SIGSUSPEND
 #define __ARCH_WANT_SYS_GETPGRP
 
-/* 
+/*
  * Ignore legacy system calls in the checksyscalls.sh script
  */
 

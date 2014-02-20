@@ -34,7 +34,7 @@ static void __init zap_identity_mappings(void)
 	__flush_tlb_all();
 }
 
-/* Don't add a printk in there. printk relies on the PDA which is not initialized 
+/* Don't add a printk in there. printk relies on the PDA which is not initialized
    yet. */
 static void __init clear_bss(void)
 {

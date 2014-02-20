@@ -1,23 +1,23 @@
-/* 
-* Copyright (C) ST-Ericsson AP Pte Ltd 2010 
+/*
+* Copyright (C) ST-Ericsson AP Pte Ltd 2010
 *
 * ISP1763 Linux OTG Controller driver : hal
-* 
-* This program is free software; you can redistribute it and/or modify it under the terms of 
-* the GNU General Public License as published by the Free Software Foundation; version 
-* 2 of the License. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY  
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS  
-* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more  
-* details. 
-* 
-* You should have received a copy of the GNU General Public License 
-* along with this program; if not, write to the Free Software 
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
-* 
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; version
+* 2 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*
 * This is a hardware abstraction layer header file.
-* 
+*
 * Author : wired support <wired.support@stericsson.com>
 *
 */
@@ -34,7 +34,7 @@
 #define PTD_DUMP_COMPLETE
 #undef  PTD_DUMP_COMPLETE
 /* ------------------------------------*/
-#define CONFIG_ISO_SUPPORT 
+#define CONFIG_ISO_SUPPORT
 
 #ifdef CONFIG_ISO_SUPPORT
 
@@ -61,7 +61,7 @@ do \
 #endif /* CONFIG_ISO_SUPPORT */
 
 /*Debug	For Entry/Exit of the functions	*/
-//#define HCD_DEBUG_LEVEL1 
+//#define HCD_DEBUG_LEVEL1
 #ifdef HCD_DEBUG_LEVEL1
 #define	pehci_entry(format, args... ) printk(format, ##args)
 #else
@@ -69,7 +69,7 @@ do \
 #endif
 
 /*Debug	for Port Info and Errors */
-//#define HCD_DEBUG_LEVEL2 
+//#define HCD_DEBUG_LEVEL2
 #ifdef HCD_DEBUG_LEVEL2
 #define	pehci_print(format, args... ) printk(format, ##args)
 #else
@@ -77,7 +77,7 @@ do \
 #endif
 
 /*Debug	For the	Port changes and Enumeration */
-//#define HCD_DEBUG_LEVEL3 
+//#define HCD_DEBUG_LEVEL3
 #ifdef HCD_DEBUG_LEVEL3
 #define	pehci_info(format,arg...) printk(format, ##arg)
 #else
@@ -85,7 +85,7 @@ do \
 #endif
 
 /*Debug	For Transfer flow  */
-// #define HCD_DEBUG_LEVEL4 
+// #define HCD_DEBUG_LEVEL4
 #ifdef HCD_DEBUG_LEVEL4
 #define	pehci_check(format,args...) printk(format, ##args)
 #else

@@ -460,7 +460,7 @@ static int oaktrail_chip_setup(struct drm_device *dev)
 	struct drm_psb_private *dev_priv = dev->dev_private;
 	struct oaktrail_vbt *vbt = &dev_priv->vbt_data;
 	int ret;
-	
+
 	ret = mid_chip_setup(dev);
 	if (ret < 0)
 		return ret;

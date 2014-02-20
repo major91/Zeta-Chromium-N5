@@ -16,7 +16,7 @@
 * Please look at the bitkeeper changelog (or any other scm tool that ends up
 * importing bitkeeper changelog or that replaces bitkeeper in the future as
 * main tool for linux development).
-* 
+*
 * 2001/05/09	acme		Fix MODULE_DESC for debug, .bss nitpicks,
 * 				some cleanups
 * 2000/07/13	acme		remove useless #ifdef MODULE and crap

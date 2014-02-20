@@ -94,7 +94,7 @@ void __init config_BSP(char *commandp, int size)
 /***************************************************************************/
 /* Board initialization */
 /***************************************************************************/
-/* 
+/*
  * PLL min/max specifications
  */
 #define MAX_FVCO	500000	/* KHz */
@@ -118,7 +118,7 @@ void __init config_BSP(char *commandp, int size)
 #define SYSTEM_PERIOD	12.5
 /*
  *  SDRAM Timing Parameters
- */  
+ */
 #define SDRAM_BL	8	/* # of beats in a burst */
 #define SDRAM_TWR	2	/* in clocks */
 #define SDRAM_CASL	2.5	/* CASL in clocks */
@@ -150,7 +150,7 @@ asmlinkage void __init sysinit(void)
 {
 	sys_clk_khz = clock_pll(0, 0);
 	sys_clk_mhz = sys_clk_khz/1000;
-	
+
 	wtm_init();
 	scm_init();
 	gpio_init();
@@ -171,7 +171,7 @@ void scm_init(void)
 {
 	/* All masters are trusted */
 	MCF_SCM_MPR = 0x77777777;
-    
+
 	/* Allow supervisor/user, read/write, and trusted/untrusted
 	   access to all slaves */
 	MCF_SCM_PACRA = 0;
@@ -227,7 +227,7 @@ void sdramc_init(void)
 	 */
 	if (!(MCF_SDRAMC_SDCR & MCF_SDRAMC_SDCR_REF)) {
 		/* SDRAM chip select initialization */
-		
+
 		/* Initialize SDRAM chip select */
 		MCF_SDRAMC_SDCS0 = (0
 			| MCF_SDRAMC_SDCS_BA(SDRAM_ADDRESS)
@@ -250,7 +250,7 @@ void sdramc_init(void)
 		| MCF_SDRAMC_SDCFG2_BRD2WT((int)((SDRAM_CASL+SDRAM_BL/2-1.0)+0.5))
 		| MCF_SDRAMC_SDCFG2_BL(SDRAM_BL-1));
 
-            
+
 	/*
 	 * Precharge and enable write to SDMR
 	 */
@@ -261,7 +261,7 @@ void sdramc_init(void)
 		| MCF_SDRAMC_SDCR_MUX(1)
 		| MCF_SDRAMC_SDCR_RCNT((int)(((SDRAM_TREFI/(SYSTEM_PERIOD*64)) - 1) + 0.5))
 		| MCF_SDRAMC_SDCR_PS_16
-		| MCF_SDRAMC_SDCR_IPALL);            
+		| MCF_SDRAMC_SDCR_IPALL);
 
 	/*
 	 * Write extended mode register
@@ -297,7 +297,7 @@ void sdramc_init(void)
 		| MCF_SDRAMC_SDMR_BNKAD_LMR
 		| MCF_SDRAMC_SDMR_AD(0x063)
 		| MCF_SDRAMC_SDMR_CMD);
-				
+
 	/*
 	 * Enable auto refresh and lock SDMR
 	 */
@@ -329,7 +329,7 @@ int clock_pll(int fsys, int flags)
 	u32 i;
 
 	fref = FREF;
-        
+
 	if (fsys == 0) {
 		/* Return current PLL output */
 		mfd = MCF_PLL_PFDR;
@@ -349,7 +349,7 @@ int clock_pll(int fsys, int flags)
 	   point libraries. */
 	temp = 100 * fsys / fref;
 	mfd = 4 * BUSDIV * temp / 100;
-    	    	    	
+
 	/* Determine the output frequency for selected values */
 	fout = (fref * mfd / (BUSDIV * 4));
 
@@ -369,17 +369,17 @@ int clock_pll(int fsys, int flags)
 
 	/* Enter LIMP mode */
 	clock_limp(DEFAULT_LPD);
-     					
+
 	/* Reprogram PLL for desired fsys */
 	MCF_PLL_PODR = (0
 		| MCF_PLL_PODR_CPUDIV(BUSDIV/3)
 		| MCF_PLL_PODR_BUSDIV(BUSDIV));
-						
+
 	MCF_PLL_PFDR = mfd;
-		
+
 	/* Exit LIMP mode */
 	clock_exit_limp();
-	
+
 	/*
 	 * Return the SDRAM to normal operation if it is in use.
 	 */
@@ -406,32 +406,32 @@ int clock_limp(int div)
 		div = MIN_LPD;
 	if (div > MAX_LPD)
 		div = MAX_LPD;
-    
+
 	/* Save of the current value of the SSIDIV so we don't
 	   overwrite the value*/
 	temp = (MCF_CCM_CDR & MCF_CCM_CDR_SSIDIV(0xF));
-      
+
 	/* Apply the divider to the system clock */
 	MCF_CCM_CDR = ( 0
 		| MCF_CCM_CDR_LPDIV(div)
 		| MCF_CCM_CDR_SSIDIV(temp));
-    
+
 	MCF_CCM_MISCCR |= MCF_CCM_MISCCR_LIMP;
-    
+
 	return (FREF/(3*(1 << div)));
 }
 
 int clock_exit_limp(void)
 {
 	int fout;
-	
+
 	/* Exit LIMP mode */
 	MCF_CCM_MISCCR = (MCF_CCM_MISCCR & ~ MCF_CCM_MISCCR_LIMP);
 
 	/* Wait for PLL to lock */
 	while (!(MCF_CCM_MISCCR & MCF_CCM_MISCCR_PLL_LOCK))
 		;
-	
+
 	fout = get_sys_clock();
 
 	return fout;
@@ -440,7 +440,7 @@ int clock_exit_limp(void)
 int get_sys_clock(void)
 {
 	int divider;
-	
+
 	/* Test to see if device is in LIMP mode */
 	if (MCF_CCM_MISCCR & MCF_CCM_MISCCR_LIMP) {
 		divider = MCF_CCM_CDR & MCF_CCM_CDR_LPDIV(0xF);

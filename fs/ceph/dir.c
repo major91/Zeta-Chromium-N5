@@ -1095,7 +1095,7 @@ static int ceph_snapdir_d_revalidate(struct dentry *dentry,
 void ceph_dir_set_complete(struct inode *inode)
 {
 	struct dentry *dentry = d_find_any_alias(inode);
-	
+
 	if (dentry && ceph_dentry(dentry) &&
 	    ceph_test_mount_opt(ceph_sb_to_client(dentry->d_sb), DCACHE)) {
 		dout(" marking %p (%p) complete\n", inode, dentry);

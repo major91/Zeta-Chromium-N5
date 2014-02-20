@@ -6,7 +6,7 @@
     A U D I O   P O S T   P R O C E S S I N G  I N T E R N A L  C O M M A N D S
 
 GENERAL DESCRIPTION
-  This file contains defintions of format blocks of commands 
+  This file contains defintions of format blocks of commands
   that are accepted by AUDPP Task
 
 REFERENCES
@@ -20,7 +20,7 @@ Copyright(c) 1992-2009, 2012-2013 The Linux Foundation. All rights reserved.
 This software is licensed under the terms of the GNU General Public
 License version 2, as published by the Free Software Foundation, and
 may be copied, distributed, and modified under those terms.
- 
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,13 +33,13 @@ GNU General Public License for more details.
 
 This section contains comments describing changes made to this file.
 Notice that changes are listed in reverse chronological order.
-   
-$Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audppcmdi.h#2 $   
-  
+
+$Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audppcmdi.h#2 $
+
 ===========================================================================*/
 
 /*
- * ARM to AUDPPTASK Commands 
+ * ARM to AUDPPTASK Commands
  *
  * ARM uses three command queues to communicate with AUDPPTASK
  * 1)uPAudPPCmd1Queue : Used for more frequent and shorter length commands
@@ -61,7 +61,7 @@ $Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/
  */
 
 /*
- * Command Structure to enable or disable the active decoders 
+ * Command Structure to enable or disable the active decoders
  */
 
 #define AUDPP_CMD_CFG_DEC_TYPE 		0x0001
@@ -80,7 +80,7 @@ $Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/
 
 
 /* Type specification of cmd_cfg_dec */
- 
+
 typedef struct {
   unsigned short cmd_id;
   unsigned short dec0_cfg;
@@ -133,7 +133,7 @@ typedef struct {
 } __attribute__((packed)) audpp_cmd_avsync;
 
 /*
- * Command Structure to enable or disable(sleep) the   AUDPPTASK 
+ * Command Structure to enable or disable(sleep) the   AUDPPTASK
  */
 
 #define AUDPP_CMD_CFG	0x0004
@@ -249,7 +249,7 @@ struct audpp_cmd_routing_mode {
 #define  AUDPP_CMD_SAMP_RATE_8000  	0x000B
 
 
-/* 
+/*
  * Type specification of cmd_adec_cfg sent to all decoder
  */
 
@@ -470,14 +470,14 @@ struct audpp_cmd_cfg_adec_params_ac3 {
 
 #define  AUDPP_CMD_PCM_INTF_OBJECT_NUM           0x5
 #define  AUDPP_CMD_PCM_INTF_COMMON_OBJECT_NUM    0x6
-  
+
 
 typedef struct {
   unsigned short  cmd_id;
   unsigned short  object_num;
   signed short  config;
   unsigned short  intf_type;
-  
+
   /* DSP -> ARM Configuration */
   unsigned short  read_buf1LSW;
   unsigned short  read_buf1MSW;
@@ -496,7 +496,7 @@ typedef struct {
   unsigned short  write_buf1LSW;
   unsigned short  write_buf1MSW;
   unsigned short  write_buf1_len;
- 
+
   unsigned short  write_buf2LSW;
   unsigned short  write_buf2MSW;
   unsigned short  write_buf2_len;
@@ -679,7 +679,7 @@ typedef struct {
 
 
 /*
- * Command Structure to configure post processing parameters (equalizer) 
+ * Command Structure to configure post processing parameters (equalizer)
  */
 
 #define AUDPP_CMD_EQUALIZER		2
@@ -801,7 +801,7 @@ typedef struct {
 
 
 /*
- * Command Structure to configure post processing parameters (ADRC) 
+ * Command Structure to configure post processing parameters (ADRC)
  */
 
 #define AUDPP_CMD_ADRC			3
@@ -870,7 +870,7 @@ typedef struct {
 } __attribute__((packed)) audpp_cmd_cfg_object_params_spectram;
 
 /*
- * Command Structure to configure post processing parameters (QConcert) 
+ * Command Structure to configure post processing parameters (QConcert)
  */
 
 #define AUDPP_CMD_QCONCERT		5
@@ -917,7 +917,7 @@ typedef struct {
 } __attribute__((packed)) audpp_cmd_cfg_object_params_qconcert;
 
 /*
- * Command Structure to configure post processing parameters (Side Chain) 
+ * Command Structure to configure post processing parameters (Side Chain)
  */
 
 #define AUDPP_CMD_SIDECHAIN_TUNING_FILTER	6

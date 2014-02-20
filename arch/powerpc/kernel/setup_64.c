@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Common boot and setup code.
  *
  * Copyright (C) 2001 PPC64 Team, IBM Corp
@@ -350,7 +350,7 @@ static void __init initialize_cache_info(void)
 
 
 /*
- * Do some initial setup of the system.  The parameters are those which 
+ * Do some initial setup of the system.  The parameters are those which
  * were passed in from the bootloader.
  */
 void __init setup_system(void)
@@ -573,7 +573,7 @@ void __init setup_arch(char **cmdline_p)
 	init_mm.end_code = (unsigned long) _etext;
 	init_mm.end_data = (unsigned long) _edata;
 	init_mm.brk = klimit;
-	
+
 	irqstack_early_init();
 	exc_lvl_early_init();
 	emergency_stack_init();

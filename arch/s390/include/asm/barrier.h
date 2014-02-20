@@ -13,7 +13,7 @@
  * to devices.
  *
  * This is very similar to the ppc eieio/sync instruction in that is
- * does a checkpoint syncronisation & makes sure that 
+ * does a checkpoint syncronisation & makes sure that
  * all memory ops have completed wrt other CPU's ( see 7-15 POP  DJB ).
  */
 

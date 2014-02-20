@@ -190,8 +190,8 @@ static int __init ixdp2800_pci_map_irq(const struct pci_dev *dev, u8 slot,
 		if(dev->bus->self->devfn == IXDP2X00_P2P_DEVFN) {
 			switch(dev->devfn) {
 				case IXDP2X00_PMC_DEVFN:
-					return IRQ_IXDP2800_PMC;	
-			
+					return IRQ_IXDP2800_PMC;
+
 				case IXDP2800_MASTER_ENET_DEVFN:
 					return IRQ_IXDP2800_EGRESS_ENET;
 

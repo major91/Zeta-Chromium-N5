@@ -34,9 +34,9 @@
 
 This section contains comments describing changes made to this file.
 Notice that changes are listed in reverse chronological order.
-   
+
  $Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audreccmdi.h#3 $
-  
+
 ============================================================================*/
 
 /*
@@ -53,7 +53,7 @@ Notice that changes are listed in reverse chronological order.
  */
 
 /*
- * Commands on uPAudRecCmdQueue 
+ * Commands on uPAudRecCmdQueue
  */
 
 /*

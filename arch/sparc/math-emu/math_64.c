@@ -350,13 +350,13 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f)
 			} else if (IR == 1) {
 				/* Change the instruction into plain fmovq */
 				insn = (insn & 0x3e00001f) | 0x81a00060;
-				TYPE(3,3,0,3,0,0,0); 
+				TYPE(3,3,0,3,0,0,0);
 			}
 		}
 	}
 	if (type) {
 		argp rs1 = NULL, rs2 = NULL, rd = NULL;
-		
+
 		freg = (current_thread_info()->xfsr[0] >> 14) & 0xf;
 		if (freg != (type >> 9))
 			goto err;
@@ -369,7 +369,7 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f)
 			}
 		case 2: freg = ((freg & 1) << 5) | (freg & 0x1e);
 		case 1: rs1 = (argp)&f->regs[freg];
-			flags = (freg < 32) ? FPRS_DL : FPRS_DU; 
+			flags = (freg < 32) ? FPRS_DL : FPRS_DU;
 			if (!(current_thread_info()->fpsaved[0] & flags))
 				rs1 = (argp)&zero;
 			break;
@@ -387,7 +387,7 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f)
 			}
 		case 2: freg = ((freg & 1) << 5) | (freg & 0x1e);
 		case 1: rs2 = (argp)&f->regs[freg];
-			flags = (freg < 32) ? FPRS_DL : FPRS_DU; 
+			flags = (freg < 32) ? FPRS_DL : FPRS_DU;
 			if (!(current_thread_info()->fpsaved[0] & flags))
 				rs2 = (argp)&zero;
 			break;
@@ -405,7 +405,7 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f)
 			}
 		case 2: freg = ((freg & 1) << 5) | (freg & 0x1e);
 		case 1: rd = (argp)&f->regs[freg];
-			flags = (freg < 32) ? FPRS_DL : FPRS_DU; 
+			flags = (freg < 32) ? FPRS_DL : FPRS_DU;
 			if (!(current_thread_info()->fpsaved[0] & FPRS_FEF)) {
 				current_thread_info()->fpsaved[0] = FPRS_FEF;
 				current_thread_info()->gsr[0] = 0;

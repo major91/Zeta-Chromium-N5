@@ -1,24 +1,24 @@
-/* 
-* Copyright (C) ST-Ericsson AP Pte Ltd 2010 
+/*
+* Copyright (C) ST-Ericsson AP Pte Ltd 2010
 *
 * ISP1763 Linux OTG Controller driver : host
-* 
-* This program is free software; you can redistribute it and/or modify it under the terms of 
-* the GNU General Public License as published by the Free Software Foundation; version 
-* 2 of the License. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY  
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS  
-* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more  
-* details. 
-* 
-* You should have received a copy of the GNU General Public License 
-* along with this program; if not, write to the Free Software 
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
-* 
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; version
+* 2 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*
 * Refer to file ~/drivers/usb/host/ehci-dbg.h for copyright owners (kernel version 2.6.9)
-* Code is modified for ST-Ericsson product 
-* 
+* Code is modified for ST-Ericsson product
+*
 * Author : wired support <wired.support@stericsson.com>
 *
 */
@@ -250,7 +250,7 @@ struct ehci_qh {
 	u32 hw_token;
 	u32 hw_buf[5];
 	u32 hw_buf_hi[5];
-	
+
 	/* the rest is HCD-private */
 	dma_addr_t qh_dma;	/* address of qh */
 	struct list_head qtd_list;	/* sw qtd list */
@@ -463,7 +463,7 @@ struct _isp1763_hcd;
 #include <linux/usb/hcd.h>
 
 #define USBNET
-#ifdef USBNET 
+#ifdef USBNET
 struct isp1763_async_cleanup_urb {
         struct list_head urb_list;
         struct urb *urb;
@@ -515,7 +515,7 @@ typedef	struct _phci_hcd {
 	struct timer_list watchdog;
 	void (*worker_function)	(struct	_phci_hcd * hcd);
 	struct _periodic_list periodic_list[PTD_PERIODIC_SIZE];
-#ifdef USBNET 
+#ifdef USBNET
 	struct isp1763_async_cleanup_urb cleanup_urb;
 #endif
 } phci_hcd, *pphci_hcd;
@@ -633,7 +633,7 @@ phci_mem_cleanup(void)
 #define	PORT_PE				(1<<2)	/* port	enable */
 #define	PORT_CSC			(1<<1)	/* connect status change */
 #define	PORT_CONNECT			(1<<0)	/* device connected */
-#define PORT_RWC_BITS	(PORT_CSC | PORT_PEC | PORT_OCC)	
+#define PORT_RWC_BITS	(PORT_CSC | PORT_PEC | PORT_OCC)
 /*Legends,
  * ATL	  control, bulk	transfer
  * INTL	  interrupt transfer

@@ -1,6 +1,6 @@
 /* arch/arm/mach-msm/htc_wifi_nvs.c
  *
- * Code to extract WiFi calibration information from ATAG set up 
+ * Code to extract WiFi calibration information from ATAG set up
  * by the bootloader.
  *
  * Copyright (C) 2008 Google, Inc.
@@ -39,15 +39,15 @@ static int __init parse_tag_msm_wifi(const struct tag *tag)
 {
 	unsigned char *dptr = (unsigned char *)(&tag->u);
 	unsigned size;
-	
+
 	size = min((tag->hdr.size - 2) * sizeof(__u32), MAX_NVS_SIZE);
-#ifdef ATAG_MSM_WIFI_DEBUG	
+#ifdef ATAG_MSM_WIFI_DEBUG
 	unsigned i;
-	
+
 	printk("WiFi Data size = %d , 0x%x\n", tag->hdr.size, tag->hdr.tag);
 	for (i = 0; i < size; i++)
 		printk("%02x ", *dptr++);
-#endif	
+#endif
 	memcpy( (void *)wifi_nvs_ram, (void *)dptr, size );
 	return 0;
 }

@@ -95,7 +95,7 @@ check_rela(Elf_Rela *rela, struct module *me)
 	case R_390_GLOB_DAT:
 	case R_390_JMP_SLOT:
 	case R_390_RELATIVE:
-		/* Only needed if we want to support loading of 
+		/* Only needed if we want to support loading of
 		   modules linked with -shared. */
 		break;
 	}
@@ -170,7 +170,7 @@ module_frob_arch_sections(Elf_Ehdr *hdr, Elf_Shdr *sechdrs,
 }
 
 static int
-apply_rela(Elf_Rela *rela, Elf_Addr base, Elf_Sym *symtab, 
+apply_rela(Elf_Rela *rela, Elf_Addr base, Elf_Sym *symtab,
 	   struct module *me)
 {
 	struct mod_arch_syminfo *info;
@@ -348,7 +348,7 @@ apply_rela(Elf_Rela *rela, Elf_Addr base, Elf_Sym *symtab,
 	case R_390_GLOB_DAT:	/* Create GOT entry.  */
 	case R_390_JMP_SLOT:	/* Create PLT entry.  */
 	case R_390_RELATIVE:	/* Adjust by program base.  */
-		/* Only needed if we want to support loading of 
+		/* Only needed if we want to support loading of
 		   modules linked with -shared. */
 		break;
 	default:

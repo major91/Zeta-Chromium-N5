@@ -1,4 +1,4 @@
-/* Header file for: 
+/* Header file for:
  * Cypress TrueTouch(TM) Standard Product touchscreen drivers.
  * drivers/input/touchscreen/cyttsp_fw.h
  *

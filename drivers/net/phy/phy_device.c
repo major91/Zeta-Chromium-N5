@@ -403,7 +403,7 @@ void phy_disconnect(struct phy_device *phydev)
 		phy_stop_interrupts(phydev);
 
 	phy_stop_machine(phydev);
-	
+
 	phydev->adjust_link = NULL;
 
 	phy_detach(phydev);
@@ -620,7 +620,7 @@ static int genphy_setup_forced(struct phy_device *phydev)
 
 	if (DUPLEX_FULL == phydev->duplex)
 		ctl |= BMCR_FULLDPLX;
-	
+
 	err = phy_write(phydev, MII_BMCR, ctl);
 
 	return err;
@@ -787,7 +787,7 @@ int genphy_read_status(struct phy_device *phydev)
 				phydev->duplex = DUPLEX_FULL;
 		} else if (lpa & (LPA_100FULL | LPA_100HALF)) {
 			phydev->speed = SPEED_100;
-			
+
 			if (lpa & LPA_100FULL)
 				phydev->duplex = DUPLEX_FULL;
 		} else

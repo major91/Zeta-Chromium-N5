@@ -83,7 +83,7 @@ enum {
 
 /*
  * Description of an execution domain.
- * 
+ *
  * The first two members are refernced from assembly source
  * and should stay where they are unless explicitly needed.
  */

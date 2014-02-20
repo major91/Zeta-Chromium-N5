@@ -36,7 +36,7 @@ struct ev_entry {
 	uint32_t id;
 	uint32_t arg;
 };
-	
+
 struct ev_log {
 	struct ev_entry *entry;
 	unsigned max;
@@ -58,7 +58,7 @@ static ssize_t ev_log_read(struct file *file, char __user *buf,
 	int size = 0;
 	unsigned n, id, max;
 	struct timespec now, t;
-	
+
 	max = log->max;
 	getnstimeofday(&now);
 	local_irq_save(flags);

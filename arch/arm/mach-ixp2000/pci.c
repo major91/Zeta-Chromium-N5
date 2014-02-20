@@ -54,7 +54,7 @@ ixp2000_pci_config_addr(unsigned int bus_nr, unsigned int devfn, int where)
 				    | (1 << (PCI_SLOT(devfn) + 16))
 				    | (PCI_FUNC(devfn) << 8) | where);
 	} else {
-		paddress = (u32 *) (IXP2000_PCI_CFG1_VIRT_BASE 
+		paddress = (u32 *) (IXP2000_PCI_CFG1_VIRT_BASE
 				    | (bus_nr << 16)
 				    | (PCI_SLOT(devfn) << 11)
 				    | (PCI_FUNC(devfn) << 8) | where);
@@ -152,7 +152,7 @@ int ixp2000_pci_abort_handler(unsigned long addr, unsigned int fsr, struct pt_re
 
 	temp = *(IXP2000_PCI_CMDSTAT);
 	if (temp & (1 << 29)) {
-		while (temp & (1 << 29)) {	
+		while (temp & (1 << 29)) {
 			ixp2000_reg_write(IXP2000_PCI_CMDSTAT, temp);
 			temp = *(IXP2000_PCI_CMDSTAT);
 		}

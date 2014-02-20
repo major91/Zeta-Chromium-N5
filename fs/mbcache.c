@@ -58,7 +58,7 @@
 #define MB_CACHE_WRITER ((unsigned short)~0U >> 1)
 
 static DECLARE_WAIT_QUEUE_HEAD(mb_cache_queue);
-		
+
 MODULE_AUTHOR("Andreas Gruenbacher <a.gruenbacher@computer.org>");
 MODULE_DESCRIPTION("Meta block cache (for extended attributes)");
 MODULE_LICENSE("GPL");
@@ -391,7 +391,7 @@ mb_cache_entry_insert(struct mb_cache_entry *ce, struct block_device *bdev,
 	struct list_head *l;
 	int error = -EBUSY;
 
-	bucket = hash_long((unsigned long)bdev + (block & 0xffffffff), 
+	bucket = hash_long((unsigned long)bdev + (block & 0xffffffff),
 			   cache->c_bucket_bits);
 	spin_lock(&mb_cache_spinlock);
 	list_for_each_prev(l, &cache->c_block_hash[bucket]) {

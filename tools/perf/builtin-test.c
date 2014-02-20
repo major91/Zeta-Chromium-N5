@@ -316,7 +316,7 @@ static int test__open_syscall_event(void)
 			 nr_open_calls, evsel->counts->cpu[0].val);
 		goto out_close_fd;
 	}
-	
+
 	err = 0;
 out_close_fd:
 	perf_evsel__close_fd(evsel, 1, threads->nr);

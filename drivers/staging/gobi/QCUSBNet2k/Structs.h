@@ -4,7 +4,7 @@ FILE:
 
 DESCRIPTION:
    Declaration of structures used by the Qualcomm Linux USB Network driver
-   
+
 FUNCTIONS:
    none
 
@@ -74,7 +74,7 @@ typedef struct sReadMemList
 {
    /* Data buffer */
    void *                     mpData;
-   
+
    /* Transaction ID */
    u16                        mTransactionID;
 
@@ -95,13 +95,13 @@ typedef struct sNotifyList
 {
    /* Function to be run when data becomes available */
    void                  (* mpNotifyFunct)(struct sQCUSBNet *, u16, void *);
-   
+
    /* Transaction ID */
    u16                   mTransactionID;
 
    /* Data to provide as parameter to mpNotifyFunct */
    void *                mpData;
-   
+
    /* Next entry in linked list */
    struct sNotifyList *  mpNext;
 
@@ -136,17 +136,17 @@ typedef struct sClientMemList
    /* Linked list of Read entries */
    /*    Stores data read from device before sending to client */
    sReadMemList *               mpList;
-   
+
    /* Linked list of Notification entries */
-   /*    Stores notification functions to be run as data becomes 
+   /*    Stores notification functions to be run as data becomes
          available or the device is removed */
    sNotifyList *                mpReadNotifyList;
 
    /* Linked list of URB entries */
-   /*    Stores pointers to outstanding URBs which need canceled 
+   /*    Stores pointers to outstanding URBs which need canceled
          when the client is deregistered or the device is removed */
    sURBList *                   mpURBList;
-   
+
    /* Next entry in linked list */
    struct sClientMemList *      mpNext;
 
@@ -185,7 +185,7 @@ typedef struct sURBSetupPacket
 // Struct sAutoPM
 //
 //    Structure used to manage AutoPM thread which determines whether the
-//    device is in use or may enter autosuspend.  Also submits net 
+//    device is in use or may enter autosuspend.  Also submits net
 //    transmissions asynchronously.
 /*=========================================================================*/
 typedef struct sAutoPM
@@ -204,13 +204,13 @@ typedef struct sAutoPM
 
    /* URB list lock (for adding and removing elements) */
    spinlock_t                 mURBListLock;
-   
+
    /* Active URB */
    struct urb *               mpActiveURB;
 
    /* Active URB lock (for adding and removing elements) */
    spinlock_t                 mActiveURBLock;
-   
+
    /* Duplicate pointer to USB device interface */
    struct usb_interface *     mpIntf;
 
@@ -241,17 +241,17 @@ typedef struct sQMIDev
 
    /* Read buffer attached to current read URB */
    void *                     mpReadBuffer;
-   
+
    /* Inturrupt URB */
    /*    Used to asynchronously notify when read data is available */
    struct urb *               mpIntURB;
 
    /* Buffer used by Inturrupt URB */
    void *                     mpIntBuffer;
-   
+
    /* Pointer to memory linked list for all clients */
    sClientMemList *           mpClientMemList;
-   
+
    /* Spinlock for client Memory entries */
    spinlock_t                 mClientMemLock;
 
@@ -272,11 +272,11 @@ typedef struct sQCUSBNet
 
    /* Usb device interface */
    struct usb_interface * mpIntf;
-   
+
    /* Pointers to usbnet_open and usbnet_stop functions */
    int                  (* mpUSBNetOpen)(struct net_device *);
    int                  (* mpUSBNetStop)(struct net_device *);
-   
+
    /* Reason(s) why interface is down */
    /* Used by Q*DownReason */
    unsigned long          mDownReason;
@@ -293,7 +293,7 @@ typedef struct sQCUSBNet
 
    /* Device MEID */
    char                   mMEID[14];
-   
+
    /* AutoPM thread */
    sAutoPM                mAutoPM;
 
@@ -309,7 +309,7 @@ typedef struct sQMIFilpStorage
 {
    /* Client ID */
    u16                  mClientID;
-   
+
    /* Device pointer */
    sQCUSBNet *          mpDev;
 

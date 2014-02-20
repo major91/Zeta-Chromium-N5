@@ -1,23 +1,23 @@
-/* 
-* Copyright (C) ST-Ericsson AP Pte Ltd 2010 
+/*
+* Copyright (C) ST-Ericsson AP Pte Ltd 2010
 *
 * ISP1763 Linux OTG Controller driver : host
-* 
-* This program is free software; you can redistribute it and/or modify it under the terms of 
-* the GNU General Public License as published by the Free Software Foundation; version 
-* 2 of the License. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY  
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS  
-* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more  
-* details. 
-* 
-* You should have received a copy of the GNU General Public License 
-* along with this program; if not, write to the Free Software 
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
-* 
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; version
+* 2 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*
 * This is a host controller driver file.  QTD processing is handled here.
-* 
+*
 * Author : wired support <wired.support@stericsson.com>
 *
 */
@@ -117,7 +117,7 @@ phci_hcd_urb_free_priv(phci_hcd	* hcd,
 		}
 
 	}
-	
+
 	return;
 }
 
@@ -133,7 +133,7 @@ phci_hcd_qtd_allocate(int mem_flags)
 	{
 		return 0;
 	}
-	
+
 	memset(qtd, 0, sizeof *qtd);
 	qtd->qtd_dma = cpu_to_le32(qtd);
 	qtd->hw_next = EHCI_LIST_END;
@@ -354,7 +354,7 @@ phci_hcd_qh_alloc(phci_hcd * hcd)
 	{
 		return qh;
 	}
-	
+
 	memset(qh, 0, sizeof *qh);
 	atomic_set(&qh->refcount, 1);
 	init_waitqueue_head(&qh->waitforcomplete);
@@ -868,7 +868,7 @@ phci_hcd_submit_async(phci_hcd * hcd,
 	unsigned long flags;
 #endif
 
-	
+
 	struct ehci_qh *qh = 0;
 
 	urb_priv_t *urb_priv = urb->hcpriv;
@@ -926,8 +926,8 @@ phci_hcd_submit_async(phci_hcd * hcd,
 			   qh->qh_state);
 		phci_hcd_qtd_list_free(hcd, urb, &qh->qtd_list);
 		spin_unlock(&hcd_data_lock);
-		
-#ifndef THREAD_BASED			
+
+#ifndef THREAD_BASED
 		spin_unlock_irqrestore(&hcd->lock, flags);
 #endif
 		*status	= -ENODEV;
@@ -943,11 +943,11 @@ phci_hcd_submit_async(phci_hcd * hcd,
 	cleanup:
 	spin_unlock(&hcd_data_lock);
 
-#ifndef THREAD_BASED			
+#ifndef THREAD_BASED
 	/* free	it from	lock systme can	sleep now */
 	spin_unlock_irqrestore(&hcd->lock, flags);
 #endif
-	
+
 	/* could not get the QH	terminate and clean. */
 	if (unlikely(qh	== 0) || *status < 0) {
 		phci_hcd_qtd_list_free(hcd, urb, qtd_list);
@@ -1295,7 +1295,7 @@ phci_hcd_qha_from_qtd(phci_hcd * hcd,
 	} else {
 		td_info4 |= (0 << 23);
 	}
-	
+
 	/*nak count */
 	td_info4 |= (nk	<< 19);
 

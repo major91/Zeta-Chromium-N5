@@ -44,7 +44,7 @@ struct nmi_desc {
 	struct list_head head;
 };
 
-static struct nmi_desc nmi_desc[NMI_MAX] = 
+static struct nmi_desc nmi_desc[NMI_MAX] =
 {
 	{
 		.lock = __SPIN_LOCK_UNLOCKED(&nmi_desc[0].lock),
@@ -129,7 +129,7 @@ static int __setup_nmi(unsigned int type, struct nmiaction *action)
 		list_add_rcu(&action->list, &desc->head);
 	else
 		list_add_tail_rcu(&action->list, &desc->head);
-	
+
 	spin_unlock_irqrestore(&desc->lock, flags);
 	return 0;
 }
@@ -190,7 +190,7 @@ fail_setup_nmi:
 	kfree(action->name);
 fail_action_name:
 	kfree(action);
-fail_action:	
+fail_action:
 
 	return retval;
 }

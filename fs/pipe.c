@@ -37,10 +37,10 @@ unsigned int pipe_max_size = 1048576;
 unsigned int pipe_min_size = PAGE_SIZE;
 
 /*
- * We use a start+len construction, which provides full use of the 
+ * We use a start+len construction, which provides full use of the
  * allocated memory.
  * -- Florian Coosmann (FGC)
- * 
+ *
  * Reads with count = 0 should always return 0.
  * -- Julian Bradfield 1999-06-07.
  *

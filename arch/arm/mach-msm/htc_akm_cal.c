@@ -1,6 +1,6 @@
 /* arch/arm/mach-msm/htc_akm_cal.c
  *
- * Code to extract compass calibration information from ATAG set up 
+ * Code to extract compass calibration information from ATAG set up
  * by the bootloader.
  *
  * Copyright (C) 2007-2008 HTC Corporation

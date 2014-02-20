@@ -427,7 +427,7 @@ TRACE_EVENT(btrfs_sync_fs,
 		{ BTRFS_DROP_DELAYED_REF,   "DROP_DELAYED_REF" },	\
 		{ BTRFS_ADD_DELAYED_EXTENT, "ADD_DELAYED_EXTENT" }, 	\
 		{ BTRFS_UPDATE_DELAYED_HEAD, "UPDATE_DELAYED_HEAD" })
-			
+
 
 TRACE_EVENT(btrfs_delayed_tree_ref,
 
@@ -440,7 +440,7 @@ TRACE_EVENT(btrfs_delayed_tree_ref,
 	TP_STRUCT__entry(
 		__field(	u64,  bytenr		)
 		__field(	u64,  num_bytes		)
-		__field(	int,  action		) 
+		__field(	int,  action		)
 		__field(	u64,  parent		)
 		__field(	u64,  ref_root		)
 		__field(	int,  level		)
@@ -479,7 +479,7 @@ TRACE_EVENT(btrfs_delayed_data_ref,
 	TP_STRUCT__entry(
 		__field(	u64,  bytenr		)
 		__field(	u64,  num_bytes		)
-		__field(	int,  action		) 
+		__field(	int,  action		)
 		__field(	u64,  parent		)
 		__field(	u64,  ref_root		)
 		__field(	u64,  owner		)
@@ -522,7 +522,7 @@ TRACE_EVENT(btrfs_delayed_ref_head,
 	TP_STRUCT__entry(
 		__field(	u64,  bytenr		)
 		__field(	u64,  num_bytes		)
-		__field(	int,  action		) 
+		__field(	int,  action		)
 		__field(	int,  is_data		)
 	),
 

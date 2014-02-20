@@ -887,7 +887,7 @@ aoecmd_cfg(ushort aoemajor, unsigned char aoeminor)
 	aoecmd_cfg_pkts(aoemajor, aoeminor, &queue);
 	aoenet_xmit(&queue);
 }
- 
+
 struct sk_buff *
 aoecmd_ata_id(struct aoedev *d)
 {
@@ -925,7 +925,7 @@ aoecmd_ata_id(struct aoedev *d)
 
 	return skb_clone(skb, GFP_ATOMIC);
 }
- 
+
 static struct aoetgt *
 addtgt(struct aoedev *d, char *addr, ulong nframes)
 {

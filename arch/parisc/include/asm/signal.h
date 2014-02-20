@@ -71,7 +71,7 @@
 
 #define SA_RESTORER	0x04000000 /* obsolete -- ignored */
 
-/* 
+/*
  * sigaltstack controls
  */
 #define SS_ONSTACK	1

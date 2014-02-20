@@ -35,7 +35,7 @@
  * fef00000	c0000000	1M		CAP
  */
 
-/* 
+/*
  * Static I/O regions.
  *
  * Most of the registers are clumped in 4K regions spread throughout
@@ -107,7 +107,7 @@
 #define IXP2000_PCI_CFG1_VIRT_BASE	0xfb000000
 #define IXP2000_PCI_CFG1_SIZE		0x01000000
 
-/* 
+/*
  * Timers
  */
 #define	IXP2000_TIMER_REG(x)		((volatile unsigned long*)(IXP2000_TIMER_VIRT_BASE | (x)))
@@ -302,7 +302,7 @@
 #define	IXP2000_SLOWPORT_FIN		SLOWPORT_CSR(0x28)
 
 /*
- * CCR values.  
+ * CCR values.
  * The CCR configures the clock division for the slowport interface.
  */
 #define	SLOWPORT_CCR_DIV_1		0x00

@@ -14,7 +14,7 @@
  Updated for Linux 2.5.45 to use the new error handler, cleaned up the
  lock macros and did a few unavoidable locking tweaks, plus one locking
  fix in the irq and completion path.
- 
+
  */
 
 #include <linux/module.h>
@@ -239,9 +239,9 @@ struct im_tsb {
 #define CMD_FAIL           255
 
 /* The SCSI-ID(!) of the accessed SCSI-device is shown on PS/2-95 machines' LED
-   displays. ldn is no longer displayed here, because the ldn mapping is now 
-   done dynamically and the ldn <-> pun,lun maps can be looked-up at boottime 
-   or during uptime in /proc/scsi/ibmmca/<host_no> in case of trouble, 
+   displays. ldn is no longer displayed here, because the ldn mapping is now
+   done dynamically and the ldn <-> pun,lun maps can be looked-up at boottime
+   or during uptime in /proc/scsi/ibmmca/<host_no> in case of trouble,
    interest, debugging or just for having fun. The left number gives the
    host-adapter number and the right shows the accessed SCSI-ID. */
 
@@ -536,7 +536,7 @@ static irqreturn_t interrupt_handler(int irq, void *dev_id)
 	/* get the last_scsi_command here */
 	lastSCSI = last_scsi_command(shpnt)[ldn];
 	outb(IM_EOI | ldn, IM_ATTN_REG(shpnt));
-	
+
 	/*these should never happen (hw fails, or a local programming bug) */
 	if (!global_command_error_excuse) {
 		switch (cmd_result) {
@@ -832,7 +832,7 @@ static int get_pos_info(struct Scsi_Host *shpnt)
 		/*issue scb to ldn=15, and busy wait for interrupt */
 		got_interrupt(shpnt) = 0;
 		issue_cmd(shpnt, isa_virt_to_bus(scb), IM_SCB | MAX_LOG_DEV);
-		
+
 		/* FIXME: timeout */
 		while (!got_interrupt(shpnt))
 			barrier();
@@ -912,7 +912,7 @@ static int immediate_feature(struct Scsi_Host *shpnt, unsigned int speed, unsign
 		 * right speed! */
 		global_command_error_excuse = 1;
 		issue_cmd(shpnt, (unsigned long) (imm_cmd), IM_IMM_CMD | MAX_LOG_DEV);
-		
+
 		/* FIXME: timeout */
 		while (!got_interrupt(shpnt))
 			barrier();
@@ -2069,7 +2069,7 @@ static int __ibmmca_abort(Scsi_Cmnd * cmd)
 #endif
 
 	/*if abort went well, call saved done, then return success or error */
-	if (cmd->result == (DID_ABORT << 16)) 
+	if (cmd->result == (DID_ABORT << 16))
 	{
 		cmd->result |= DID_ABORT << 16;
 		if (cmd->scsi_done)
@@ -2141,7 +2141,7 @@ static int __ibmmca_host_reset(Scsi_Cmnd * cmd)
 	outb(IM_IMM_CMD | 0xf, IM_ATTN_REG(shpnt));
 	/* wait for interrupt finished or intr_stat register to be set, as the
 	 * interrupt will not be executed, while we are in here! */
-	 
+
 	/* FIXME: This is really really icky we so want a sleeping version of this ! */
 	while (reset_status(shpnt) == IM_RESET_IN_PROGRESS && --ticks && ((inb(IM_INTR_REG(shpnt)) & 0x8f) != 0x8f)) {
 		udelay((1 + 999 / HZ) * 1000);
@@ -2268,7 +2268,7 @@ static int ibmmca_proc_info(struct Scsi_Host *shpnt, char *buffer, char **start,
 	unsigned long flags;
 	int max_pun;
 
-	
+
 	spin_lock_irqsave(shpnt->host_lock, flags);	/* Check it */
 
 	max_pun = subsystem_maxid(shpnt);

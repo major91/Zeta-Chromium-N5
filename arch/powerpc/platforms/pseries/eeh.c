@@ -364,9 +364,9 @@ void eeh_clear_slot(struct device_node *dn, int mode_flag)
 {
 	unsigned long flags;
 	raw_spin_lock_irqsave(&confirm_error_lock, flags);
-	
+
 	dn = eeh_find_device_pe(dn);
-	
+
 	/* Back up one, since config addrs might be shared */
 	if (!pcibios_find_pci_bus(dn) && of_node_to_eeh_dev(dn->parent))
 		dn = dn->parent;
@@ -475,7 +475,7 @@ int eeh_dn_check_failure(struct device_node *dn, struct pci_dev *dev)
 	}
 
 	eeh_stats.slot_resets++;
- 
+
 	/* Avoid repeated reports of this failure, including problems
 	 * with other functions on this device, and functions under
 	 * bridges.
@@ -670,8 +670,8 @@ static void eeh_reset_pe_once(struct eeh_dev *edev)
 	 */
 #define PCI_BUS_RST_HOLD_TIME_MSEC 250
 	msleep(PCI_BUS_RST_HOLD_TIME_MSEC);
-	
-	/* We might get hit with another EEH freeze as soon as the 
+
+	/* We might get hit with another EEH freeze as soon as the
 	 * pci slot reset line is dropped. Make sure we don't miss
 	 * these, and clear the flag now.
 	 */
@@ -725,7 +725,7 @@ int eeh_reset_pe(struct eeh_dev *edev)
  * Although firmware will set up BARs during boot, it doesn't
  * set up device BAR's after a device reset, although it will,
  * if requested, set up bridge configuration. Thus, we need to
- * configure the PCI devices ourselves.  
+ * configure the PCI devices ourselves.
  */
 
 /**
@@ -791,7 +791,7 @@ void eeh_restore_bars(struct eeh_dev *edev)
 	struct device_node *dn;
 	if (!edev)
 		return;
-	
+
 	if ((edev->mode & EEH_MODE_SUPPORTED) && !IS_BRIDGE(edev->class_code))
 		eeh_restore_one_device_bars(edev);
 
@@ -816,7 +816,7 @@ static void eeh_save_bars(struct eeh_dev *edev)
 	if (!edev)
 		return;
 	dn = eeh_dev_to_of_node(edev);
-	
+
 	for (i = 0; i < 16; i++)
 		eeh_ops->read_config(dn, i * 4, 4, &edev->config_space[i]);
 }
@@ -873,7 +873,7 @@ static void *eeh_early_enable(struct device_node *dn, void *data)
 		if (ret == 0) {
 			edev->config_addr = regs[0];
 
-			/* If the newer, better, ibm,get-config-addr-info is supported, 
+			/* If the newer, better, ibm,get-config-addr-info is supported,
 			 * then use that instead.
 			 */
 			edev->pe_config_addr = eeh_ops->get_pe_addr(dn);

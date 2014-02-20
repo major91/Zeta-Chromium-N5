@@ -230,7 +230,7 @@ static ssize_t pcm_write(struct file *file, const char __user *buf,
 		if (xfer > ab->size)
 			xfer = ab->size;
 
-		if (copy_from_user(ab->data, buf, xfer)) 
+		if (copy_from_user(ab->data, buf, xfer))
 			return -EFAULT;
 
 		buf += xfer;

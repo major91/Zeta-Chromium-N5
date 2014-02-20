@@ -1,6 +1,6 @@
 /*
  * include/linux/nfsd/export.h
- * 
+ *
  * Public declarations for NFS exports. The definitions for the
  * syscall interface are in nfsctl.h
  *
@@ -137,7 +137,7 @@ struct svc_export *	rqst_exp_get_by_name(struct svc_rqst *,
 struct svc_export *	rqst_exp_parent(struct svc_rqst *,
 					struct path *);
 struct svc_export *	rqst_find_fsidzero_export(struct svc_rqst *);
-int			exp_rootfh(struct auth_domain *, 
+int			exp_rootfh(struct auth_domain *,
 					char *path, struct knfsd_fh *, int maxsize);
 __be32			exp_pseudoroot(struct svc_rqst *, struct svc_fh *);
 __be32			nfserrno(int errno);

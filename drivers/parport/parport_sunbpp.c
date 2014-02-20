@@ -1,5 +1,5 @@
 /* parport_sunbpp.c: Parallel-port routines for SBUS
- * 
+ *
  * Author: Derrick J. Brashear <shadow@dementia.org>
  *
  * based on work by:
@@ -15,7 +15,7 @@
  *          Tom Dyas
  *
  * Updated to new SBUS device framework: David S. Miller <davem@davemloft.net>
- * 
+ *
  */
 
 #include <linux/string.h>
@@ -89,13 +89,13 @@ static void control_pc_to_sunbpp(struct parport *p, unsigned char status)
 	unsigned char value_tcr = sbus_readb(&regs->p_tcr);
 	unsigned char value_or = sbus_readb(&regs->p_or);
 
-	if (status & PARPORT_CONTROL_STROBE) 
+	if (status & PARPORT_CONTROL_STROBE)
 		value_tcr |= P_TCR_DS;
-	if (status & PARPORT_CONTROL_AUTOFD) 
+	if (status & PARPORT_CONTROL_AUTOFD)
 		value_or |= P_OR_AFXN;
-	if (status & PARPORT_CONTROL_INIT) 
+	if (status & PARPORT_CONTROL_INIT)
 		value_or |= P_OR_INIT;
-	if (status & PARPORT_CONTROL_SELECT) 
+	if (status & PARPORT_CONTROL_SELECT)
 		value_or |= P_OR_SLCT_IN;
 
 	sbus_writeb(value_or, &regs->p_or);
@@ -249,7 +249,7 @@ static void parport_sunbpp_restore_state(struct parport *p, struct parport_state
 	parport_sunbpp_write_control(p, s->u.pc.ctr);
 }
 
-static struct parport_operations parport_sunbpp_ops = 
+static struct parport_operations parport_sunbpp_ops =
 {
 	.write_data	= parport_sunbpp_write_data,
 	.read_data	= parport_sunbpp_read_data,

@@ -462,7 +462,7 @@ static void get_product_info(struct edgeport_serial *edge_serial)
 		product_info->iDownloadFile = EDGE_DOWNLOAD_FILE_80251;
 	else
 		product_info->iDownloadFile = EDGE_DOWNLOAD_FILE_I930;
- 
+
 	/* Determine Product type and set appropriate flags */
 	switch (DEVICE_ID_FROM_USB_PRODUCT_ID(product_info->ProductId)) {
 	case ION_DEVICE_ID_EDGEPORT_COMPATIBLE:
@@ -2906,9 +2906,9 @@ static void load_application_firmware(struct edgeport_serial *edge_serial)
 	}
 
 	dbg("sending exec_dl_code");
-	response = usb_control_msg (edge_serial->serial->dev, 
-				    usb_sndctrlpipe(edge_serial->serial->dev, 0), 
-				    USB_REQUEST_ION_EXEC_DL_CODE, 
+	response = usb_control_msg (edge_serial->serial->dev,
+				    usb_sndctrlpipe(edge_serial->serial->dev, 0),
+				    USB_REQUEST_ION_EXEC_DL_CODE,
 				    0x40, 0x4000, 0x0001, NULL, 0, 3000);
 
 	release_firmware(fw);

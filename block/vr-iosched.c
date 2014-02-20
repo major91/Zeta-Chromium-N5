@@ -115,7 +115,7 @@ vr_add_request(struct request_queue *q, struct request *rq)
 	const int dir = rq_is_sync(rq);
 
 	vr_add_rq_rb(vd, rq);
-	
+
 	if (vd->fifo_expire[dir]) {
 		rq_set_fifo_time(rq, jiffies + vd->fifo_expire[dir]);
 		list_add_tail(&rq->queuelist, &vd->fifo_list[dir]);
@@ -140,7 +140,7 @@ vr_merge(struct request_queue *q, struct request **rqp, struct bio *bio)
 	sector_t sector = bio->bi_sector + bio_sectors(bio);
 	struct vr_data *vd = vr_get_data(q);
 	struct request *rq = elv_rb_find(&vd->sort_list, sector);
-	
+
 	if (rq && elv_rq_merge_ok(rq, bio)) {
 		*rqp = rq;
 		return ELEVATOR_FRONT_MERGE;
@@ -251,7 +251,7 @@ vr_choose_request(struct vr_data *vd)
 	struct request *next = vd->next_rq;
 	struct request *prev = vd->prev_rq;
 	sector_t next_pen, prev_pen;
-	
+
 	BUG_ON(prev && prev == next);
 
 	if (!prev)
@@ -313,7 +313,7 @@ vr_exit_queue(struct elevator_queue *e)
 static void *vr_init_queue(struct request_queue *q)
 {
 	struct vr_data *vd;
-	
+
 	vd = kmalloc_node(sizeof(*vd), GFP_KERNEL | __GFP_ZERO, q->node);
 	if (!vd)
 		return NULL;
@@ -411,7 +411,7 @@ static struct elevator_type iosched_vr = {
 	.elevator_name = "vr",
 	.elevator_owner = THIS_MODULE,
 };
-	
+
 static int __init vr_init(void)
 {
 	elv_register(&iosched_vr);
