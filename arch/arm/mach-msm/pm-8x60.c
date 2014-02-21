@@ -40,6 +40,7 @@
 #include <mach/trace_msm_low_power.h>
 #include <mach/msm-krait-l2-accessors.h>
 #include <mach/msm_bus.h>
+#include <mach/mpm.h>
 #include <asm/cacheflush.h>
 #include <asm/hardware/gic.h>
 #include <asm/pgtable.h>
@@ -1152,18 +1153,14 @@ void msm_pm_set_sleep_ops(struct msm_pm_sleep_ops *ops)
 
 int msm_suspend_prepare(void)
 {
-	if (pnoc_clk != NULL)
-		clk_disable_unprepare(pnoc_clk);
-
+	msm_mpm_suspend_prepare();
 	suspend_time = msm_pm_timer_enter_suspend(&suspend_period);
 	return 0;
 }
 
 void msm_suspend_wake(void)
 {
-	if (pnoc_clk != NULL)
-		clk_prepare_enable(pnoc_clk);
-
+	msm_mpm_suspend_wake();
 	if (suspend_power_collapsed) {
 		suspend_time = msm_pm_timer_exit_suspend(suspend_time,
 				suspend_period);
