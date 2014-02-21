@@ -1570,7 +1570,7 @@ static void sun4c_mmu_info(struct seq_file *m)
 	for (i = 0; i < num_contexts; i++)
 		used_user_entries += sun4c_context_ring[i].num_entries;
 
-	seq_printf(m, 
+	seq_printf(m,
 		   "vacsize\t\t: %d bytes\n"
 		   "vachwflush\t: %s\n"
 		   "vaclinesize\t: %d bytes\n"
@@ -1747,7 +1747,7 @@ static pmd_t *sun4c_pmd_offset(pgd_t * dir, unsigned long address)
 	return (pmd_t *) dir;
 }
 
-/* Find an entry in the third-level page table.. */ 
+/* Find an entry in the third-level page table.. */
 pte_t *sun4c_pte_offset_kernel(pmd_t * dir, unsigned long address)
 {
 	return (pte_t *) sun4c_pmd_page_v(*dir) +
@@ -1791,7 +1791,7 @@ static pgd_t *sun4c_get_pgd_fast(void)
 		pgtable_cache_size--;
 	} else {
 		pgd_t *init;
-		
+
 		ret = (unsigned long *)__get_free_page(GFP_KERNEL);
 		memset (ret, 0, (KERNBASE / SUN4C_PGDIR_SIZE) * sizeof(pgd_t));
 		init = sun4c_pgd_offset(&init_mm, 0);
@@ -2034,7 +2034,7 @@ static pgprot_t sun4c_pgprot_noncached(pgprot_t prot)
 void __init ld_mmu_sun4c(void)
 {
 	extern void ___xchg32_sun4c(void);
-	
+
 	printk("Loading sun4c MMU routines\n");
 
 	/* First the constants */
@@ -2057,7 +2057,7 @@ void __init ld_mmu_sun4c(void)
 	BTFIXUPSET_CALL(pgprot_noncached, sun4c_pgprot_noncached, BTFIXUPCALL_NORM);
 	BTFIXUPSET_CALL(___xchg32, ___xchg32_sun4c, BTFIXUPCALL_NORM);
 	BTFIXUPSET_CALL(do_check_pgt_cache, sun4c_check_pgt_cache, BTFIXUPCALL_NORM);
-	
+
 	BTFIXUPSET_CALL(flush_cache_all, sun4c_flush_cache_all, BTFIXUPCALL_NORM);
 
 	if (sun4c_vacinfo.do_hwflushes) {

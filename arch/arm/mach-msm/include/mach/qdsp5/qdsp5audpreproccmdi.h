@@ -33,9 +33,9 @@
 
 This section contains comments describing changes made to this file.
 Notice that changes are listed in reverse chronological order.
-   
-$Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audpreproccmdi.h#2 $ 
-  
+
+$Header: //source/qcom/qct/multimedia2/Audio/drivers/QDSP5Driver/QDSP5Interface/main/latest/qdsp5audpreproccmdi.h#2 $
+
 ===========================================================================*/
 
 /*
@@ -228,7 +228,7 @@ typedef struct {
 	unsigned short 	denominator_coeff_a0_filter0_lsw;
 	unsigned short 	denominator_coeff_a0_filter0_msw;
 	unsigned short 	denominator_coeff_a1_filter0_lsw;
-	unsigned short 	denominator_coeff_a1_filter0_msw; 
+	unsigned short 	denominator_coeff_a1_filter0_msw;
 	unsigned short 	denominator_coeff_a0_filter1_lsw;
 	unsigned short 	denominator_coeff_a0_filter1_msw;
 	unsigned short 	denominator_coeff_a1_filter1_lsw;

@@ -1688,7 +1688,7 @@ int vt_do_diacrit(unsigned int cmd, void __user *up, int perm)
 				kfree(buf);
 				return -EFAULT;
 			}
-		} 
+		}
 		spin_lock_irqsave(&kbd_event_lock, flags);
 		if (ct)
 			memcpy(accent_table, buf,

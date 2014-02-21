@@ -42,7 +42,7 @@ static const struct usb_device_id wdm_ids[] = {
 		.bInterfaceSubClass = USB_CDC_SUBCLASS_DMM
 	},
 	{
-		/* 
+		/*
 		 * Huawei E392, E398 and possibly other Qualcomm based modems
 		 * embed the Qualcomm QMI protocol inside CDC on CDC ECM like
 		 * control interfaces.  Userspace access to this is required

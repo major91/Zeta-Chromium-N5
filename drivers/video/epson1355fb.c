@@ -731,7 +731,7 @@ int __init epson1355fb_init(void)
 }
 
 module_init(epson1355fb_init);
-	
+
 #ifdef MODULE
 static void __exit epson1355fb_exit(void)
 {

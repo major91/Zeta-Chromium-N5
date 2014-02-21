@@ -528,7 +528,7 @@ out:
 		if (copy_to_user(sic->data, buffer, out_len))
 			err = -EFAULT;
 	}
-	
+
 error:
 	kfree(buffer);
 	blk_put_request(rq);

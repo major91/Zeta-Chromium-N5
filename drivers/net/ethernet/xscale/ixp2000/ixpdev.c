@@ -414,7 +414,7 @@ err_free_rx:
 
 err_out:
 	return err;
-} 
+}
 
 void ixpdev_deinit(void)
 {

@@ -46,7 +46,7 @@ static struct workqueue_struct *msm_cpufreq_wq;
 
 /* maxscroff */
 uint32_t maxscroff_freq = 1190400;
-uint32_t maxscroff = 0; 
+uint32_t maxscroff = 0;
 
 struct cpufreq_suspend_t {
 	struct mutex suspend_mutex;
@@ -421,7 +421,7 @@ static ssize_t store_max_screen_off(struct cpufreq_policy *policy,
 		const char *buf, size_t count)
 {
 	if (buf[0] >= '0' && buf[0] <= '1' && buf[1] == '\n')
-            if (maxscroff != buf[0] - '0') 
+            if (maxscroff != buf[0] - '0')
 		        maxscroff = buf[0] - '0';
 
 	return count;

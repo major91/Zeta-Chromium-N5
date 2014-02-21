@@ -119,7 +119,7 @@ static void show_regwindow32(struct pt_regs *regs)
 	struct reg_window32 __user *rw;
 	struct reg_window32 r_w;
 	mm_segment_t old_fs;
-	
+
 	__asm__ __volatile__ ("flushw");
 	rw = compat_ptr((unsigned)regs->u_regs[14]);
 	old_fs = get_fs();
@@ -129,7 +129,7 @@ static void show_regwindow32(struct pt_regs *regs)
 		return;
 	}
 
-	set_fs (old_fs);			
+	set_fs (old_fs);
 	printk("l0: %08x l1: %08x l2: %08x l3: %08x "
 	       "l4: %08x l5: %08x l6: %08x l7: %08x\n",
 	       r_w.locals[0], r_w.locals[1], r_w.locals[2], r_w.locals[3],
@@ -164,7 +164,7 @@ static void show_regwindow(struct pt_regs *regs)
 				return;
 			}
 			rwk = &r_w;
-			set_fs (old_fs);			
+			set_fs (old_fs);
 		}
 	} else {
 		show_regwindow32(regs);
@@ -326,7 +326,7 @@ unsigned long thread_saved_pc(struct task_struct *tsk)
 {
 	struct thread_info *ti = task_thread_info(tsk);
 	unsigned long ret = 0xdeadbeefUL;
-	
+
 	if (ti && ti->ksp) {
 		unsigned long *sp;
 		sp = (unsigned long *)(ti->ksp + STACK_BIAS);
@@ -756,7 +756,7 @@ unsigned long get_wchan(struct task_struct *task)
 	struct thread_info *tp;
 	struct reg_window *rw;
         unsigned long ret = 0;
-	int count = 0; 
+	int count = 0;
 
 	if (!task || task == current ||
             task->state == TASK_RUNNING)

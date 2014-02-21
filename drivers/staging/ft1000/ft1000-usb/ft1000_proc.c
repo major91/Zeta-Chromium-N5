@@ -67,8 +67,8 @@ ft1000ReadProc(char *page, char **start, off_t off, int count, int *eof,
 
 	struct ft1000_info *info;
 
-	char *status[] = { 
-		"Idle (Disconnect)", 
+	char *status[] = {
+		"Idle (Disconnect)",
 		"Searching",
 		"Active (Connected)",
 		"Waiting for L2",

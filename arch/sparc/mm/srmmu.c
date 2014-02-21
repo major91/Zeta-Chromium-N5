@@ -178,7 +178,7 @@ static inline void srmmu_pmd_clear(pmd_t *pmdp) {
 		srmmu_set_pte((pte_t *)&pmdp->pmdv[i], __pte(0));
 }
 
-static inline int srmmu_pgd_none(pgd_t pgd)          
+static inline int srmmu_pgd_none(pgd_t pgd)
 { return !(pgd_val(pgd) & 0xFFFFFFF); }
 
 static inline int srmmu_pgd_bad(pgd_t pgd)
@@ -266,7 +266,7 @@ static inline pmd_t *srmmu_pmd_offset(pgd_t * dir, unsigned long address)
 	    ((address >> PMD_SHIFT) & (PTRS_PER_PMD - 1));
 }
 
-/* Find an entry in the third-level page table.. */ 
+/* Find an entry in the third-level page table.. */
 static inline pte_t *srmmu_pte_offset(pmd_t * dir, unsigned long address)
 {
 	void *pte;
@@ -1141,21 +1141,21 @@ static void __init srmmu_inherit_prom_mappings(unsigned long start,
 			start += PAGE_SIZE;
 			continue;
 		}
-    
+
 		/* A red snapper, see what it really is. */
 		what = 0;
-    
+
 		if(!(start & ~(SRMMU_REAL_PMD_MASK))) {
 			if(srmmu_hwprobe((start-PAGE_SIZE) + SRMMU_REAL_PMD_SIZE) == prompte)
 				what = 1;
 		}
-    
+
 		if(!(start & ~(SRMMU_PGDIR_MASK))) {
 			if(srmmu_hwprobe((start-PAGE_SIZE) + SRMMU_PGDIR_SIZE) ==
 			   prompte)
 				what = 2;
 		}
-    
+
 		pgdp = pgd_offset_k(start);
 		if(what == 2) {
 			*(pgd_t *)__nocache_fix(pgdp) = __pgd(prompte);
@@ -1220,7 +1220,7 @@ static unsigned long __init map_spbank(unsigned long vbase, int sp_entry)
 
 	if (vstart < min_vaddr || vstart >= max_vaddr)
 		return vstart;
-	
+
 	if (vend > max_vaddr || vend < min_vaddr)
 		vend = max_vaddr;
 
@@ -1361,7 +1361,7 @@ void __init srmmu_paging_init(void)
 
 static void srmmu_mmu_info(struct seq_file *m)
 {
-	seq_printf(m, 
+	seq_printf(m,
 		   "MMU type\t: %s\n"
 		   "contexts\t: %d\n"
 		   "nocache total\t: %ld\n"
@@ -1786,7 +1786,7 @@ static void __cpuinit poke_turbosparc(void)
 	mreg &= ~(TURBOSPARC_ICENABLE | TURBOSPARC_DCENABLE); /* Temporarily disable I & D caches */
 	mreg &= ~(TURBOSPARC_PCENABLE);		/* Don't check parity */
 	srmmu_set_mmureg(mreg);
-	
+
 	ccreg = turbosparc_get_ccreg();
 
 #ifdef TURBOSPARC_WRITEBACK
@@ -2072,7 +2072,7 @@ static void __init get_srmmu_type(void)
 		}
 		return;
 	}
-	
+
 	/*
 	 * Now Fujitsu TurboSparc. It might happen that it is
 	 * in Swift emulation mode, so we will check later...
@@ -2100,7 +2100,7 @@ static void __init get_srmmu_type(void)
 				break;
 			}
 		}
-		
+
 		init_swift();
 		return;
 	}
@@ -2145,7 +2145,7 @@ extern unsigned long srmmu_fault;
 static void __init patch_window_trap_handlers(void)
 {
 	unsigned long *iaddr, *daddr;
-	
+
 	PATCH_BRANCH(spwin_mmu_patchme, spwin_srmmu_stackchk);
 	PATCH_BRANCH(fwin_mmu_patchme, srmmu_fwin_stackchk);
 	PATCH_BRANCH(tsetup_mmu_patchme, tsetup_srmmu_stackchk);
@@ -2205,7 +2205,7 @@ void __init ld_mmu_srmmu(void)
 
 	/* Functions */
 	BTFIXUPSET_CALL(pgprot_noncached, srmmu_pgprot_noncached, BTFIXUPCALL_NORM);
-#ifndef CONFIG_SMP	
+#ifndef CONFIG_SMP
 	BTFIXUPSET_CALL(___xchg32, ___xchg32_sun4md, BTFIXUPCALL_SWAPG1G2);
 #endif
 	BTFIXUPSET_CALL(do_check_pgt_cache, srmmu_check_pgt_cache, BTFIXUPCALL_NOP);
@@ -2235,7 +2235,7 @@ void __init ld_mmu_srmmu(void)
 	BTFIXUPSET_CALL(pgd_set, srmmu_pgd_set, BTFIXUPCALL_NORM);
 	BTFIXUPSET_CALL(pmd_set, srmmu_pmd_set, BTFIXUPCALL_NORM);
 	BTFIXUPSET_CALL(pmd_populate, srmmu_pmd_populate, BTFIXUPCALL_NORM);
-	
+
 	BTFIXUPSET_INT(pte_modify_mask, SRMMU_CHG_MASK);
 	BTFIXUPSET_CALL(pmd_offset, srmmu_pmd_offset, BTFIXUPCALL_NORM);
 	BTFIXUPSET_CALL(pte_offset_kernel, srmmu_pte_offset, BTFIXUPCALL_NORM);

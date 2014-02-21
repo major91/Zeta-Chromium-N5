@@ -113,7 +113,7 @@ asmlinkage void sparc64_set_context(struct pt_regs *regs)
 	if (fenab) {
 		unsigned long *fpregs = current_thread_info()->fpregs;
 		unsigned long fprs;
-		
+
 		fprs_write(0);
 		err |= __get_user(fprs, &(ucp->uc_mcontext.mc_fpregs.mcfpu_fprs));
 		if (fprs & FPRS_DL)
@@ -157,7 +157,7 @@ asmlinkage void sparc64_get_context(struct pt_regs *regs)
 #else
 	fenab = (current_thread_info()->fpsaved[0] & FPRS_FEF);
 #endif
-		
+
 	mcp = &ucp->uc_mcontext;
 	grp = &mcp->mc_gregs;
 
@@ -208,7 +208,7 @@ asmlinkage void sparc64_get_context(struct pt_regs *regs)
 	if (fenab) {
 		unsigned long *fpregs = current_thread_info()->fpregs;
 		unsigned long fprs;
-		
+
 		fprs = current_thread_info()->fpsaved[0];
 		if (fprs & FPRS_DL)
 			err |= copy_to_user(&(mcp->mc_fpregs.mcfpu_fregs), fpregs,
@@ -380,7 +380,7 @@ setup_rt_frame(struct k_sigaction *ka, struct pt_regs *regs,
 	/* 1. Make sure everything is clean */
 	synchronize_user_stack();
 	save_and_clear_fpu();
-	
+
 	wsaved = get_thread_wsaved();
 
 	sf_size = sizeof(struct rt_signal_frame);
@@ -416,7 +416,7 @@ setup_rt_frame(struct k_sigaction *ka, struct pt_regs *regs,
 	} else {
 		err |= __put_user(0, &sf->rwin_save);
 	}
-	
+
 	/* Setup sigaltstack */
 	err |= __put_user(current->sas_ss_sp, &sf->stack.ss_sp);
 	err |= __put_user(sas_ss_flags(regs->u_regs[UREG_FP]), &sf->stack.ss_flags);
@@ -443,7 +443,7 @@ setup_rt_frame(struct k_sigaction *ka, struct pt_regs *regs,
 	}
 	if (err)
 		goto sigsegv;
-	
+
 	/* 3. signal handler back-trampoline and parameters */
 	regs->u_regs[UREG_FP] = ((unsigned long) sf) - STACK_BIAS;
 	regs->u_regs[UREG_I0] = signo;
@@ -524,7 +524,7 @@ static void do_signal(struct pt_regs *regs, unsigned long orig_i0)
 	sigset_t *oldset;
 	siginfo_t info;
 	int signr;
-	
+
 	/* It's a lot of work and synchronization to add a new ptrace
 	 * register for GDB to save and restore in order to get
 	 * orig_i0 correct for syscall restarts when debugging.
@@ -558,7 +558,7 @@ static void do_signal(struct pt_regs *regs, unsigned long orig_i0)
 		do_signal32(oldset, regs);
 		return;
 	}
-#endif	
+#endif
 
 	signr = get_signal_to_deliver(&info, &ka, regs, NULL);
 

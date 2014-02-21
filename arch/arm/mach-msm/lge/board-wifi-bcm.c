@@ -665,7 +665,7 @@ static struct wifi_platform_data bcm_wifi_control = {
 	.set_power	= bcm_wifi_set_power,
 	.set_reset      = bcm_wifi_reset,
 	.set_carddetect = bcm_wifi_carddetect,
-	.get_mac_addr   = bcm_wifi_get_mac_addr, 
+	.get_mac_addr   = bcm_wifi_get_mac_addr,
 	.get_country_code = bcm_wifi_get_country_code,
 };
 

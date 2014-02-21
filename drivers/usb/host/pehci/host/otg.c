@@ -1,23 +1,23 @@
-/* 
-* Copyright (C) ST-Ericsson AP Pte Ltd 2010 
+/*
+* Copyright (C) ST-Ericsson AP Pte Ltd 2010
 *
 * ISP1763 Linux OTG Controller driver : host
-* 
-* This program is free software; you can redistribute it and/or modify it under the terms of 
-* the GNU General Public License as published by the Free Software Foundation; version 
-* 2 of the License. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY  
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS  
-* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more  
-* details. 
-* 
-* You should have received a copy of the GNU General Public License 
-* along with this program; if not, write to the Free Software 
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
-* 
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; version
+* 2 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*
 * This is a host controller driver file. OTG related events are handled here.
-* 
+*
 * Author : wired support <wired.support@stericsson.com>
 *
 */
@@ -110,7 +110,7 @@ phci_remotewakeup(struct isp1763_dev *dev)
         huburb->status = 0;
     /*complete the urb*/
 #if ((defined LINUX_269) || defined (LINUX_2611))
-    huburb->complete(huburb,NULL);      
+    huburb->complete(huburb,NULL);
 #else
 	 huburb->complete(huburb);
 #endif
@@ -132,7 +132,7 @@ phci_resume_wakeup(struct isp1763_dev *dev)
         huburb->status = 0;
     /*complete the urb*/
 #if ((defined LINUX_269) || defined (LINUX_2611))
-    huburb->complete(huburb,NULL);      
+    huburb->complete(huburb,NULL);
 #else
 	 huburb->complete(huburb);
 #endif

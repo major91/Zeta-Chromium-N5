@@ -49,7 +49,7 @@ static void pci_destroy_dev(struct pci_dev *dev)
  * pci_remove_device_safe - remove an unused hotplug device
  * @dev: the device to remove
  *
- * Delete the device structure from the device lists and 
+ * Delete the device structure from the device lists and
  * notify userspace (/sbin/hotplug), but only if the device
  * in question is not being used by a driver.
  * Returns 0 on success.

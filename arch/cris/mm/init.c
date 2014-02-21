@@ -33,7 +33,7 @@ mem_init(void)
 	 */
 
 	max_mapnr = num_physpages = max_low_pfn - min_low_pfn;
- 
+
 	/* this will put all memory onto the freelists */
         totalram_pages = free_all_bootmem();
 
@@ -49,7 +49,7 @@ mem_init(void)
 	codesize =  (unsigned long) &_etext - (unsigned long) &_stext;
         datasize =  (unsigned long) &_edata - (unsigned long) &_etext;
         initsize =  (unsigned long) &__init_end - (unsigned long) &__init_begin;
-	
+
         printk(KERN_INFO
                "Memory: %luk/%luk available (%dk kernel code, %dk reserved, %dk data, "
 	       "%dk init)\n" ,
@@ -64,7 +64,7 @@ mem_init(void)
 
 /* free the pages occupied by initialization code */
 
-void 
+void
 free_initmem(void)
 {
         unsigned long addr;

@@ -3,7 +3,7 @@
 /*
  *      mcfmbus.h -- Coldfire MBUS support defines.
  *
- *      (C) Copyright 1999, Martin Floeer (mfloeer@axcent.de) 
+ *      (C) Copyright 1999, Martin Floeer (mfloeer@axcent.de)
  */
 
 /****************************************************************************/

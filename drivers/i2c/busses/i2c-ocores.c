@@ -18,7 +18,7 @@
  * - interrupts      : interrupt number
  * - regstep         : size of device registers in bytes
  * - clock-frequency : frequency of bus clock in Hz
- * 
+ *
  * Example:
  *
  *  i2c0: ocores@a0000000 {

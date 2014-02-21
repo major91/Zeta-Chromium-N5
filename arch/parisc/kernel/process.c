@@ -115,7 +115,7 @@ void machine_restart(char *cmd)
 #endif
 	/* set up a new led state on systems shipped with a LED State panel */
 	pdc_chassis_send_status(PDC_CHASSIS_DIRECT_SHUTDOWN);
-	
+
 	/* "Normal" system reset */
 	pdc_do_reset();
 
@@ -139,7 +139,7 @@ void (*chassis_power_off)(void);
 
 /*
  * This routine is called from sys_reboot to actually turn off the
- * machine 
+ * machine
  */
 void machine_power_off(void)
 {
@@ -151,9 +151,9 @@ void machine_power_off(void)
 	 * If the user had already pressed the power button, the
 	 * following call will immediately power off. */
 	pdc_soft_power_button(0);
-	
+
 	pdc_chassis_send_status(PDC_CHASSIS_DIRECT_SHUTDOWN);
-		
+
 	/* It seems we have no way to power the system off via
 	 * software. The user has to press the button himself. */
 
@@ -228,9 +228,9 @@ sys_clone(unsigned long clone_flags, unsigned long usp,
 	   r26 = Clone flags.
 	   r25 = Child stack.
 	   r24 = parent_tidptr.
-	   r23 = Is the TLS storage descriptor 
-	   r22 = child_tidptr 
-	   
+	   r23 = Is the TLS storage descriptor
+	   r22 = child_tidptr
+
 	   However, these last 3 args are only examined
 	   if the proper flags are set. */
 	int __user *parent_tidptr = (int __user *)regs->gr[24];
@@ -261,7 +261,7 @@ copy_thread(unsigned long clone_flags, unsigned long usp,
 {
 	struct pt_regs * cregs = &(p->thread.regs);
 	void *stack = task_stack_page(p);
-	
+
 	/* We have to use void * instead of a function pointer, because
 	 * function pointers aren't a pointer to the function on 64-bit.
 	 * Make them const so the compiler knows they live in .text */
@@ -324,7 +324,7 @@ copy_thread(unsigned long clone_flags, unsigned long usp,
 		/* Setup thread TLS area from the 4th parameter in clone */
 		if (clone_flags & CLONE_SETTLS)
 		  cregs->cr27 = pregs->gr[23];
-	
+
 	}
 
 	return 0;

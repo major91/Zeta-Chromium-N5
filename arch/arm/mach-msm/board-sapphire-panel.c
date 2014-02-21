@@ -75,10 +75,10 @@ static void sapphire_set_backlight_level(uint8_t level)
 	unsigned long flags;
 	int i = 0;
 
-	/* Non-linear transform for the difference between two 
-         * kind of default backlight settings. 
+	/* Non-linear transform for the difference between two
+         * kind of default backlight settings.
 	 */
-	new_level = level<=GDBB ? 
+	new_level = level<=GDBB ?
 		level*SDBB/GDBB : (SDBB + (level-GDBB)*(255-SDBB) / (255-GDBB)) ;
 	index = new_level/dimming_factor ;
 

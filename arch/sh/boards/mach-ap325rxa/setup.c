@@ -166,7 +166,7 @@ static int ap320_wvga_set_brightness(int brightness)
 		__raw_writew(0, FPGA_BKLREG);
 		gpio_set_value(GPIO_PTS3, 1);
 	}
-	
+
 	return 0;
 }
 

@@ -10,7 +10,7 @@
  *    Copyright (C) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *    Author(s): Ulrich Hild        (first version)
  *               Martin Schwidefsky (heavily optimized CKSM version)
- *               D.J. Barrow        (third attempt) 
+ *               D.J. Barrow        (third attempt)
  */
 
 #include <asm/uaccess.h>
@@ -61,7 +61,7 @@ csum_partial_copy_from_user(const void __user *src, void *dst,
 		memset(dst + len - missing, 0, missing);
 		*err_ptr = -EFAULT;
 	}
-		
+
 	return csum_partial(dst, len, sum);
 }
 

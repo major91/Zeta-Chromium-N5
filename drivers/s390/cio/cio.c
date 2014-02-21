@@ -718,7 +718,7 @@ void wait_cons_dev(void)
 	unsigned long cr6      __attribute__ ((aligned (8)));
 	unsigned long save_cr6 __attribute__ ((aligned (8)));
 
-	/* 
+	/*
 	 * before entering the spinlock we may already have
 	 * processed the interrupt on a different CPU...
 	 */
@@ -761,7 +761,7 @@ static int
 cio_get_console_sch_no(void)
 {
 	struct subchannel_id schid;
-	
+
 	init_subchannel_id(&schid);
 	if (console_irq != -1) {
 		/* VM provided us with the irq number of the console. */

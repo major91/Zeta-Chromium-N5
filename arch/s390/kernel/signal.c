@@ -5,7 +5,7 @@
  *    Author(s): Denis Joseph Barrow (djbarrow@de.ibm.com,barrow_dj@yahoo.com)
  *
  *    Based on Intel version
- * 
+ *
  *  Copyright (C) 1991, 1992  Linus Torvalds
  *
  *  1997-11-28  Modified for POSIX.1b signals by Richard Henderson
@@ -36,7 +36,7 @@
 #define _BLOCKABLE (~(sigmask(SIGKILL) | sigmask(SIGSTOP)))
 
 
-typedef struct 
+typedef struct
 {
 	__u8 callee_used_stack[__SIGNAL_FRAMESIZE];
 	struct sigcontext sc;
@@ -45,7 +45,7 @@ typedef struct
 	__u8 retcode[S390_SYSCALL_SIZE];
 } sigframe;
 
-typedef struct 
+typedef struct
 {
 	__u8 callee_used_stack[__SIGNAL_FRAMESIZE];
 	__u8 retcode[S390_SYSCALL_SIZE];
@@ -123,7 +123,7 @@ static int save_sigregs(struct pt_regs *regs, _sigregs __user *sregs)
 	memcpy(&user_sregs.regs.gprs, &regs->gprs, sizeof(sregs->regs.gprs));
 	memcpy(&user_sregs.regs.acrs, current->thread.acrs,
 	       sizeof(sregs->regs.acrs));
-	/* 
+	/*
 	 * We have to store the fp registers to current->thread.fp_regs
 	 * to merge them with the emulated registers.
 	 */

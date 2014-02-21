@@ -255,14 +255,14 @@ static struct dbs_tuners {
 	.powersave_bias = 0,
 	.sync_freq = 0,
 	.optimal_freq = 0,
-	//20130711 smart_up 
+	//20130711 smart_up
 	.smart_up = SMART_UP_PLUS,
 	.smart_slow_up_load = SUP_SLOW_UP_LOAD,
 	.smart_slow_up_freq = SUP_SLOW_UP_FREQUENCY,
 	.smart_slow_up_dur = SUP_SLOW_UP_DUR_DEFAULT,
 	.smart_high_slow_up_freq = SUP_HIGH_SLOW_UP_FREQUENCY,
 	.smart_high_slow_up_dur = SUP_HIGH_SLOW_UP_DUR,
-	.smart_each_off = 0,	
+	.smart_each_off = 0,
 	// end smart_up
 	.freq_step = DEF_FREQ_STEP,
 	.step_up_early_hispeed = DEF_STEP_UP_EARLY_HISPEED,
@@ -467,7 +467,7 @@ show_one(ignore_nice_load, ignore_nice);
 show_one(optimal_freq, optimal_freq);
 show_one(up_threshold_any_cpu_load, up_threshold_any_cpu_load);
 show_one(sync_freq, sync_freq);
-//20130711 smart_up 
+//20130711 smart_up
 show_one(smart_up, smart_up);
 show_one(smart_slow_up_load, smart_slow_up_load);
 show_one(smart_slow_up_freq, smart_slow_up_freq);
@@ -995,7 +995,7 @@ static ssize_t store_smart_up(struct kobject *a, struct attribute *b,
 	}else if (input < 0 ){
 		input = 0;
 	}
-	
+
 	// buffer reset
 	for_each_online_cpu(i){
 		reset_hist(&hist_load[i]);
@@ -1312,7 +1312,7 @@ int input_event_boosted(void)
 {
 	unsigned long flags;
 
-	
+
 	spin_lock_irqsave(&input_boost_lock, flags);
 	if (input_event_boost) {
 		if (time_before(jiffies, ui_sampling_expired)) {
@@ -1476,26 +1476,26 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 			(policy->max - policy->cur) / SUP_FREQ_STEPS[0];
 		int freq_next = 0;
 		int i = 0;
-		
+
 		//20130429 UPDATE
 		int check_idx =  0;
-		int check_freq = 0; 
+		int check_freq = 0;
 		int temp_up_inc =0;
 
 		if (counter < 5) {
 			counter++;
-			if (counter > 2) {				
+			if (counter > 2) {
 				phase = 1;
 			}
 		}
-		
+
 		nr_cpus = num_online_cpus();
 		dbs_tuners_ins.two_phase_freq = two_phase_freq_array[nr_cpus-1];
 		if (dbs_tuners_ins.two_phase_freq < policy->cur)
 			phase = 1;
-		if (dbs_tuners_ins.two_phase_freq != 0 && phase == 0) {			
+		if (dbs_tuners_ins.two_phase_freq != 0 && phase == 0) {
 			dbs_freq_increase(policy, dbs_tuners_ins.two_phase_freq);
-		} else {			
+		} else {
 			if (policy->cur < policy->max)
 				this_dbs_info->rate_mult =
 					dbs_tuners_ins.sampling_down_factor;
@@ -1507,16 +1507,16 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 							* policy->cur) {
 				smart_up_inc = (policy->max - policy->cur)
 						/ SUP_FREQ_STEPS[i];
-			
+
 				break;
 			}
 		}
-		
+
 		//20130429 UPDATE
 		check_idx =  pre_freq_idx[core_j].freq_idx;
-		check_freq = pre_freq_idx[core_j].freq_value; 
-		if ( ( check_idx == 0) 
-		|| (this_dbs_info->freq_table[check_idx].frequency 
+		check_freq = pre_freq_idx[core_j].freq_value;
+		if ( ( check_idx == 0)
+		|| (this_dbs_info->freq_table[check_idx].frequency
 			!=  policy->cur) )
 		{
 			int i = 0;
@@ -1524,35 +1524,35 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 			{
 				if (this_dbs_info->freq_table[i].frequency == policy->cur)
 				{
-					
+
 					pre_freq_idx[core_j].freq_idx = i;
 					pre_freq_idx[core_j].freq_value = policy->cur;
 					check_idx =  i;
-					check_freq = policy->cur; 
+					check_freq = policy->cur;
 					break;
 				}
 			}
-			
+
 		}
-		if( check_idx < SUP_FREQ_LEVEL-1 ){ 
-		temp_up_inc =  
-			this_dbs_info->freq_table[check_idx + 1].frequency 
+		if( check_idx < SUP_FREQ_LEVEL-1 ){
+		temp_up_inc =
+			this_dbs_info->freq_table[check_idx + 1].frequency
 			- check_freq;
 		}
-			
+
 		if (smart_up_inc < temp_up_inc )
 			smart_up_inc = temp_up_inc;
 
 		freq_next = MIN((policy->cur + smart_up_inc), policy->max);
 
-			
+
 			if (policy->cur >= dbs_tuners_ins.smart_high_slow_up_freq){
 			int idx = hist_load_high[core_j].hist_load_cnt;
 			int avg_hist_load = 0;
-			
+
 				if (idx >= dbs_tuners_ins.smart_high_slow_up_dur)
 				idx = 0;
-				
+
 			hist_load_high[core_j].hist_max_load[idx] = max_load;
 			hist_load_high[core_j].hist_load_cnt = idx + 1;
 
@@ -1567,7 +1567,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 				avg_hist_load = sum_hist_load_freq
 							/dbs_tuners_ins.smart_high_slow_up_dur;
-						
+
 					if (avg_hist_load > dbs_tuners_ins.smart_slow_up_load){
 					reset_hist_high(&hist_load_high[core_j]);
 					freq_next = MIN((policy->cur + temp_up_inc), policy->max);
@@ -1576,7 +1576,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 			} else {
 				freq_next = policy->cur;
 			}
-			
+
 			} else if (policy->cur >= dbs_tuners_ins.smart_slow_up_freq ) {
 			int idx = hist_load[core_j].hist_load_cnt;
 			int avg_hist_load = 0;
@@ -1667,7 +1667,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	}
 	if (counter > 0) {
 		counter--;
-		if (counter == 0) {						
+		if (counter == 0) {
 			phase = 0;
 		}
 	}
@@ -1728,7 +1728,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 			hist_load_high[core_j].hist_max_load[idx] = max_load;
 			hist_load_high[core_j].hist_load_cnt = idx + 1;
 
-		
+
 			}else if (freq_next >= dbs_tuners_ins.smart_slow_up_freq) {
 			int idx = hist_load[core_j].hist_load_cnt;
 
@@ -1740,12 +1740,12 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 			reset_hist_high(&hist_load_high[core_j]);
 
-		
+
 			} else if (policy->cur >= dbs_tuners_ins.smart_slow_up_freq) {
 			reset_hist(&hist_load[core_j]);
 			reset_hist_high(&hist_load_high[core_j]);
 
-				
+
 			}
 		}
 //#endif
@@ -2032,7 +2032,7 @@ static void dbs_input_event(struct input_handle *handle, unsigned int type,
 		return;
 	}
 
-	if (type == EV_SYN && code == SYN_REPORT) {		
+	if (type == EV_SYN && code == SYN_REPORT) {
 		spin_lock_irqsave(&input_boost_lock, flags);
 		input_event_boost = true;
 		ui_sampling_expired = jiffies + msecs_to_jiffies(dbs_tuners_ins.ui_timeout);
@@ -2041,7 +2041,7 @@ static void dbs_input_event(struct input_handle *handle, unsigned int type,
 		input_event_min_freq = input_event_min_freq_array[num_online_cpus() - 1];
 		for_each_online_cpu(i) {
 			dbs_info = &per_cpu(od_cpu_dbs_info, i);
-			if (dbs_info->cur_policy &&		
+			if (dbs_info->cur_policy &&
 				dbs_info->cur_policy->cur < input_event_min_freq) {
 				wake_up_process(per_cpu(up_task, i));
 			}
@@ -2055,7 +2055,7 @@ static int input_dev_filter(const char *input_dev_name)
  	    strstr(input_dev_name, "touch_dev") ||
  	    strstr(input_dev_name, "sec-touchscreen") ||
 	    strstr(input_dev_name, "keypad")) {
-		return 0; 
+		return 0;
 	} else {
 		return 1;
 	}
@@ -2067,7 +2067,7 @@ static int dbs_input_connect(struct input_handler *handler,
 {
 	struct input_handle *handle;
 	int error;
-	
+
 	if (input_dev_filter(dev->name))
 		return -ENODEV;
 
@@ -2290,7 +2290,7 @@ static int cpufreq_gov_dbs_up_task(void *data)
 		this_dbs_info = &per_cpu(od_cpu_dbs_info, cpu);
 		policy = this_dbs_info->cur_policy;
 		if (!policy) {
-			
+
 			goto bail_incorrect_governor;
 		}
 
@@ -2298,7 +2298,7 @@ static int cpufreq_gov_dbs_up_task(void *data)
 
 		input_event_min_freq = input_event_min_freq_array[num_online_cpus() - 1];
 		if (policy->cur < input_event_min_freq) {
-			
+
 			dbs_tuners_ins.powersave_bias = 0;
 			dbs_freq_increase(policy, input_event_min_freq);
 			this_dbs_info->prev_cpu_idle = get_cpu_idle_time(cpu, &this_dbs_info->prev_cpu_wall);

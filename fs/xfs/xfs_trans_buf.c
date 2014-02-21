@@ -755,7 +755,7 @@ xfs_trans_inode_buf(
 /*
  * This call is used to indicate that the buffer is going to
  * be staled and was an inode buffer. This means it gets
- * special processing during unpin - where any inodes 
+ * special processing during unpin - where any inodes
  * associated with the buffer should be removed from ail.
  * There is also special processing during recovery,
  * any replay of the inodes in the buffer needs to be

@@ -1,23 +1,23 @@
-/* 
-* Copyright (C) ST-Ericsson AP Pte Ltd 2010 
+/*
+* Copyright (C) ST-Ericsson AP Pte Ltd 2010
 *
 * ISP1763 Linux OTG Controller driver : host
-* 
-* This program is free software; you can redistribute it and/or modify it under the terms of 
-* the GNU General Public License as published by the Free Software Foundation; version 
-* 2 of the License. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY  
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS  
-* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more  
-* details. 
-* 
-* You should have received a copy of the GNU General Public License 
-* along with this program; if not, write to the Free Software 
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
-* 
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; version
+* 2 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*
 * This is a host controller driver file. Isochronous event processing is handled here.
-* 
+*
 * Author : wired support <wired.support@stericsson.com>
 *
 */
@@ -314,7 +314,7 @@ phcd_iso_itd_to_ptd(phci_hcd * hcd,
 	 */
 	max_packet = usb_maxpacket(urb->dev, urb->pipe, usb_pipeout(urb->pipe));
 
-	maxpacket = usb_maxpacket(urb->dev, urb->pipe, usb_pipeout(urb->pipe));	
+	maxpacket = usb_maxpacket(urb->dev, urb->pipe, usb_pipeout(urb->pipe));
 
 	/*
 	 * We need to add 1 since our Multi starts with 1 instead of the USB specs defined
@@ -890,7 +890,7 @@ phcd_iso_get_sitd_ptd_index(phci_hcd * hcd, struct ehci_sitd *sitd)
 
 			ptd_map_buff->active_ptd_bitmap |=
 				(bitmap << sitd_index);
-			ptd_map_buff->pending_ptd_bitmap |= (bitmap << sitd_index);	
+			ptd_map_buff->pending_ptd_bitmap |= (bitmap << sitd_index);
 			break;
 		}		/* if(ptd_map_buff->map_list[sitd_index].state == TD_PTD_NEW) */
 	}			/* for(itd_index = 0; itd_index < max_ptds; itd_index++) */
@@ -968,7 +968,7 @@ phcd_iso_get_itd_ptd_index(phci_hcd * hcd, struct ehci_itd *itd)
 
 			ptd_map_buff->active_ptd_bitmap |=
 				(bitmap << itd_index);
-			ptd_map_buff->pending_ptd_bitmap |= (bitmap << itd_index);	
+			ptd_map_buff->pending_ptd_bitmap |= (bitmap << itd_index);
 			break;
 		}		/* if(ptd_map_buff->map_list[itd_index].state == TD_PTD_NEW) */
 	}			/* for(itd_index = 0; itd_index < max_ptds; itd_index++) */
@@ -1322,7 +1322,7 @@ phcd_clean_urb_pending(phci_hcd * hcd, struct urb *urb)
 	if (periodic_ep[1] == qhead->ep) {
 		periodic_ep[1] = NULL;
 	}
-#else	
+#else
 	qhead = urb->ep->hcpriv;
 	if (periodic_ep[0] == urb->ep) {
 		periodic_ep[0] = NULL;
@@ -1332,7 +1332,7 @@ phcd_clean_urb_pending(phci_hcd * hcd, struct urb *urb)
 	if (periodic_ep[1] == urb->ep) {
 		periodic_ep[1] = NULL;
 	}
-#endif	
+#endif
 	if (!qhead) {
 		return 0;
 	}
@@ -1459,10 +1459,10 @@ phcd_store_urb_pending(phci_hcd * hcd, int index, struct urb *urb, int *status)
 			usb_maxpacket(urb->dev,urb->pipe, usb_pipeout(urb->pipe)));
 		/*if enough free slots */
 		if (urb->dev->speed == USB_SPEED_FULL) {	/*for FULL SPEED */
-	//		if (hcd->periodic_sched < 
+	//		if (hcd->periodic_sched <
 		//		MAX_PERIODIC_SIZE - urb->number_of_packets) {
 			if(1){
-				if (phcd_submit_iso(hcd, 
+				if (phcd_submit_iso(hcd,
 					#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 						struct usb_host_endpoint *ep,
 					#endif
@@ -1683,7 +1683,7 @@ phcd_submit_iso(phci_hcd * hcd,
 		iNumofSlots = NUMMICROFRAME / urb->interval;
 		/*number of PTDs need to schedule for this PTD */
 		iNumofPTDs = (urb->number_of_packets / mult) / iNumofSlots;
-		if ((urb->number_of_packets / mult) % iNumofSlots != 0){	
+		if ((urb->number_of_packets / mult) % iNumofSlots != 0){
 			/*get remainder */
 			iNumofPTDs += 1;
 		}
@@ -1793,14 +1793,14 @@ phcd_submit_iso(phci_hcd * hcd,
 				if (((int)(qhead->next_uframe -
 					urb->number_of_packets)) < 0){
 					/*plus max PTDs*/
-					qhead->next_uframe = qhead->next_uframe + PTD_PERIODIC_SIZE;	
-					
+					qhead->next_uframe = qhead->next_uframe + PTD_PERIODIC_SIZE;
+
 				}
 				qhead->next_uframe -= urb->number_of_packets;
 
 				/* Handle SITD list cleanup */
 				if (urb->hcpriv) {
-					phcd_iso_sitd_free_list(hcd, urb, 
+					phcd_iso_sitd_free_list(hcd, urb,
 						*status);
 				}
 				iso_dbg(ISO_DBG_ERR,
@@ -1852,11 +1852,11 @@ phcd_submit_iso(phci_hcd * hcd,
 			*status = phcd_iso_sitd_fill(hcd, sitd, urb, packets);
 
 			if (*status != 0) {
-				if (((int)(qhead->next_uframe - 
+				if (((int)(qhead->next_uframe -
 					urb->number_of_packets)) < 0){
 					/*plus max PTDs*/
-					qhead->next_uframe = qhead->next_uframe + 
-						PTD_PERIODIC_SIZE;	
+					qhead->next_uframe = qhead->next_uframe +
+						PTD_PERIODIC_SIZE;
 				}
 				qhead->next_uframe -= urb->number_of_packets;
 
@@ -1898,7 +1898,7 @@ phcd_submit_iso(phci_hcd * hcd,
 				if (((int) (qhead->next_uframe -
 					urb->number_of_packets)) < 0){
 					/*plus max PTDs*/
-					qhead->next_uframe = qhead->next_uframe + PTD_PERIODIC_SIZE;	
+					qhead->next_uframe = qhead->next_uframe + PTD_PERIODIC_SIZE;
 				}
 				qhead->next_uframe -= urb->number_of_packets;
 
@@ -1927,7 +1927,7 @@ phcd_submit_iso(phci_hcd * hcd,
 				urb->hcpriv = sitd;
 			}
 		}	/* for(packets = 0; packets... */
-	} else if (urb->dev->speed == USB_SPEED_HIGH) {	
+	} else if (urb->dev->speed == USB_SPEED_HIGH) {
 		iNumofPks = iNumofPTDs;
 
 		packets = 0;
@@ -1947,8 +1947,8 @@ phcd_submit_iso(phci_hcd * hcd,
 				*status = -ENOMEM;
 				if(((int) (qhead->next_uframe - iNumofPTDs))<0){
 					/*plus max PTDs*/
-					qhead->next_uframe = qhead->next_uframe + 
-						PTD_PERIODIC_SIZE;	
+					qhead->next_uframe = qhead->next_uframe +
+						PTD_PERIODIC_SIZE;
 				}
 				qhead->next_uframe -= iNumofPTDs;
 
@@ -2053,10 +2053,10 @@ phcd_submit_iso(phci_hcd * hcd,
 					length += urb->iso_frame_desc[i].length;
 				}
 				itd->hw_transaction[iMicroIndex] =
-					EHCI_ISOC_ACTIVE | (length & 
+					EHCI_ISOC_ACTIVE | (length &
 					EHCI_ITD_TRANLENGTH)
 					<< 16 | iPG << 12 | buff_dma;
-					
+
 				if (itd->hw_bufp[iPG] != buff_dma){
 					itd->hw_bufp[++iPG] = buff_dma;
 				}
@@ -2079,7 +2079,7 @@ phcd_submit_iso(phci_hcd * hcd,
 						EHCI_ITD_IOC;
 
 					break;
-					
+
 				}
 			}
 
@@ -2115,7 +2115,7 @@ phcd_submit_iso(phci_hcd * hcd,
 				if (((int) (qhead->next_uframe - iNumofPTDs)) <
 					0){
 					/*plus max PTDs*/
-					qhead->next_uframe = qhead->next_uframe + PTD_PERIODIC_SIZE;	
+					qhead->next_uframe = qhead->next_uframe + PTD_PERIODIC_SIZE;
 				}
 				qhead->next_uframe -= iNumofPTDs;
 

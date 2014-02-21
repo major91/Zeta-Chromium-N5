@@ -1070,7 +1070,7 @@ int sequencer_open(int dev, struct file *file)
 			{
 				if (!try_module_get(midi_devs[i]->owner))
 					continue;
-	
+
 				if ((retval = midi_devs[i]->open(i, mode,
 					sequencer_midi_input, sequencer_midi_output)) >= 0)
 				{

@@ -117,7 +117,7 @@
 #define CSOR_AVEC_OFF		0x0000
 #define CSOR_AVEC_MASK		0x0001
 
-#define CSBAR_ADDR(x)		((addr >> 11) << 3) 
+#define CSBAR_ADDR(x)		((addr >> 11) << 3)
 #define CSBAR_ADDR_MASK		0xfff8
 #define CSBAR_BLKSIZE_2K	0x0000
 #define CSBAR_BLKSIZE_8K	0x0001

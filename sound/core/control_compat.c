@@ -284,7 +284,7 @@ static int copy_ctl_value_to_user(struct snd_ctl_elem_value32 __user *data32,
 	return 0;
 }
 
-static int snd_ctl_elem_read_user_compat(struct snd_card *card, 
+static int snd_ctl_elem_read_user_compat(struct snd_card *card,
 					 struct snd_ctl_elem_value32 __user *data32)
 {
 	struct snd_ctl_elem_value *data;
@@ -384,7 +384,7 @@ static int snd_ctl_elem_add_compat(struct snd_ctl_file *file,
  error:
 	kfree(data);
 	return err;
-}  
+}
 
 enum {
 	SNDRV_CTL_IOCTL_ELEM_LIST32 = _IOWR('U', 0x10, struct snd_ctl_elem_list32),

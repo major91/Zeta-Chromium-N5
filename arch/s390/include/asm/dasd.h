@@ -1,4 +1,4 @@
-/* 
+/*
  * File...........: linux/drivers/s390/block/dasd.c
  * Author(s)......: Holger Smolinski <Holger.Smolinski@de.ibm.com>
  * Bugreports.to..: <Linux390@de.ibm.com>
@@ -21,7 +21,7 @@
 
 #define DASD_API_VERSION 6
 
-/* 
+/*
  * struct dasd_information2_t
  * represents any data about the device, which is visible to userspace.
  *  including foramt and featueres.
@@ -34,8 +34,8 @@ typedef struct dasd_information2_t {
         unsigned int cu_model :  8; /* from SenseID */
         unsigned int dev_type : 16; /* from SenseID */
         unsigned int dev_model : 8; /* from SenseID */
-        unsigned int open_count; 
-        unsigned int req_queue_len; 
+        unsigned int open_count;
+        unsigned int req_queue_len;
         unsigned int chanq_len;     /* length of chanq */
         char type[4];               /* from discipline.name, 'none' for unknown */
         unsigned int status;        /* current device level */
@@ -86,7 +86,7 @@ typedef struct dasd_information2_t {
 
 #define DASD_PARTN_BITS 2
 
-/* 
+/*
  * struct dasd_information_t
  * represents any data about the data, which is visible to userspace
  */
@@ -98,8 +98,8 @@ typedef struct dasd_information_t {
         unsigned int cu_model :  8; /* from SenseID */
         unsigned int dev_type : 16; /* from SenseID */
         unsigned int dev_model : 8; /* from SenseID */
-        unsigned int open_count; 
-        unsigned int req_queue_len; 
+        unsigned int open_count;
+        unsigned int req_queue_len;
         unsigned int chanq_len;     /* length of chanq */
         char type[4];               /* from discipline.name, 'none' for unknown */
         unsigned int status;        /* current device level */
@@ -113,7 +113,7 @@ typedef struct dasd_information_t {
 
 /*
  * Read Subsystem Data - Performance Statistics
- */ 
+ */
 typedef struct dasd_rssd_perf_stats_t {
 	unsigned char  invalid:1;
 	unsigned char  format:3;
@@ -148,9 +148,9 @@ typedef struct dasd_rssd_perf_stats_t {
 	unsigned char  reseved2[96];
 } __attribute__((packed)) dasd_rssd_perf_stats_t;
 
-/* 
+/*
  * struct profile_info_t
- * holds the profinling information 
+ * holds the profinling information
  */
 typedef struct dasd_profile_info_t {
         unsigned int dasd_io_reqs;	 /* number of requests processed at all */
@@ -189,7 +189,7 @@ typedef struct format_data_t {
 #define DASD_FMT_INT_COMPAT 8 /* use OS/390 compatible disk layout */
 
 
-/* 
+/*
  * struct attrib_data_t
  * represents the operation (cache) bits for the device.
  * Used in DE to influence caching of the DASD.
@@ -245,13 +245,13 @@ struct dasd_snid_ioctl_data {
  * Here ist how the ioctl-nr should be used:
  *    0 -   31   DASD driver itself
  *   32 -  239   still open
- *  240 -  255   reserved for EMC 
+ *  240 -  255   reserved for EMC
  *******************************************************************************/
 
 /* Disable the volume (for Linux) */
-#define BIODASDDISABLE _IO(DASD_IOCTL_LETTER,0) 
+#define BIODASDDISABLE _IO(DASD_IOCTL_LETTER,0)
 /* Enable the volume (for Linux) */
-#define BIODASDENABLE  _IO(DASD_IOCTL_LETTER,1)  
+#define BIODASDENABLE  _IO(DASD_IOCTL_LETTER,1)
 /* Issue a reserve/release command, rsp. */
 #define BIODASDRSRV    _IO(DASD_IOCTL_LETTER,2) /* reserve */
 #define BIODASDRLSE    _IO(DASD_IOCTL_LETTER,3) /* release */
@@ -259,9 +259,9 @@ struct dasd_snid_ioctl_data {
 /* reset profiling information of a device */
 #define BIODASDPRRST   _IO(DASD_IOCTL_LETTER,5)
 /* Quiesce IO on device */
-#define BIODASDQUIESCE _IO(DASD_IOCTL_LETTER,6) 
+#define BIODASDQUIESCE _IO(DASD_IOCTL_LETTER,6)
 /* Resume IO on device */
-#define BIODASDRESUME  _IO(DASD_IOCTL_LETTER,7) 
+#define BIODASDRESUME  _IO(DASD_IOCTL_LETTER,7)
 
 
 /* retrieve API version number */
@@ -275,13 +275,13 @@ struct dasd_snid_ioctl_data {
 /* Performance Statistics Read */
 #define BIODASDPSRD    _IOR(DASD_IOCTL_LETTER,4,dasd_rssd_perf_stats_t)
 /* Get Attributes (cache operations) */
-#define BIODASDGATTR   _IOR(DASD_IOCTL_LETTER,5,attrib_data_t) 
+#define BIODASDGATTR   _IOR(DASD_IOCTL_LETTER,5,attrib_data_t)
 
 
 /* #define BIODASDFORMAT  _IOW(IOCTL_LETTER,0,format_data_t) , deprecated */
-#define BIODASDFMT     _IOW(DASD_IOCTL_LETTER,1,format_data_t) 
+#define BIODASDFMT     _IOW(DASD_IOCTL_LETTER,1,format_data_t)
 /* Set Attributes (cache operations) */
-#define BIODASDSATTR   _IOW(DASD_IOCTL_LETTER,2,attrib_data_t) 
+#define BIODASDSATTR   _IOW(DASD_IOCTL_LETTER,2,attrib_data_t)
 
 /* Get Sense Path Group ID (SNID) data */
 #define BIODASDSNID    _IOWR(DASD_IOCTL_LETTER, 1, struct dasd_snid_ioctl_data)

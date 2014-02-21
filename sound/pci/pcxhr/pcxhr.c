@@ -1526,7 +1526,7 @@ static int __devinit pcxhr_probe(struct pci_dev *pci,
 	tasklet_init(&mgr->trigger_taskq, pcxhr_trigger_tasklet,
 		     (unsigned long) mgr);
 
-	mgr->prmh = kmalloc(sizeof(*mgr->prmh) + 
+	mgr->prmh = kmalloc(sizeof(*mgr->prmh) +
 			    sizeof(u32) * (PCXHR_SIZE_MAX_LONG_STATUS -
 					   PCXHR_SIZE_MAX_STATUS),
 			    GFP_KERNEL);

@@ -77,7 +77,7 @@ EXPORT_SYMBOL(__do_clear_user);
 EXPORT_SYMBOL(__strncpy_from_user);
 EXPORT_SYMBOL(__strnlen_user);
 
-/* 
+/*
  * SMP-specific symbols.
  */
 

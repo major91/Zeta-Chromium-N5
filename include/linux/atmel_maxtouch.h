@@ -1,6 +1,6 @@
 /*
  *  Atmel maXTouch header file
- *  
+ *
  *  Copyright (c) 2010 Atmel Corporation
  *  Copyright (C) 2010 Ulf Samuelsson (ulf@atmel.com)
  *
@@ -256,14 +256,14 @@
 #define MXT_RESET_IOCTL       ('x' + 2)  /* Resets the device */
 #define MXT_CALIBRATE_IOCTL   ('x' + 3)  /* Calibrates the device */
 /* Backups the current state of registers to NVM */
-#define MXT_BACKUP_IOCTL      ('x' + 4) 
+#define MXT_BACKUP_IOCTL      ('x' + 4)
 /*
- * Only non-touch messages can be read from the message buffer 
+ * Only non-touch messages can be read from the message buffer
  * (/dev/maXTouch_messages)
  */
 #define MXT_NONTOUCH_MSG_IOCTL ('x' + 5)
 /* All messages can be read from the message buffer */
-#define MXT_ALL_MSG_IOCTL ('x' + 6)  
+#define MXT_ALL_MSG_IOCTL ('x' + 6)
 
 
 /* Message buffer size. This is a ring buffer, and when full, the oldest entry
@@ -285,7 +285,7 @@ static int mxt_write_block_bl(struct i2c_client *client, u16 length, u8 *value);
 /**
  * struct maxtouch_platform_data - includes platform specific informatio
  * related to Atmel maXTouch touchscreen controller.
- * 
+ *
  * @numtouch:           Number of simultaneous touches supported
  * @init_platform_hw(): Initialization function, which can for example
  *                      trigger a hardware reset by toggling a GPIO pin
@@ -297,7 +297,7 @@ static int mxt_write_block_bl(struct i2c_client *client, u16 length, u8 *value);
  * @max_x:              Reported X range
  * @max_y:              Reported Y range
  */
- 
+
 struct maxtouch_platform_data {
 	u8    numtouch;	/* Number of touches to report	*/
 	int   (*init_platform_hw)(struct i2c_client *client);
@@ -306,7 +306,7 @@ struct maxtouch_platform_data {
 	int   display_res_y;
 	int   min_x;
 	int   min_y;
-	int   max_x;    /* The default reported X range   */  
+	int   max_x;    /* The default reported X range   */
 	int   max_y;    /* The default reported Y range   */
 	u8    (*valid_interrupt) (void);
 	u8    (*read_chg) (void);

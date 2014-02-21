@@ -173,7 +173,7 @@ vMgrDecodeBeacon(
             break;
 
         case WLAN_EID_RSN:
-            if (pFrame->pRSN == NULL) 
+            if (pFrame->pRSN == NULL)
                 pFrame->pRSN = (PWLAN_IE_RSN)pItem;
             break;
         case WLAN_EID_RSN_WPA:

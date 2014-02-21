@@ -714,7 +714,7 @@ int usbhid_open(struct hid_device *hid)
 		usbhid->intf->needs_remote_wakeup = 1;
 		if (hid_start_in(hid))
 			hid_io_error(hid);
- 
+
 		usb_autopm_put_interface(usbhid->intf);
 	}
 	mutex_unlock(&hid_open_mut);

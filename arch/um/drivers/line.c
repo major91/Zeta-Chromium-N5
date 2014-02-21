@@ -661,7 +661,7 @@ int register_lines(struct line_driver *line_driver,
 	driver->subtype = line_driver->subtype;
 	driver->flags = TTY_DRIVER_REAL_RAW | TTY_DRIVER_DYNAMIC_DEV;
 	driver->init_termios = tty_std_termios;
-	
+
 	for (i = 0; i < nlines; i++) {
 		spin_lock_init(&lines[i].lock);
 		mutex_init(&lines[i].count_lock);

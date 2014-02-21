@@ -44,7 +44,7 @@ int adsp_vfe_patch_event(struct msm_adsp_module *module,
 	case VFE_MSG_OP2:
 		return patch_op_event(module, event);
 	case VFE_MSG_STATS_AF:
-	case VFE_MSG_STATS_WB_EXP:	
+	case VFE_MSG_STATS_WB_EXP:
 		return patch_af_wb_event(module, event);
 	default:
 		break;

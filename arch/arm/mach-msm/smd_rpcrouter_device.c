@@ -167,7 +167,7 @@ static ssize_t rpcrouter_read(struct file *filp, char __user *buf,
 
 	count = rc;
 
-	while (frag != NULL) {		
+	while (frag != NULL) {
 		if (copy_to_user(buf, frag->data, frag->length)) {
 			printk(KERN_ERR
 			       "rpcrouter: could not copy all read data to user!\n");

@@ -1840,12 +1840,12 @@ extern void r600_hdmi_setmode(struct drm_encoder *encoder, struct drm_display_mo
 extern int ni_init_microcode(struct radeon_device *rdev);
 extern int ni_mc_load_microcode(struct radeon_device *rdev);
 
-/* radeon_acpi.c */ 
-#if defined(CONFIG_ACPI) 
-extern int radeon_acpi_init(struct radeon_device *rdev); 
-#else 
-static inline int radeon_acpi_init(struct radeon_device *rdev) { return 0; } 
-#endif 
+/* radeon_acpi.c */
+#if defined(CONFIG_ACPI)
+extern int radeon_acpi_init(struct radeon_device *rdev);
+#else
+static inline int radeon_acpi_init(struct radeon_device *rdev) { return 0; }
+#endif
 
 #include "radeon_object.h"
 

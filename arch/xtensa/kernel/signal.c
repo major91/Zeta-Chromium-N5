@@ -50,7 +50,7 @@ struct rt_sigframe
 	unsigned int window[4];
 };
 
-/* 
+/*
  * Flush register windows stored in pt_regs to stack.
  * Returns 1 for errors.
  */
@@ -74,7 +74,7 @@ flush_window_regs_user(struct pt_regs *regs)
 
 	wm = (ws >> wb) | (ws << (XCHAL_NUM_AREGS / 4 - wb));
 	base = (XCHAL_NUM_AREGS / 4) - (regs->wmask >> 4);
-		
+
 	/* For call8 or call12 frames, we need the previous stack pointer. */
 
 	if ((regs->wmask & 2) == 0)
@@ -128,10 +128,10 @@ errout:
 }
 
 /*
- * Note: We don't copy double exception 'regs', we have to finish double exc. 
- * first before we return to signal handler! This dbl.exc.handler might cause 
- * another double exception, but I think we are fine as the situation is the 
- * same as if we had returned to the signal handerl and got an interrupt 
+ * Note: We don't copy double exception 'regs', we have to finish double exc.
+ * first before we return to signal handler! This dbl.exc.handler might cause
+ * another double exception, but I think we are fine as the situation is the
+ * same as if we had returned to the signal handerl and got an interrupt
  * immediately...
  */
 
@@ -392,13 +392,13 @@ static int setup_frame(int sig, struct k_sigaction *ka, siginfo_t *info,
 		ra = (unsigned long) frame->retcode;
 	}
 
-	/* 
+	/*
 	 * Create signal handler execution context.
 	 * Return context not modified until this point.
 	 */
 
 	/* Set up registers for signal handler */
-	start_thread(regs, (unsigned long) ka->sa.sa_handler, 
+	start_thread(regs, (unsigned long) ka->sa.sa_handler,
 		     (unsigned long) frame);
 
 	/* Set up a stack frame for a call4
@@ -430,9 +430,9 @@ give_sigsegv:
  * Atomically swap in the new signal mask, and wait for a signal.
  */
 
-asmlinkage long xtensa_rt_sigsuspend(sigset_t __user *unewset, 
+asmlinkage long xtensa_rt_sigsuspend(sigset_t __user *unewset,
     				     size_t sigsetsize,
-    				     long a2, long a3, long a4, long a5, 
+    				     long a2, long a3, long a4, long a5,
 				     struct pt_regs *regs)
 {
 	sigset_t saveset, newset;
@@ -457,7 +457,7 @@ asmlinkage long xtensa_rt_sigsuspend(sigset_t __user *unewset,
 	}
 }
 
-asmlinkage long xtensa_sigaltstack(const stack_t __user *uss, 
+asmlinkage long xtensa_sigaltstack(const stack_t __user *uss,
 				   stack_t __user *uoss,
     				   long a2, long a3, long a4, long a5,
 				   struct pt_regs *regs)

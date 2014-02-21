@@ -1340,7 +1340,7 @@ BeceemFlashBulkWrite_EXIT:
 	{
 		BcmRestoreBlockProtectStatus(Adapter,ulStatus);
 	}
-	
+
 	kfree(pTempBuff);
 
 	Adapter->SelectedChip = RESET_CHIP_SELECT;

@@ -143,7 +143,7 @@ void flush_thread(void)
 }
 
 /*
- * This is called before the thread is copied. 
+ * This is called before the thread is copied.
  */
 void prepare_to_copy(struct task_struct *tsk)
 {

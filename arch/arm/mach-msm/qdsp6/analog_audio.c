@@ -56,7 +56,7 @@ void analog_speaker_enable(int en)
 		pmic_set_spkr_configuration(&scm);
 		pmic_spkr_en(LEFT_SPKR, 1);
 		pmic_spkr_en(RIGHT_SPKR, 1);
-		
+
 		/* unmute */
 		pmic_spkr_en_mute(LEFT_SPKR, 1);
 		pmic_spkr_en_mute(RIGHT_SPKR, 1);

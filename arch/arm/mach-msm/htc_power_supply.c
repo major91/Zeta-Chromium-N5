@@ -501,7 +501,7 @@ done:
 
 static int htc_battery_probe(struct platform_device *pdev)
 {
-	struct rpc_request_hdr req;	
+	struct rpc_request_hdr req;
 	struct htc_get_batt_info_rep {
 		struct rpc_reply_hdr hdr;
 		struct battery_info_reply info;
@@ -555,7 +555,7 @@ struct rpc_batt_mtoa_cable_status_update_args {
 
 static int handle_battery_call(struct msm_rpc_server *server,
 			       struct rpc_request_hdr *req, unsigned len)
-{	
+{
 	struct rpc_batt_mtoa_cable_status_update_args *args;
 
 	if (req->procedure != RPC_BATT_MTOA_CABLE_STATUS_UPDATE_PROC)

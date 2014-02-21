@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1997-2000  Jakub Jelinek  (jakub@redhat.com)
  * Copyright (C) 1998  Eddie C. Dost  (ecd@skynet.be)
- * Copyright (C) 2001,2002  Andi Kleen, SuSE Labs 
+ * Copyright (C) 2001,2002  Andi Kleen, SuSE Labs
  * Copyright (C) 2003       Pavel Machek (pavel@ucw.cz)
  * Copyright (c) 2011 The Linux Foundation. All rights reserved.
  *

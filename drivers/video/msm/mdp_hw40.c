@@ -73,7 +73,7 @@ int mdp_hw_init(struct mdp_info *mdp)
 
 	/* TODO: Configure the VG/RGB pipes fetch data */
 
-	/* this should work for any mdp_clk freq. 
+	/* this should work for any mdp_clk freq.
 	 * TODO: use different value for mdp_clk freqs >= 90Mhz */
 	mdp_writel(mdp, 0x27, MDP_DMA_P_FETCH_CFG); /* 8 bytes-burst x 8 req */
 

@@ -218,7 +218,7 @@ static int prepare_for_access_response(struct fsnotify_group *group,
 		event->response = FAN_ALLOW;
 		return 0;
 	}
-		
+
 	list_add_tail(&re->list, &group->fanotify_data.access_list);
 	mutex_unlock(&group->fanotify_data.access_mutex);
 

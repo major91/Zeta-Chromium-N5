@@ -472,7 +472,7 @@ void __init kirkwood_init(void)
 	kirkwood_xor1_init();
 	kirkwood_crypto_init();
 
-#ifdef CONFIG_KEXEC 
+#ifdef CONFIG_KEXEC
 	kexec_reinit = kirkwood_enable_pcie;
 #endif
 }
@@ -502,7 +502,7 @@ static int __init kirkwood_clock_gate(void)
 		/* Disable PHY */
 		writel(readl(SATA1_IF_CTRL) | 0x200, SATA1_IF_CTRL);
 	}
-	
+
 	/* For PCIe: first shutdown the phy */
 	if (!(kirkwood_clk_ctrl & CGC_PEX0)) {
 		writel(readl(PCIE_LINK_CTRL) | 0x10, PCIE_LINK_CTRL);

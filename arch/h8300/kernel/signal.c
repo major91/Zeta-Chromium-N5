@@ -105,7 +105,7 @@ do_rt_sigsuspend(struct pt_regs *regs)
 	}
 }
 
-asmlinkage int 
+asmlinkage int
 sys_sigaction(int sig, const struct old_sigaction *act,
 	      struct old_sigaction *oact)
 {
@@ -236,7 +236,7 @@ asmlinkage int do_sigreturn(unsigned long __unused,...)
 	current->blocked = set;
 	recalc_sigpending();
 	spin_unlock_irq(&current->sighand->siglock);
-	
+
 	if (restore_sigcontext(regs, &frame->sc, &er0))
 		goto badframe;
 	return er0;
@@ -264,7 +264,7 @@ asmlinkage int do_rt_sigreturn(unsigned long __unused,...)
 	current->blocked = set;
 	recalc_sigpending();
 	spin_lock_irq(&current->sighand->siglock);
-	
+
 	if (restore_sigcontext(regs, &frame->uc.uc_mcontext, &er0))
 		goto badframe;
 

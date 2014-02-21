@@ -423,7 +423,7 @@ static void gfs2_init_dir(struct buffer_head *dibh,
 	gfs2_qstr2dirent(&gfs2_qdotdot, dibh->b_size - GFS2_DIRENT_SIZE(1) - sizeof(struct gfs2_dinode), dent);
 	gfs2_inum_out(parent, dent);
 	dent->de_type = cpu_to_be16(DT_DIR);
-	
+
 }
 
 /**
@@ -487,7 +487,7 @@ static void init_dinode(struct gfs2_inode *dip, struct gfs2_glock *gl,
 	di->di_ctime_nsec = cpu_to_be32(tv.tv_nsec);
 	memset(&di->di_reserved, 0, sizeof(di->di_reserved));
 
-	switch(mode & S_IFMT) {	
+	switch(mode & S_IFMT) {
 	case S_IFREG:
 		if ((dip->i_diskflags & GFS2_DIF_INHERIT_JDATA) ||
 		    gfs2_tune_get(sdp, gt_new_files_jdata))
@@ -1261,7 +1261,7 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 	if (nip) {
 		gfs2_holder_init(nip->i_gl, LM_ST_EXCLUSIVE, 0, ghs + num_gh);
 		num_gh++;
-		/* grab the resource lock for unlink flag twiddling 
+		/* grab the resource lock for unlink flag twiddling
 		 * this is the case of the target file already existing
 		 * so we unlink before doing the rename
 		 */

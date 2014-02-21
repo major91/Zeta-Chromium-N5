@@ -3,7 +3,7 @@
  *
  *    Copyright (C) IBM Corp. 2000,2006
  *    Author(s): Denis Joseph Barrow (djbarrow@de.ibm.com,barrow_dj@yahoo.com)
- *               Gerhard Tonn (ton@de.ibm.com)                  
+ *               Gerhard Tonn (ton@de.ibm.com)
  *
  *  Copyright (C) 1991, 1992  Linus Torvalds
  *
@@ -34,7 +34,7 @@
 
 #define _BLOCKABLE (~(sigmask(SIGKILL) | sigmask(SIGSTOP)))
 
-typedef struct 
+typedef struct
 {
 	__u8 callee_used_stack[__SIGNAL_FRAMESIZE32];
 	struct sigcontext32 sc;
@@ -44,7 +44,7 @@ typedef struct
 	__u8 retcode[S390_SYSCALL_SIZE];
 } sigframe32;
 
-typedef struct 
+typedef struct
 {
 	__u8 callee_used_stack[__SIGNAL_FRAMESIZE32];
 	__u8 retcode[S390_SYSCALL_SIZE];
@@ -64,7 +64,7 @@ int copy_siginfo_to_user32(compat_siginfo_t __user *to, siginfo_t *from)
 	   this code is fixed accordingly.
 	   It should never copy any pad contained in the structure
 	   to avoid security leaks, but must copy the generic
-	   3 ints plus the relevant union member.  
+	   3 ints plus the relevant union member.
 	   This routine must convert siginfo from 64bit to 32bit as well
 	   at the same time.  */
 	err = __put_user(from->si_signo, &to->si_signo);
@@ -218,7 +218,7 @@ sys32_rt_sigaction(int sig, const struct sigaction32 __user *act,
 		new_ka.sa.sa_mask.sig[0] =
 			set32.sig[0] | (((long)set32.sig[1]) << 32);
 		ret |= __get_user(new_ka.sa.sa_flags, &act->sa_flags);
-		
+
 		if (ret)
 			return -EFAULT;
 		new_ka.sa.sa_handler = (__sighandler_t) sa_handler;
@@ -405,7 +405,7 @@ asmlinkage long sys32_rt_sigreturn(void)
 	err |= __get_user(st.ss_size, &frame->uc.uc_stack.ss_size);
 	err |= __get_user(st.ss_flags, &frame->uc.uc_stack.ss_flags);
 	if (err)
-		goto badframe; 
+		goto badframe;
 	set_fs (KERNEL_DS);
 	do_sigaltstack((stack_t __force __user *)&st, NULL, regs->gprs[15]);
 	set_fs (old_fs);
@@ -413,7 +413,7 @@ asmlinkage long sys32_rt_sigreturn(void)
 badframe:
 	force_sig(SIGSEGV, current);
 	return 0;
-}	
+}
 
 /*
  * Set up a signal frame.
@@ -587,7 +587,7 @@ give_sigsegv:
 
 /*
  * OK, we're invoking a handler
- */	
+ */
 
 int handle_signal32(unsigned long sig, struct k_sigaction *ka,
 		    siginfo_t *info, sigset_t *oldset, struct pt_regs *regs)

@@ -257,17 +257,17 @@ void die_if_kernel(char *str, struct pt_regs *regs, long err)
 			"                 (__)\\       )\\/\\\n"
 			"                  U  ||----w |\n"
 			"                     ||     ||\n");
-	
+
 	/* unlock the pdc lock if necessary */
 	pdc_emergency_unlock();
 
-	/* maybe the kernel hasn't booted very far yet and hasn't been able 
-	 * to initialize the serial or STI console. In that case we should 
-	 * re-enable the pdc console, so that the user will be able to 
+	/* maybe the kernel hasn't booted very far yet and hasn't been able
+	 * to initialize the serial or STI console. In that case we should
+	 * re-enable the pdc console, so that the user will be able to
 	 * identify the problem. */
 	if (!console_drivers)
 		pdc_console_restart();
-	
+
 	if (err)
 		printk(KERN_CRIT "%s (pid %d): %s (code %ld)\n",
 			current->comm, task_pid_nr(current), str, err);
@@ -463,7 +463,7 @@ void parisc_terminate(char *msg, struct pt_regs *regs, int code, unsigned long o
 		break;
 
 	}
-	    
+
 	{
 		/* show_stack(NULL, (unsigned long *)regs->gr[30]); */
 		struct unwind_frame_info info;
@@ -479,14 +479,14 @@ void parisc_terminate(char *msg, struct pt_regs *regs, int code, unsigned long o
 	spin_unlock(&terminate_lock);
 
 	/* put soft power button back under hardware control;
-	 * if the user had pressed it once at any time, the 
+	 * if the user had pressed it once at any time, the
 	 * system will shut down immediately right here. */
 	pdc_soft_power_button(0);
-	
-	/* Call kernel panic() so reboot timeouts work properly 
+
+	/* Call kernel panic() so reboot timeouts work properly
 	 * FIXME: This function should be on the list of
 	 * panic notifiers, and we should call panic
-	 * directly from the location that we wish. 
+	 * directly from the location that we wish.
 	 * e.g. We should not call panic from
 	 * parisc_terminate, but rather the oter way around.
 	 * This hack works, prints the panic message twice,
@@ -521,13 +521,13 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 	 * could *be* on the gateway page, and processes
 	 * executing on the gateway page can't have signals
 	 * delivered.
-	 * 
+	 *
 	 * We merely readjust the address into the users
 	 * space, at a destination address of zero, and
 	 * allow processing to continue.
 	 */
 	if (((unsigned long)regs->iaoq[0] & 3) &&
-	    ((unsigned long)regs->iasq[0] != (unsigned long)regs->sr[7])) { 
+	    ((unsigned long)regs->iasq[0] != (unsigned long)regs->sr[7])) {
 	  	/* Kill the user process later */
 	  	regs->iaoq[0] = 0 | 3;
 		regs->iaoq[1] = regs->iaoq[0] + 4;
@@ -535,7 +535,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 		regs->gr[0] &= ~PSW_B;
 		return;
 	}
-	
+
 #if 0
 	printk(KERN_CRIT "Interruption # %d\n", code);
 #endif
@@ -544,14 +544,14 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 
 	case  1:
 		/* High-priority machine check (HPMC) */
-		
+
 		/* set up a new led state on systems shipped with a LED State panel */
 		pdc_chassis_send_status(PDC_CHASSIS_DIRECT_HPMC);
-		    
+
 	    	parisc_terminate("High Priority Machine Check (HPMC)",
 				regs, code, 0);
 		/* NOT REACHED */
-		
+
 	case  2:
 		/* Power failure interrupt */
 		printk(KERN_CRIT "Power failure interrupt !\n");
@@ -568,7 +568,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 	case  5:
 		/* Low-priority machine check */
 		pdc_chassis_send_status(PDC_CHASSIS_DIRECT_LPMC);
-		
+
 		flush_cache_all();
 		flush_tlb_all();
 		cpu_lpmc(5, regs);
@@ -590,13 +590,13 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 		/* Break instruction trap */
 		handle_break(regs);
 		return;
-	
+
 	case 10:
 		/* Privileged operation trap */
 		die_if_kernel("Privileged operation", regs, code);
 		si.si_code = ILL_PRVOPC;
 		goto give_sigill;
-	
+
 	case 11:
 		/* Privileged register trap */
 		if ((regs->iir & 0xffdfffe0) == 0x034008a0) {
@@ -632,7 +632,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 		si.si_addr = (void __user *) regs->iaoq[0];
 		force_sig_info(SIGFPE, &si, current);
 		return;
-		
+
 	case 13:
 		/* Conditional Trap
 		   The condition succeeds in an instruction which traps
@@ -645,16 +645,16 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 			si.si_addr = (void __user *) regs->iaoq[0];
 			force_sig_info(SIGFPE, &si, current);
 			return;
-		} 
+		}
 		/* The kernel doesn't want to handle condition codes */
 		break;
-		
+
 	case 14:
 		/* Assist Exception Trap, i.e. floating point exception. */
 		die_if_kernel("Floating point exception", regs, 0); /* quiet */
 		handle_fpe(regs);
 		return;
-		
+
 	case 15:
 		/* Data TLB miss fault/Data page fault */
 		/* Fall through */
@@ -665,7 +665,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 		/* Fall through */
 	case 17:
 		/* Non-access data TLB miss fault/Non-access data page fault */
-		/* FIXME: 
+		/* FIXME:
 		 	 Still need to add slow path emulation code here!
 		         If the insn used a non-shadow register, then the tlb
 			 handlers could not have their side-effect (e.g. probe
@@ -674,7 +674,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 			 setup everything, call this function we are in, and emulate
 			 by hand. Technically we need to emulate:
 			 fdc,fdce,pdc,"fic,4f",prober,probeir,probew, probeiw
-		*/			  
+		*/
 		fault_address = regs->ior;
 		fault_space = regs->isr;
 		break;
@@ -687,7 +687,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 			return;
 		}
 		/* Fall Through */
-	case 26: 
+	case 26:
 		/* PCXL: Data memory access rights trap */
 		fault_address = regs->ior;
 		fault_space   = regs->isr;
@@ -712,7 +712,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 		 */
 		return;
 
-	case  7:  
+	case  7:
 		/* Instruction access rights */
 		/* PCXL: Instruction memory protection trap */
 
@@ -744,7 +744,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 			up_read(&current->mm->mmap_sem);
 		}
 		/* Fall Through */
-	case 27: 
+	case 27:
 		/* Data memory protection ID trap */
 		if (code == 27 && !user_mode(regs) &&
 			fixup_exception(regs))
@@ -761,7 +761,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 		force_sig_info(SIGSEGV, &si, current);
 		return;
 
-	case 28: 
+	case 28:
 		/* Unaligned data reference trap */
 		handle_unaligned(regs);
 		return;
@@ -782,7 +782,7 @@ void notrace handle_interruption(int code, struct pt_regs *regs)
 			return;
 		}
 		pdc_chassis_send_status(PDC_CHASSIS_DIRECT_PANIC);
-		
+
 		parisc_terminate("Unexpected interruption", regs, code, 0);
 		/* NOT REACHED */
 	}
@@ -860,7 +860,7 @@ int __init check_ivt(void *iva)
 
 	return 0;
 }
-	
+
 #ifndef CONFIG_64BIT
 extern const void fault_vector_11;
 #endif

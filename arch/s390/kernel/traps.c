@@ -212,7 +212,7 @@ void show_registers(struct pt_regs *regs)
 	       regs->gprs[12], regs->gprs[13], regs->gprs[14], regs->gprs[15]);
 
 	show_code(regs);
-}	
+}
 
 void show_regs(struct pt_regs *regs)
 {
@@ -586,7 +586,7 @@ static void data_exception(struct pt_regs *regs)
 			break;
                 }
         }
-#endif 
+#endif
 	if (current->thread.fp_regs.fpc & FPC_DXC_MASK)
 		signal = SIGFPE;
 	else

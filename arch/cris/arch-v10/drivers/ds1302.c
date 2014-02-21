@@ -36,7 +36,7 @@
 static DEFINE_MUTEX(ds1302_mutex);
 static const char ds1302_name[] = "ds1302";
 
-/* The DS1302 might be connected to different bits on different products. 
+/* The DS1302 might be connected to different bits on different products.
  * It has three signals - SDA, SCL and RST. RST and SCL are always outputs,
  * but SDA can have a selected direction.
  * For now, only PORT_PB is hardcoded.
@@ -63,21 +63,21 @@ static const char ds1302_name[] = "ds1302";
 
 /*
  * The reason for tempudelay and not udelay is that loops_per_usec
- * (used in udelay) is not set when functions here are called from time.c 
+ * (used in udelay) is not set when functions here are called from time.c
  */
 
-static void tempudelay(int usecs) 
+static void tempudelay(int usecs)
 {
 	volatile int loops;
 
 	for(loops = usecs * 12; loops > 0; loops--)
-		/* nothing */;	
+		/* nothing */;
 }
 
 
 /* Send 8 bits. */
 static void
-out_byte(unsigned char x) 
+out_byte(unsigned char x)
 {
 	int i;
 	TK_SDA_DIR(1);
@@ -94,7 +94,7 @@ out_byte(unsigned char x)
 }
 
 static unsigned char
-in_byte(void) 
+in_byte(void)
 {
 	unsigned char x = 0;
 	int i;
@@ -119,19 +119,19 @@ in_byte(void)
 /* Prepares for a transaction by de-activating RST (active-low). */
 
 static void
-start(void) 
+start(void)
 {
 	TK_SCL_OUT(0);
 	tempudelay(1);
 	TK_RST_OUT(0);
 	tempudelay(5);
-	TK_RST_OUT(1);	
+	TK_RST_OUT(1);
 }
 
 /* Ends a transaction by taking RST active again. */
 
 static void
-stop(void) 
+stop(void)
 {
 	tempudelay(2);
 	TK_RST_OUT(0);
@@ -140,9 +140,9 @@ stop(void)
 /* Enable writing. */
 
 static void
-ds1302_wenable(void) 
+ds1302_wenable(void)
 {
-	start(); 	
+	start();
 	out_byte(0x8e); /* Write control register  */
 	out_byte(0x00); /* Disable write protect bit 7 = 0 */
 	stop();
@@ -151,7 +151,7 @@ ds1302_wenable(void)
 /* Disable writing. */
 
 static void
-ds1302_wdisable(void) 
+ds1302_wdisable(void)
 {
 	start();
 	out_byte(0x8e); /* Write control register  */
@@ -164,7 +164,7 @@ ds1302_wdisable(void)
 /* Read a byte from the selected register in the DS1302. */
 
 unsigned char
-ds1302_readreg(int reg) 
+ds1302_readreg(int reg)
 {
 	unsigned char x;
 
@@ -179,7 +179,7 @@ ds1302_readreg(int reg)
 /* Write a byte to the selected register. */
 
 void
-ds1302_writereg(int reg, unsigned char val) 
+ds1302_writereg(int reg, unsigned char val)
 {
 #ifndef CONFIG_ETRAX_RTC_READONLY
 	int do_writereg = 1;
@@ -201,7 +201,7 @@ ds1302_writereg(int reg, unsigned char val)
 }
 
 void
-get_rtc_time(struct rtc_time *rtc_tm) 
+get_rtc_time(struct rtc_time *rtc_tm)
 {
 	unsigned long flags;
 
@@ -215,7 +215,7 @@ get_rtc_time(struct rtc_time *rtc_tm)
 	rtc_tm->tm_year = CMOS_READ(RTC_YEAR);
 
 	local_irq_restore(flags);
-	
+
 	rtc_tm->tm_sec = bcd2bin(rtc_tm->tm_sec);
 	rtc_tm->tm_min = bcd2bin(rtc_tm->tm_min);
 	rtc_tm->tm_hour = bcd2bin(rtc_tm->tm_hour);
@@ -234,7 +234,7 @@ get_rtc_time(struct rtc_time *rtc_tm)
 	rtc_tm->tm_mon--;
 }
 
-static unsigned char days_in_mo[] = 
+static unsigned char days_in_mo[] =
     {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 /* ioctl that supports RTC_RD_TIME and RTC_SET_TIME (read and set time/date). */
@@ -247,11 +247,11 @@ static int rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		case RTC_RD_TIME:	/* read the time/date from RTC	*/
 		{
 			struct rtc_time rtc_tm;
-						
+
 			memset(&rtc_tm, 0, sizeof (struct rtc_time));
-			get_rtc_time(&rtc_tm);						
+			get_rtc_time(&rtc_tm);
 			if (copy_to_user((struct rtc_time*)arg, &rtc_tm, sizeof(struct rtc_time)))
-				return -EFAULT;	
+				return -EFAULT;
 			return 0;
 		}
 
@@ -273,8 +273,8 @@ static int rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			hrs = rtc_tm.tm_hour;
 			min = rtc_tm.tm_min;
 			sec = rtc_tm.tm_sec;
-			
-			
+
+
 			if ((yrs < 1970) || (yrs > 2069))
 				return -EINVAL;
 
@@ -285,7 +285,7 @@ static int rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 			if (day > (days_in_mo[mon] + ((mon == 2) && leap_yr)))
 				return -EINVAL;
-			
+
 			if ((hrs >= 24) || (min >= 60) || (sec >= 60))
 				return -EINVAL;
 
@@ -324,7 +324,7 @@ static int rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 			if (!capable(CAP_SYS_TIME))
 				return -EPERM;
-			
+
 			if(copy_from_user(&tcs_val, (int*)arg, sizeof(int)))
 				return -EFAULT;
 
@@ -388,26 +388,26 @@ static const struct file_operations rtc_fops = {
 	.owner		= THIS_MODULE,
 	.unlocked_ioctl = rtc_unlocked_ioctl,
 	.llseek		= noop_llseek,
-}; 
+};
 
 /* Probe for the chip by writing something to its RAM and try reading it back. */
 
 #define MAGIC_PATTERN 0x42
 
 static int __init
-ds1302_probe(void) 
+ds1302_probe(void)
 {
-	int retval, res; 
+	int retval, res;
 
 	TK_RST_DIR(1);
 	TK_SCL_DIR(1);
 	TK_SDA_DIR(0);
-	
+
 	/* Try to talk to timekeeper. */
 
-	ds1302_wenable();  
+	ds1302_wenable();
 	start();
-	out_byte(0xc0); /* write RAM byte 0 */	
+	out_byte(0xc0); /* write RAM byte 0 */
 	out_byte(MAGIC_PATTERN); /* write something magic */
 	start();
 	out_byte(0xc1); /* read RAM byte 0 */
@@ -440,7 +440,7 @@ ds1302_probe(void)
 /* Just probe for the RTC and register the device to handle the ioctl needed. */
 
 int __init
-ds1302_init(void) 
+ds1302_init(void)
 {
 #ifdef CONFIG_ETRAX_I2C
 	i2c_init();
@@ -504,7 +504,7 @@ static int __init ds1302_register(void)
 {
 	ds1302_init();
 	if (register_chrdev(RTC_MAJOR_NR, ds1302_name, &rtc_fops)) {
-		printk(KERN_INFO "%s: unable to get major %d for rtc\n", 
+		printk(KERN_INFO "%s: unable to get major %d for rtc\n",
 		       ds1302_name, RTC_MAJOR_NR);
 		return -1;
 	}

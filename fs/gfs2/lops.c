@@ -187,7 +187,7 @@ static struct buffer_head *gfs2_log_get_buf(struct gfs2_sbd *sdp)
 }
 
 /**
- * gfs2_fake_write_endio - 
+ * gfs2_fake_write_endio -
  * @bh: The buffer head
  * @uptodate: The I/O Status
  *
@@ -660,7 +660,7 @@ static void gfs2_write_blocks(struct gfs2_sbd *sdp, struct buffer_head *bh,
 	ld->ld_data1 = cpu_to_be32(n);
 
 	ptr = bh_log_ptr(bh);
-	
+
 	get_bh(bh);
 	submit_bh(WRITE_SYNC, bh);
 	gfs2_log_lock(sdp);

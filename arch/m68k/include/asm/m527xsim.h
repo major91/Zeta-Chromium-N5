@@ -322,7 +322,7 @@
 #define MCF_GPIO_PAR_UART	0x10007c	/* PAR UART address */
 #define UART0_ENABLE_MASK	0x000f
 #define UART1_ENABLE_MASK	0x00f0
-#define UART2_ENABLE_MASK	0x3f00 
+#define UART2_ENABLE_MASK	0x3f00
 #endif
 
 /*

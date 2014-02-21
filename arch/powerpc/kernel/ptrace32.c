@@ -133,7 +133,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		ret = put_user((unsigned int)tmp, (u32 __user *)data);
 		break;
 	}
-  
+
 	/*
 	 * Read 4 bytes out of the other process' pt_regs area
 	 *  data is a pointer specifying where the user wants the
@@ -173,7 +173,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 				[FPRINDEX_3264(numReg)];
 		} else { /* register within PT_REGS struct */
 			tmp = ptrace_get_reg(child, numReg);
-		} 
+		}
 		reg32bits = ((u32*)&tmp)[part];
 		ret = put_user(reg32bits, (u32 __user *)data);
 		break;

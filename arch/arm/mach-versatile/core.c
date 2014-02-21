@@ -799,14 +799,14 @@ static void __init versatile_timer_init(void)
 {
 	u32 val;
 
-	/* 
-	 * set clock frequency: 
+	/*
+	 * set clock frequency:
 	 *	VERSATILE_REFCLK is 32KHz
 	 *	VERSATILE_TIMCLK is 1MHz
 	 */
 	val = readl(__io_address(VERSATILE_SCTL_BASE));
 	writel((VERSATILE_TIMCLK << VERSATILE_TIMER1_EnSel) |
-	       (VERSATILE_TIMCLK << VERSATILE_TIMER2_EnSel) | 
+	       (VERSATILE_TIMCLK << VERSATILE_TIMER2_EnSel) |
 	       (VERSATILE_TIMCLK << VERSATILE_TIMER3_EnSel) |
 	       (VERSATILE_TIMCLK << VERSATILE_TIMER4_EnSel) | val,
 	       __io_address(VERSATILE_SCTL_BASE));

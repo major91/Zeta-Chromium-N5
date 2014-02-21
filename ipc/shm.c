@@ -649,7 +649,7 @@ static inline unsigned long copy_shminfo_to_user(void __user *buf, struct shminf
 		out.shmmin	= in->shmmin;
 		out.shmmni	= in->shmmni;
 		out.shmseg	= in->shmseg;
-		out.shmall	= in->shmall; 
+		out.shmall	= in->shmall;
 
 		return copy_to_user(buf, &out, sizeof(out));
 	    }
@@ -1051,7 +1051,7 @@ long do_shmat(int shmid, char __user *shmaddr, int shmflg, ulong *raddr)
 		    addr > current->mm->start_stack - size - PAGE_SIZE * 5)
 			goto invalid;
 	}
-		
+
 	user_addr = do_mmap (file, addr, size, prot, flags, 0);
 	*raddr = user_addr;
 	err = 0;

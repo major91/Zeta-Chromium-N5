@@ -183,7 +183,7 @@ static void hid_lg4ff_set_autocenter_ffex(struct input_dev *dev, u16 magnitude)
 	struct list_head *report_list = &hid->report_enum[HID_OUTPUT_REPORT].report_list;
 	struct hid_report *report = list_entry(report_list->next, struct hid_report, list);
 	magnitude = magnitude * 90 / 65535;
-	
+
 
 	report->field[0]->value[0] = 0xfe;
 	report->field[0]->value[1] = 0x03;

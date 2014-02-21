@@ -963,7 +963,7 @@ static int mixer_ctl_feature_info(struct snd_kcontrol *kcontrol, struct snd_ctl_
 		if (!cval->initialized) {
 			get_min_max_with_quirks(cval, 0, kcontrol);
 			if (cval->initialized && cval->dBmin >= cval->dBmax) {
-				kcontrol->vd[0].access &= 
+				kcontrol->vd[0].access &=
 					~(SNDRV_CTL_ELEM_ACCESS_TLV_READ |
 					  SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK);
 				snd_ctl_notify(cval->mixer->chip->card,
@@ -1183,7 +1183,7 @@ static void build_feature_ctl(struct mixer_build *state, void *raw_desc,
 			check_mapped_dB(map, cval);
 			if (cval->dBmin < cval->dBmax || !cval->initialized) {
 				kctl->tlv.c = mixer_vol_tlv;
-				kctl->vd[0].access |= 
+				kctl->vd[0].access |=
 					SNDRV_CTL_ELEM_ACCESS_TLV_READ |
 					SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK;
 			}

@@ -312,7 +312,7 @@ static int __init trout_init_keypad(void)
 		trout_keypad_matrix_info.keymap = trout_keymap_evt2_1;
 		trout_keypad_matrix_info.output_gpios = trout_col_gpios_evt2;
 		trout_keypad_matrix_info.input_gpios = trout_row_gpios_evt2;
-		
+
 		/* v1 has new direct keys */
 		trout_keypad_nav_info.keymap = trout_keypad_nav_map_evt2;
 		trout_keypad_nav_info.keymap_size = ARRAY_SIZE(trout_keypad_nav_map_evt2);
@@ -325,7 +325,7 @@ static int __init trout_init_keypad(void)
 		trout_keypad_matrix_info.keymap = trout_keymap_evt2_2;
 		trout_keypad_matrix_info.output_gpios = trout_col_gpios_evt2;
 		trout_keypad_matrix_info.input_gpios = trout_row_gpios_evt2;
-		
+
 		/* v2 has new direct keys */
 		trout_keypad_nav_info.keymap = trout_keypad_nav_map_evt2;
 		trout_keypad_nav_info.keymap_size = ARRAY_SIZE(trout_keypad_nav_map_evt2);

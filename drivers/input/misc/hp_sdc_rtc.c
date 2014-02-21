@@ -77,8 +77,8 @@ static int hp_sdc_rtc_fasync (int fd, struct file *filp, int on);
 static int hp_sdc_rtc_read_proc(char *page, char **start, off_t off,
 				int count, int *eof, void *data);
 
-static void hp_sdc_rtc_isr (int irq, void *dev_id, 
-			    uint8_t status, uint8_t data) 
+static void hp_sdc_rtc_isr (int irq, void *dev_id,
+			    uint8_t status, uint8_t data)
 {
 	return;
 }
@@ -89,7 +89,7 @@ static int hp_sdc_rtc_do_read_bbrtc (struct rtc_time *rtctm)
 	hp_sdc_transaction t;
 	uint8_t tseq[91];
 	int i;
-	
+
 	i = 0;
 	while (i < 91) {
 		tseq[i++] = HP_SDC_ACT_DATAREG |
@@ -106,11 +106,11 @@ static int hp_sdc_rtc_do_read_bbrtc (struct rtc_time *rtctm)
 	t.seq =			tseq;
 	t.act.semaphore =	&tsem;
 	sema_init(&tsem, 0);
-	
+
 	if (hp_sdc_enqueue_transaction(&t)) return -1;
-	
+
 	down_interruptible(&tsem);  /* Put ourselves to sleep for results. */
-	
+
 	/* Check for nonpresence of BBRTC */
 	if (!((tseq[83] | tseq[90] | tseq[69] | tseq[76] |
 	       tseq[55] | tseq[62] | tseq[34] | tseq[41] |
@@ -125,7 +125,7 @@ static int hp_sdc_rtc_do_read_bbrtc (struct rtc_time *rtctm)
 	rtctm->tm_hour = (tseq[34] & 0x0f) + (tseq[41] & 0x0f) * 10;
 	rtctm->tm_min  = (tseq[20] & 0x0f) + (tseq[27] & 0x0f) * 10;
 	rtctm->tm_sec  = (tseq[6]  & 0x0f) + (tseq[13] & 0x0f) * 10;
-	
+
 	return 0;
 }
 
@@ -158,13 +158,13 @@ static int64_t hp_sdc_rtc_read_i8042timer (uint8_t loadcmd, int numreg)
 		HP_SDC_ACT_PRECMD | HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN,
 		0,
 		HP_SDC_CMD_READ_T1, 2, 0, 0,
-		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN, 
+		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN,
 		HP_SDC_CMD_READ_T2, 2, 0, 0,
-		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN, 
+		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN,
 		HP_SDC_CMD_READ_T3, 2, 0, 0,
-		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN, 
+		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN,
 		HP_SDC_CMD_READ_T4, 2, 0, 0,
-		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN, 
+		HP_SDC_ACT_POSTCMD | HP_SDC_ACT_DATAIN,
 		HP_SDC_CMD_READ_T5, 2, 0, 0
 	};
 
@@ -179,11 +179,11 @@ static int64_t hp_sdc_rtc_read_i8042timer (uint8_t loadcmd, int numreg)
 	down_interruptible(&i8042tregs);  /* Sleep if output regs in use. */
 
 	if (hp_sdc_enqueue_transaction(&t)) return -1;
-	
+
 	down_interruptible(&i8042tregs);  /* Sleep until results come back. */
 	up(&i8042tregs);
 
-	return (tseq[5] | 
+	return (tseq[5] |
 		((uint64_t)(tseq[10]) << 8)  | ((uint64_t)(tseq[15]) << 16) |
 		((uint64_t)(tseq[20]) << 24) | ((uint64_t)(tseq[25]) << 32));
 }
@@ -192,7 +192,7 @@ static int64_t hp_sdc_rtc_read_i8042timer (uint8_t loadcmd, int numreg)
 /* Read the i8042 real-time clock */
 static inline int hp_sdc_rtc_read_rt(struct timeval *res) {
 	int64_t raw;
-	uint32_t tenms; 
+	uint32_t tenms;
 	unsigned int days;
 
 	raw = hp_sdc_rtc_read_i8042timer(HP_SDC_CMD_LOAD_RT, 5);
@@ -227,8 +227,8 @@ static inline int hp_sdc_rtc_read_fhs(struct timeval *res) {
 
 /* Read the i8042 match timer (a.k.a. alarm) */
 static inline int hp_sdc_rtc_read_mt(struct timeval *res) {
-	int64_t raw;	
-	uint32_t tenms; 
+	int64_t raw;
+	uint32_t tenms;
 
 	raw = hp_sdc_rtc_read_i8042timer(HP_SDC_CMD_LOAD_MT, 3);
 	if (raw < 0) return -1;
@@ -286,7 +286,7 @@ static int hp_sdc_rtc_set_rt (struct timeval *setto)
 		HP_SDC_ACT_PRECMD | HP_SDC_ACT_DATAOUT,
 		HP_SDC_CMD_SET_RTMS, 3, 0, 0, 0,
 		HP_SDC_ACT_PRECMD | HP_SDC_ACT_DATAOUT,
-		HP_SDC_CMD_SET_RTD, 2, 0, 0 
+		HP_SDC_CMD_SET_RTD, 2, 0, 0
 	};
 
 	t.endidx = 10;
@@ -381,7 +381,7 @@ static int hp_sdc_rtc_set_i8042timer (struct timeval *setto, uint8_t setcmd)
 
 	t.seq =			tseq;
 
-	if (hp_sdc_enqueue_transaction(&t)) { 
+	if (hp_sdc_enqueue_transaction(&t)) {
 		return -1;
 	}
 	return 0;
@@ -438,42 +438,42 @@ static int hp_sdc_rtc_proc_output (char *buf)
 			     "rtc_date\t: %04d-%02d-%02d\n"
 			     "rtc_epoch\t: %04lu\n",
 			     tm.tm_hour, tm.tm_min, tm.tm_sec,
-			     tm.tm_year + 1900, tm.tm_mon + 1, 
+			     tm.tm_year + 1900, tm.tm_mon + 1,
 			     tm.tm_mday, epoch);
 	}
 
 	if (hp_sdc_rtc_read_rt(&tv)) {
 		p += sprintf(p, "i8042 rtc\t: READ FAILED!\n");
 	} else {
-		p += sprintf(p, "i8042 rtc\t: %ld.%02d seconds\n", 
+		p += sprintf(p, "i8042 rtc\t: %ld.%02d seconds\n",
 			     tv.tv_sec, (int)tv.tv_usec/1000);
 	}
 
 	if (hp_sdc_rtc_read_fhs(&tv)) {
 		p += sprintf(p, "handshake\t: READ FAILED!\n");
 	} else {
-        	p += sprintf(p, "handshake\t: %ld.%02d seconds\n", 
+        	p += sprintf(p, "handshake\t: %ld.%02d seconds\n",
 			     tv.tv_sec, (int)tv.tv_usec/1000);
 	}
 
 	if (hp_sdc_rtc_read_mt(&tv)) {
 		p += sprintf(p, "alarm\t\t: READ FAILED!\n");
 	} else {
-		p += sprintf(p, "alarm\t\t: %ld.%02d seconds\n", 
+		p += sprintf(p, "alarm\t\t: %ld.%02d seconds\n",
 			     tv.tv_sec, (int)tv.tv_usec/1000);
 	}
 
 	if (hp_sdc_rtc_read_dt(&tv)) {
 		p += sprintf(p, "delay\t\t: READ FAILED!\n");
 	} else {
-		p += sprintf(p, "delay\t\t: %ld.%02d seconds\n", 
+		p += sprintf(p, "delay\t\t: %ld.%02d seconds\n",
 			     tv.tv_sec, (int)tv.tv_usec/1000);
 	}
 
 	if (hp_sdc_rtc_read_ct(&tv)) {
 		p += sprintf(p, "periodic\t: READ FAILED!\n");
 	} else {
-		p += sprintf(p, "periodic\t: %ld.%02d seconds\n", 
+		p += sprintf(p, "periodic\t: %ld.%02d seconds\n",
 			     tv.tv_sec, (int)tv.tv_usec/1000);
 	}
 
@@ -514,14 +514,14 @@ static int hp_sdc_rtc_read_proc(char *page, char **start, off_t off,
         return len;
 }
 
-static int hp_sdc_rtc_ioctl(struct file *file, 
+static int hp_sdc_rtc_ioctl(struct file *file,
 			    unsigned int cmd, unsigned long arg)
 {
 #if 1
 	return -EINVAL;
 #else
-	
-        struct rtc_time wtime; 
+
+        struct rtc_time wtime;
 	struct timeval ttime;
 	int use_wtime = 0;
 
@@ -537,7 +537,7 @@ static int hp_sdc_rtc_ioctl(struct file *file,
         case RTC_UIE_OFF:       /* Allow ints for RTC updates.  */
         {
 		/* We cannot mask individual user timers and we
-		   cannot tell them apart when they occur, so it 
+		   cannot tell them apart when they occur, so it
 		   would be disingenuous to succeed these IOCTLs */
 		return -EINVAL;
         }
@@ -549,7 +549,7 @@ static int hp_sdc_rtc_ioctl(struct file *file,
 		wtime.tm_hour = ttime.tv_sec / 3600;  ttime.tv_sec %= 3600;
 		wtime.tm_min  = ttime.tv_sec / 60;    ttime.tv_sec %= 60;
 		wtime.tm_sec  = ttime.tv_sec;
-                
+
 		break;
         }
         case RTC_IRQP_READ:     /* Read the periodic IRQ rate.  */
@@ -558,7 +558,7 @@ static int hp_sdc_rtc_ioctl(struct file *file,
         }
         case RTC_IRQP_SET:      /* Set periodic IRQ rate.       */
         {
-                /* 
+                /*
                  * The max we can do is 100Hz.
 		 */
 
@@ -576,7 +576,7 @@ static int hp_sdc_rtc_ioctl(struct file *file,
                  * "don't care" or "match all" for PC timers.  The HP SDC
 		 * does not support that perk, but it could be emulated fairly
 		 * easily.  Only the tm_hour, tm_min and tm_sec are used.
-		 * We could do it with 10ms accuracy with the HP SDC, if the 
+		 * We could do it with 10ms accuracy with the HP SDC, if the
 		 * rtc interface left us a way to do that.
                  */
                 struct hp_sdc_rtc_time alm_tm;
@@ -587,9 +587,9 @@ static int hp_sdc_rtc_ioctl(struct file *file,
 
                 if (alm_tm.tm_hour > 23) return -EINVAL;
 		if (alm_tm.tm_min  > 59) return -EINVAL;
-		if (alm_tm.tm_sec  > 59) return -EINVAL;  
+		if (alm_tm.tm_sec  > 59) return -EINVAL;
 
-		ttime.sec = alm_tm.tm_hour * 3600 + 
+		ttime.sec = alm_tm.tm_hour * 3600 +
 		  alm_tm.tm_min * 60 + alm_tm.tm_sec;
 		ttime.usec = 0;
 		if (hp_sdc_rtc_set_mt(&ttime)) return -EFAULT;
@@ -643,14 +643,14 @@ static int hp_sdc_rtc_ioctl(struct file *file,
         }
         case RTC_EPOCH_SET:     /* Set the epoch.       */
         {
-                /* 
+                /*
                  * There were no RTC clocks before 1900.
                  */
                 if (arg < 1900)
 		  return -EINVAL;
 		if (!capable(CAP_SYS_TIME))
 		  return -EACCES;
-		
+
                 epoch = arg;
                 return 0;
         }

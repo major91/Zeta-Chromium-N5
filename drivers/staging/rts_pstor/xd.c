@@ -1919,7 +1919,7 @@ int xd_rw(struct scsi_cmnd *srb, struct rtsx_chip *chip, u32 start_sector, u16 s
 				set_sense_type(chip, lun, SENSE_TYPE_MEDIA_UNRECOVER_READ_ERR);
 			else
 				set_sense_type(chip, lun, SENSE_TYPE_MEDIA_WRITE_ERR);
-			
+
 			TRACE_RET(chip, STATUS_FAIL);
 		}
 

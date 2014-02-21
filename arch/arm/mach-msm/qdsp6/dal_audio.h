@@ -23,7 +23,7 @@ enum {
 	AUDIO_OP_CONTROL = DAL_OP_FIRST_DEVICE_API,
 	AUDIO_OP_DATA,
 	AUDIO_OP_INIT,
-};	
+};
 
 /* ---- common audio structures ---- */
 
@@ -468,7 +468,7 @@ struct adsp_set_volume_command {
 	struct adsp_command_hdr hdr;
 	s32 volume;
 } __attribute__ ((packed));
-	
+
 struct adsp_set_mute_command {
 	struct adsp_command_hdr hdr;
 	u32 mute; /* 1 == mute */

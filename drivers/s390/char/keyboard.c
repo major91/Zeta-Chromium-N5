@@ -257,7 +257,7 @@ k_spec(struct kbd_data *kbd, unsigned char value)
  * but we need only 16 bits here
  */
 static void
-to_utf8(struct tty_struct *tty, ushort c) 
+to_utf8(struct tty_struct *tty, ushort c)
 {
 	if (c < 0x80)
 		/*  0******* */
@@ -344,7 +344,7 @@ do_kdsk_ioctl(struct kbd_data *kbd, struct kbentry __user *user_kbe,
 #endif
 #if MAX_NR_KEYMAPS < 256
 	if (tmp.kb_table >= MAX_NR_KEYMAPS)
-		return -EINVAL;	
+		return -EINVAL;
 #endif
 
 	switch (cmd) {

@@ -250,7 +250,7 @@ restore_sigcontext(struct pt_regs *regs, struct sigcontext __user *usc, void __u
 	/* get previous context */
 	if (copy_from_user(&context, usc, sizeof(context)))
 		goto badframe;
-	
+
 	/* restore passed registers */
 	regs->d1 = context.sc_d1;
 	regs->a0 = context.sc_a0;
@@ -347,7 +347,7 @@ asmlinkage int do_sigreturn(unsigned long __unused)
 	current->blocked = set;
 	recalc_sigpending();
 	spin_unlock_irq(&current->sighand->siglock);
-	
+
 	if (restore_sigcontext(regs, &frame->sc, frame + 1, &d0))
 		goto badframe;
 	return d0;
@@ -376,7 +376,7 @@ asmlinkage int do_rt_sigreturn(unsigned long __unused)
 	current->blocked = set;
 	recalc_sigpending();
 	spin_unlock_irq(&current->sighand->siglock);
-	
+
 	if (rt_restore_ucontext(regs, sw, &frame->uc, &d0))
 		goto badframe;
 	return d0;
@@ -564,7 +564,7 @@ static int setup_frame (int sig, struct k_sigaction *ka,
 	wrusp ((unsigned long) frame);
 	regs->pc = (unsigned long) ka->sa.sa_handler;
 	((struct switch_stack *)regs - 1)->a5 = current->mm->start_data;
-	regs->format = 0x4; /*set format byte to make stack appear modulo 4 
+	regs->format = 0x4; /*set format byte to make stack appear modulo 4
 						which it will be when doing the rte */
 
 adjust_stack:
@@ -628,7 +628,7 @@ static int setup_rt_frame (int sig, struct k_sigaction *ka, siginfo_t *info,
 	wrusp ((unsigned long) frame);
 	regs->pc = (unsigned long) ka->sa.sa_handler;
 	((struct switch_stack *)regs - 1)->a5 = current->mm->start_data;
-	regs->format = 0x4; /*set format byte to make stack appear modulo 4 
+	regs->format = 0x4; /*set format byte to make stack appear modulo 4
 						which it will be when doing the rte */
 
 adjust_stack:

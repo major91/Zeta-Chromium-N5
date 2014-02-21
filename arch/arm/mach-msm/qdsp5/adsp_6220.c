@@ -16,7 +16,7 @@
 #include "adsp.h"
 
 /* Firmware modules */
-typedef enum { 
+typedef enum {
 	QDSP_MODULE_KERNEL,
 	QDSP_MODULE_AFETASK,
 	QDSP_MODULE_AUDPLAY0TASK,

@@ -921,7 +921,7 @@ static void s3c2410_nand_update_chip(struct s3c2410_nand_info *info,
 static int s3c24xx_nand_probe(struct platform_device *pdev)
 {
 	struct s3c2410_platform_nand *plat = to_nand_plat(pdev);
-	enum s3c_cpu_type cpu_type; 
+	enum s3c_cpu_type cpu_type;
 	struct s3c2410_nand_info *info;
 	struct s3c2410_nand_mtd *nmtd;
 	struct s3c2410_nand_set *sets;

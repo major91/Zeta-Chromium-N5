@@ -258,7 +258,7 @@ noinline static void lm3630_set_main_current_level(struct i2c_client *client, in
 				level = dev->min_brightness;
 			else if (level > dev->max_brightness)
 				level = dev->max_brightness;
-	
+
 			if (dev->blmap) {
 				if (level < dev->blmap_size)
 					lm3630_set_brightness_reg(dev, dev->blmap[level]);

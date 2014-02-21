@@ -107,7 +107,7 @@ static void gen_rtc_interrupt(unsigned long arg);
 static void genrtc_troutine(struct work_struct *work)
 {
 	unsigned int tmp = get_rtc_ss();
-	
+
 	if (stop_rtc_timers) {
 		stask_active = 0;
 		return;
@@ -131,7 +131,7 @@ static void genrtc_troutine(struct work_struct *work)
 static void gen_rtc_timer(unsigned long data)
 {
 	lostint = get_rtc_ss() - oldsecs ;
-	if (lostint<0) 
+	if (lostint<0)
 		lostint = 60 - lostint;
 	if (time_after(jiffies, tt_exp))
 		printk(KERN_INFO "genrtc: timer task delayed by %ld jiffies\n",
@@ -142,7 +142,7 @@ static void gen_rtc_timer(unsigned long data)
 		stask_active = 0;
 }
 
-/* 
+/*
  * call gen_rtc_interrupt function to signal an RTC_UIE,
  * arg is unused.
  * Could be invoked either from a real interrupt handler or

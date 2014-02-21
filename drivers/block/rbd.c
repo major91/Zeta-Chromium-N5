@@ -1543,7 +1543,7 @@ static void rbd_free_disk(struct rbd_device *rbd_dev)
 }
 
 /*
- * reload the ondisk the header 
+ * reload the ondisk the header
  */
 static int rbd_read_header(struct rbd_device *rbd_dev,
 			   struct rbd_image_header *header)

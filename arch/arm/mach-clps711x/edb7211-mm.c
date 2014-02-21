@@ -26,7 +26,7 @@
 #include <mach/hardware.h>
 #include <asm/page.h>
 #include <asm/sizes.h>
- 
+
 #include <asm/mach/map.h>
 
 extern void clps711x_map_io(void);

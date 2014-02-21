@@ -657,7 +657,7 @@ static int add_output(struct hda_codec *codec, hda_nid_t dac, int idx,
 		return err;
 
 	return 0;
-}		
+}
 
 static int build_output(struct hda_codec *codec)
 {
@@ -698,7 +698,7 @@ static int change_cur_input(struct hda_codec *codec, unsigned int idx,
 			    int force)
 {
 	struct cs_spec *spec = codec->spec;
-	
+
 	if (spec->cur_input == idx && !force)
 		return 0;
 	if (spec->cur_adc && spec->cur_adc != spec->adc_nid[idx]) {
@@ -797,7 +797,7 @@ static int add_input_volume_control(struct hda_codec *codec,
 	u32 caps;
 	const char *label;
 	struct snd_kcontrol *kctl;
-		
+
 	if (!(get_wcaps(codec, pin) & AC_WCAP_IN_AMP))
 		return 0;
 	caps = query_amp_caps(codec, pin, HDA_INPUT);
@@ -840,7 +840,7 @@ static int build_input(struct hda_codec *codec)
 				return err;
 		}
 	}
-	
+
 	if (spec->num_inputs > 1 && !spec->mic_detect) {
 		err = snd_hda_ctl_add(codec, 0,
 				      snd_ctl_new1(&cs_capture_source, codec));

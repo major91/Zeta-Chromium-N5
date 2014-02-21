@@ -293,7 +293,7 @@ static struct inode *usbfs_get_inode (struct super_block *sb, umode_t mode, dev_
 			break;
 		}
 	}
-	return inode; 
+	return inode;
 }
 
 /* SMP-safe */
@@ -413,13 +413,13 @@ static loff_t default_file_lseek (struct file *file, loff_t offset, int orig)
 		if (offset > 0) {
 			file->f_pos = offset;
 			retval = file->f_pos;
-		} 
+		}
 		break;
 	case 1:
 		if ((offset + file->f_pos) > 0) {
 			file->f_pos += offset;
 			retval = file->f_pos;
-		} 
+		}
 		break;
 	default:
 		break;
@@ -475,7 +475,7 @@ static int fs_create_by_name (const char *name, umode_t mode,
 	int error = 0;
 
 	/* If the parent is not specified, we create it in the root.
-	 * We need the root dentry to do this, which is in the super 
+	 * We need the root dentry to do this, which is in the super
 	 * block. A pointer to that is in the struct vfsmount that we
 	 * have around.
 	 */
@@ -495,7 +495,7 @@ static int fs_create_by_name (const char *name, umode_t mode,
 	if (!IS_ERR(*dentry)) {
 		if (S_ISDIR(mode))
 			error = usbfs_mkdir (parent->d_inode, *dentry, mode);
-		else 
+		else
 			error = usbfs_create (parent->d_inode, *dentry, mode);
 	} else
 		error = PTR_ERR(*dentry);
@@ -534,7 +534,7 @@ static struct dentry *fs_create_file (const char *name, umode_t mode,
 static void fs_remove_file (struct dentry *dentry)
 {
 	struct dentry *parent = dentry->d_parent;
-	
+
 	if (!parent || !parent->d_inode)
 		return;
 
@@ -592,7 +592,7 @@ static int create_special_files (void)
 	}
 
 	goto exit;
-	
+
 error_clean_mounts:
 	simple_release_fs(&usbfs_mount, &usbfs_mount_count);
 exit:

@@ -32,7 +32,7 @@ AFLAGS_misc.o += -Wa,-mcpu=cortex-a15
 MISC = misc.o
 
 AFLAGS_decompress.o += -Wa,-mcpu=cortex-a15
-DECOMPRESS = decompress.o  
+DECOMPRESS = decompress.o
 
 # string library code (-Os is enforced to keep it much smaller)
 OBJS		+= string.o

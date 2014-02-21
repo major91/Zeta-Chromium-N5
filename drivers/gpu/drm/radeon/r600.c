@@ -3640,9 +3640,9 @@ void r600_set_pcie_lanes(struct radeon_device *rdev, int lanes)
 
 	WREG32_PCIE_P(RADEON_PCIE_LC_LINK_WIDTH_CNTL, link_width_cntl);
 
-        /* some northbridges can renegotiate the link rather than requiring                                  
-         * a complete re-config.                                                                             
-         * e.g., AMD 780/790 northbridges (pci ids: 0x5956, 0x5957, 0x5958, etc.)                            
+        /* some northbridges can renegotiate the link rather than requiring
+         * a complete re-config.
+         * e.g., AMD 780/790 northbridges (pci ids: 0x5956, 0x5957, 0x5958, etc.)
          */
         if (link_width_cntl & R600_PCIE_LC_RENEGOTIATION_SUPPORT)
 		link_width_cntl |= R600_PCIE_LC_RENEGOTIATE_EN | R600_PCIE_LC_UPCONFIGURE_SUPPORT;

@@ -98,7 +98,7 @@ typedef unsigned long sigset_t;
 #define SA_ONESHOT	SA_RESETHAND
 #define SA_NOMASK	SA_NODEFER
 
-/* 
+/*
  * sigaltstack controls
  */
 #define SS_ONSTACK	1

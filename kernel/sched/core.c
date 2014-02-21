@@ -2450,7 +2450,7 @@ void calc_global_load(unsigned long ticks)
 	 * Account one period with whatever state we found before
 	 * folding in the nohz state and ageing the entire idle period.
 	 *
-	 * This avoids loosing a sample when we go idle between 
+	 * This avoids loosing a sample when we go idle between
 	 * calc_load_account_active() (10 ticks ago) and now and thus
 	 * under-accounting.
 	 */

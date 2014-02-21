@@ -7,13 +7,13 @@
  * Based on skeleton from the drivers/char/rtc.c driver by P. Gortmaker
  *
  * This code provides an architected & portable interface to the real time
- * clock by using EFI instead of direct bit fiddling. The functionalities are 
- * quite different from the rtc.c driver. The only way to talk to the device 
- * is by using ioctl(). There is a /proc interface which provides the raw 
+ * clock by using EFI instead of direct bit fiddling. The functionalities are
+ * quite different from the rtc.c driver. The only way to talk to the device
+ * is by using ioctl(). There is a /proc interface which provides the raw
  * information.
  *
  * Please note that we have kept the API as close as possible to the
- * legacy RTC. The standard /sbin/hwclock program should work normally 
+ * legacy RTC. The standard /sbin/hwclock program should work normally
  * when used to get/set the time.
  *
  * NOTES:
@@ -58,7 +58,7 @@ static const unsigned short int __mon_yday[2][13] =
 {
 	/* Normal years.  */
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
-	/* Leap years.  */  
+	/* Leap years.  */
 	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
 };
 
@@ -103,12 +103,12 @@ convert_to_efi_time(struct rtc_time *wtime, efi_time_t *eft)
 {
 
 	eft->year	= wtime->tm_year + 1900;
-	eft->month	= wtime->tm_mon + 1; 
+	eft->month	= wtime->tm_mon + 1;
 	eft->day	= wtime->tm_mday;
 	eft->hour	= wtime->tm_hour;
 	eft->minute	= wtime->tm_min;
 	eft->second 	= wtime->tm_sec;
-	eft->nanosecond = 0; 
+	eft->nanosecond = 0;
 	eft->daylight	= wtime->tm_isdst ? EFI_ISDST: 0;
 	eft->timezone	= EFI_UNSPECIFIED_TIMEZONE;
 }
@@ -302,7 +302,7 @@ efi_rtc_get_status(char *buf)
 	efi_time_t 	eft, alm;
 	efi_time_cap_t	cap;
 	char		*p = buf;
-	efi_bool_t	enabled, pending;	
+	efi_bool_t	enabled, pending;
 	unsigned long	flags;
 
 	memset(&eft, 0, sizeof(eft));
@@ -320,7 +320,7 @@ efi_rtc_get_status(char *buf)
 		     "Time           : %u:%u:%u.%09u\n"
 		     "Date           : %u-%u-%u\n"
 		     "Daylight       : %u\n",
-		     eft.hour, eft.minute, eft.second, eft.nanosecond, 
+		     eft.hour, eft.minute, eft.second, eft.nanosecond,
 		     eft.year, eft.month, eft.day,
 		     eft.daylight);
 
@@ -329,7 +329,7 @@ efi_rtc_get_status(char *buf)
 	else
 		/* XXX fixme: convert to string? */
 		p += sprintf(p, "Timezone       : %u\n", eft.timezone);
-		
+
 
 	p += sprintf(p,
 		     "Alarm Time     : %u:%u:%u.%09u\n"
@@ -337,8 +337,8 @@ efi_rtc_get_status(char *buf)
 		     "Alarm Daylight : %u\n"
 		     "Enabled        : %s\n"
 		     "Pending        : %s\n",
-		     alm.hour, alm.minute, alm.second, alm.nanosecond, 
-		     alm.year, alm.month, alm.day, 
+		     alm.hour, alm.minute, alm.second, alm.nanosecond,
+		     alm.year, alm.month, alm.day,
 		     alm.daylight,
 		     enabled == 1 ? "yes" : "no",
 		     pending == 1 ? "yes" : "no");
@@ -374,7 +374,7 @@ efi_rtc_read_proc(char *page, char **start, off_t off,
         return len;
 }
 
-static int __init 
+static int __init
 efi_rtc_init(void)
 {
 	int ret;

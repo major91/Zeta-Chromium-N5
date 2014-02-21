@@ -136,7 +136,7 @@ asmlinkage void do_sigreturn(struct pt_regs *regs)
 	err |= __get_user(set.sig[0], &sf->info.si_mask);
 	err |= __copy_from_user(&set.sig[1], &sf->extramask,
 			        (_NSIG_WORDS-1) * sizeof(unsigned int));
-			   
+
 	if (err)
 		goto segv_and_exit;
 
@@ -184,15 +184,15 @@ asmlinkage void do_rt_sigreturn(struct pt_regs *regs)
 	if (!err && fpu_save)
 		err |= restore_fpu_state(regs, fpu_save);
 	err |= __copy_from_user(&set, &sf->mask, sizeof(sigset_t));
-	
+
 	err |= __copy_from_user(&st, &sf->stack, sizeof(stack_t));
-	
+
 	if (err)
 		goto segv;
-		
+
 	regs->pc = pc;
 	regs->npc = npc;
-	
+
 	/* It is more difficult to avoid calling this function than to
 	 * call it and ignore errors.
 	 */
@@ -222,7 +222,7 @@ static inline int invalid_frame_pointer(void __user *fp, int fplen)
 	    ((sparc_cpu_model == sun4 || sparc_cpu_model == sun4c) &&
 	     ((unsigned long) fp < 0xe0000000 && (unsigned long) fp >= 0x20000000)))
 		return 1;
-	
+
 	return 0;
 }
 
@@ -284,7 +284,7 @@ static int setup_frame(struct k_sigaction *ka, struct pt_regs *regs,
 
 	/* 2. Save the current process state */
 	err = __copy_to_user(&sf->info.si_regs, regs, sizeof(struct pt_regs));
-	
+
 	err |= __put_user(0, &sf->extra_size);
 
 	if (used_math()) {
@@ -318,7 +318,7 @@ static int setup_frame(struct k_sigaction *ka, struct pt_regs *regs,
 	}
 	if (err)
 		goto sigsegv;
-	
+
 	/* 3. signal handler back-trampoline and parameters */
 	regs->u_regs[UREG_FP] = (unsigned long) sf;
 	regs->u_regs[UREG_I0] = signo;
@@ -406,12 +406,12 @@ static int setup_rt_frame(struct k_sigaction *ka, struct pt_regs *regs,
 		err |= __put_user(0, &sf->rwin_save);
 	}
 	err |= __copy_to_user(&sf->mask, &oldset->sig[0], sizeof(sigset_t));
-	
+
 	/* Setup sigaltstack */
 	err |= __put_user(current->sas_ss_sp, &sf->stack.ss_sp);
 	err |= __put_user(sas_ss_flags(regs->u_regs[UREG_FP]), &sf->stack.ss_flags);
 	err |= __put_user(current->sas_ss_size, &sf->stack.ss_size);
-	
+
 	if (!wsaved) {
 		err |= __copy_to_user(sf, (char *) regs->u_regs[UREG_FP],
 				      sizeof(struct reg_window32));

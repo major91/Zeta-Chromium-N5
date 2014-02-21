@@ -80,7 +80,7 @@ asmlinkage int sys_sigsuspend(int restart, unsigned long oldmask, old_sigset_t m
 	return -ERESTARTNOHAND;
 }
 
-asmlinkage int 
+asmlinkage int
 sys_sigaction(int sig, const struct old_sigaction __user *act,
 	      struct old_sigaction __user *oact)
 {
@@ -555,7 +555,7 @@ setup_rt_frame(int usig, struct k_sigaction *ka, siginfo_t *info,
 
 /*
  * OK, we're invoking a handler
- */	
+ */
 static int
 handle_signal(unsigned long sig, struct k_sigaction *ka,
 	      siginfo_t *info, sigset_t *oldset,

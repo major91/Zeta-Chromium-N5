@@ -5,7 +5,7 @@
  * Copyright (C) 1996 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  *
- * 2004-12-25	Krzysztof Helt (krzysztof.h1@wp.pl) 
+ * 2004-12-25	Krzysztof Helt (krzysztof.h1@wp.pl)
  *		- fixed registers constrains in inline assembly declarations
  */
 
@@ -123,9 +123,9 @@ int do_user_muldiv(struct pt_regs *regs, unsigned long pc)
 	rs1 = fetch_reg(rs1, regs);
 	switch (inst) {
 	case 10: /* umul */
-#ifdef DEBUG_MULDIV	
+#ifdef DEBUG_MULDIV
 		printk ("unsigned muldiv: 0x%x * 0x%x = ", rs1, rs2);
-#endif		
+#endif
 		__asm__ __volatile__ ("\n\t"
 			"mov	%0, %%o0\n\t"
 			"call	.umul\n\t"

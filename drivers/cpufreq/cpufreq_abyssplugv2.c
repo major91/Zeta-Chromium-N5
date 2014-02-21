@@ -656,7 +656,7 @@ static void bds_check_cpu(struct cpu_bds_info_s *this_bds_info)
 	/* Check for frequency increase */
 	if (max_load_freq > bds_tuners_ins.up_threshold * policy->cur) {
 		/* If switching to max speed, apply sampling_down_factor */
-		
+
 			/* busy phase */
 			if (policy->cur < policy->max)
 				this_bds_info->rate_mult =

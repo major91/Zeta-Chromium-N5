@@ -71,7 +71,7 @@ typedef int __bitwise snd_device_state_t;
 
 typedef int __bitwise snd_device_cmd_t;
 #define	SNDRV_DEV_CMD_PRE	((__force snd_device_cmd_t) 0)
-#define	SNDRV_DEV_CMD_NORMAL	((__force snd_device_cmd_t) 1)	
+#define	SNDRV_DEV_CMD_NORMAL	((__force snd_device_cmd_t) 1)
 #define	SNDRV_DEV_CMD_POST	((__force snd_device_cmd_t) 2)
 
 struct snd_device;
@@ -386,7 +386,7 @@ void __snd_printk(unsigned int level, const char *file, int line,
  *
  * When CONFIG_SND_DEBUG is set, this macro evaluates the given condition,
  * and call WARN() and returns the value if it's non-zero.
- * 
+ *
  * When CONFIG_SND_DEBUG is not set, this just returns zero, and the given
  * condition is ignored.
  *

@@ -4,12 +4,12 @@ FILE:
 
 DESCRIPTION:
    Qualcomm QMI driver header
-   
+
 FUNCTIONS:
    Generic QMUX functions
       ParseQMUX
       FillQMUX
-   
+
    Generic QMI functions
       GetTLV
       ValidQMIMessage
@@ -31,7 +31,7 @@ FUNCTIONS:
       QMIWDSSetEventReportReq
       QMIWDSGetPKGSRVCStatusReq
       QMIDMSGetMEIDReq
-      
+
    Parse data from QMI responses
       QMICTLGetClientIDResp
       QMICTLReleaseClientIDResp
@@ -97,10 +97,10 @@ typedef struct sQMUX
 
    /* Control flag */
    u8         mCtrlFlag;
-   
+
    /* Service Type */
    u8         mQMIService;
-   
+
    /* Client ID */
    u8         mQMIClientID;
 
