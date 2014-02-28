@@ -464,7 +464,7 @@ static void touch_fw_upgrade_func(struct work_struct *work_fw_upgrade)
 
 	TOUCH_DEBUG_TRACE("%s\n", __func__);
 
-	if (!ts->fw_info.fw_upgrade.fw_force_upgrade &&
+	if (!ts->fw_info.fw_upgrade.fw_force_upgrade && 
 		(!ts->fw_info.fw_start ||
 			kstrtoint(&ts->fw_info.config_id[1], 10, &ver) != 0 ||
 			kstrtoint(&ts->fw_info.image_config_id[1], 10,
