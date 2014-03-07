@@ -69,7 +69,7 @@ void msm_slim_put_ctrl(struct msm_slim_ctrl *dev)
 	if (ref <= 0)
 		dev_err(dev->dev, "reference count mismatch:%d", ref);
 	else
-		pm_runtime_put(dev->dev);
+		pm_runtime_put_sync(dev->dev);
 #endif
 }
 
@@ -278,7 +278,7 @@ static int msm_slim_post_tx_msgq(struct msm_slim_ctrl *dev, u8 *buf, int len)
 	struct sps_pipe *pipe = endpoint->sps;
 	int ix = (buf - (u8 *)mem->base) / SLIM_MSGQ_BUF_LEN;
 
-	u32 phys_addr = mem->phys_base + (SLIM_MSGQ_BUF_LEN * ix);
+	phys_addr_t phys_addr = mem->phys_base + (SLIM_MSGQ_BUF_LEN * ix);
 
 	for (ret = 0; ret < ((len + 3) >> 2); ret++)
 		pr_debug("BAM TX buf[%d]:0x%x", ret, ((u32 *)buf)[ret]);
@@ -311,7 +311,7 @@ static u32 *msm_slim_tx_msgq_return(struct msm_slim_ctrl *dev)
 	}
 
 	/* Calculate buffer index */
-	dev->tx_idx = (iovec.addr - mem->phys_base) / SLIM_MSGQ_BUF_LEN;
+	dev->tx_idx = ((int)(iovec.addr - mem->phys_base)) / SLIM_MSGQ_BUF_LEN;
 
 	return (u32 *)((u8 *)mem->base + (dev->tx_idx * SLIM_MSGQ_BUF_LEN));
 }
@@ -386,9 +386,9 @@ static int msm_slim_post_rx_msgq(struct msm_slim_ctrl *dev, int ix)
 
 	/* Rx message queue buffers are 4 bytes in length */
 	u8 *virt_addr = mem->base + (4 * ix);
-	u32 phys_addr = mem->phys_base + (4 * ix);
+	phys_addr_t phys_addr = mem->phys_base + (4 * ix);
 
-	pr_debug("index:%d, phys:0x%x, virt:0x%p\n", ix, phys_addr, virt_addr);
+	pr_debug("index:%d, virt:0x%p\n", ix, virt_addr);
 
 	ret = sps_transfer_one(pipe, phys_addr, 4, virt_addr, flags);
 	if (ret)
@@ -1050,6 +1050,7 @@ int msm_slim_qmi_init(struct msm_slim_ctrl *dev, bool apps_is_master)
 	}
 
 	rc = qmi_connect_to_service(handle, SLIMBUS_QMI_SVC_ID,
+						SLIMBUS_QMI_SVC_V1,
 						SLIMBUS_QMI_INS_ID);
 	if (rc < 0) {
 		pr_err("%s: QMI server not found\n", __func__);
