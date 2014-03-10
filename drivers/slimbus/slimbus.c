@@ -288,27 +288,37 @@ static struct device_type slim_dev_type = {
 
 static void slim_report(struct work_struct *work)
 {
+	u8 laddr;
+	int ret, i;
 	struct slim_driver *sbdrv;
 	struct slim_device *sbdev =
 			container_of(work, struct slim_device, wd);
+	struct slim_controller *ctrl = sbdev->ctrl;
 	if (!sbdev->dev.driver)
 		return;
 	/* check if device-up or down needs to be called */
-	if ((!sbdev->reported && !sbdev->notified) ||
-			(sbdev->reported && sbdev->notified))
-		return;
-
+	mutex_lock(&ctrl->m_ctrl);
+	/* address no longer valid, means device reported absent */
+	for (i = 0; i < ctrl->num_dev; i++) {
+		if (sbdev->laddr == ctrl->addrt[i].laddr &&
+			ctrl->addrt[i].valid == false &&
+			sbdev->notified)
+			break;
+	}
+	mutex_unlock(&ctrl->m_ctrl);
 	sbdrv = to_slim_driver(sbdev->dev.driver);
-	/*
-	 * address no longer valid, means device reported absent, whereas
-	 * address valid, means device reported present
-	 */
-	if (sbdev->notified && !sbdev->reported) {
+	if (i < ctrl->num_dev) {
 		sbdev->notified = false;
 		if (sbdrv->device_down)
 			sbdrv->device_down(sbdev);
-	} else if (!sbdev->notified && sbdev->reported) {
-		sbdev->notified = true;
+		return;
+	}
+	if (sbdev->notified)
+		return;
+	ret = slim_get_logical_addr(sbdev, sbdev->e_addr, 6, &laddr);
+	if (!ret) {
+		if (sbdrv)
+			sbdev->notified = true;
 		if (sbdrv->device_up)
 			sbdrv->device_up(sbdev);
 	}
@@ -635,7 +645,6 @@ void slim_report_absent(struct slim_device *sbdev)
 			ctrl->addrt[i].valid = false;
 	}
 	mutex_unlock(&ctrl->m_ctrl);
-	sbdev->reported = false;
 	queue_work(ctrl->wq, &sbdev->wd);
 }
 EXPORT_SYMBOL(slim_report_absent);
@@ -659,12 +668,9 @@ void slim_msg_response(struct slim_controller *ctrl, u8 *reply, u8 tid, u8 len)
 
 	mutex_lock(&ctrl->m_ctrl);
 	txn = ctrl->txnt[tid];
-	if (txn == NULL || txn->rbuf == NULL) {
-		if (txn == NULL)
-			dev_err(&ctrl->dev, "Got response to invalid TID:%d, len:%d",
+	if (txn == NULL) {
+		dev_err(&ctrl->dev, "Got response to invalid TID:%d, len:%d",
 				tid, len);
-		else
-			dev_err(&ctrl->dev, "Invalid client buffer passed\n");
 		mutex_unlock(&ctrl->m_ctrl);
 		return;
 	}
@@ -767,8 +773,6 @@ int slim_assign_laddr(struct slim_controller *ctrl, const u8 *e_addr,
 	u8 i = 0;
 	bool exists = false;
 	struct slim_device *sbdev;
-	struct list_head *pos, *next;
-
 	mutex_lock(&ctrl->m_ctrl);
 	/* already assigned */
 	if (ctrl_getlogical_addr(ctrl, e_addr, e_len, &i) == 0) {
@@ -818,12 +822,10 @@ ret_assigned_laddr:
 	pr_info("slimbus:%d laddr:0x%x, EAPC:0x%x:0x%x", ctrl->nr, *laddr,
 				e_addr[1], e_addr[2]);
 	mutex_lock(&ctrl->m_ctrl);
-	list_for_each_safe(pos, next, &ctrl->devs) {
-		sbdev = list_entry(pos, struct slim_device, dev_list);
+	list_for_each_entry(sbdev, &ctrl->devs, dev_list) {
 		if (memcmp(sbdev->e_addr, e_addr, 6) == 0) {
 			struct slim_driver *sbdrv;
 			sbdev->laddr = *laddr;
-			sbdev->reported = true;
 			if (sbdev->dev.driver) {
 				sbdrv = to_slim_driver(sbdev->dev.driver);
 				if (sbdrv->device_up)
