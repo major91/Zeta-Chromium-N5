@@ -28,7 +28,6 @@ OBJS	+= misc.o decompress.o
 FONTC	= $(srctree)/drivers/video/console/font_acorn_8x8.c
 
 AFLAGS_misc.o += -Wa,-mcpu=cortex-a15
-
 MISC = misc.o
 
 AFLAGS_decompress.o += -Wa,-mcpu=cortex-a15
