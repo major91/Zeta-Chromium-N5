@@ -1530,6 +1530,8 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
 	unsigned int written;
 	unsigned long num_pages, npages, i;
 	size_t copied, len, cur_len;
+	unsigned long nr_pages, i;
+	size_t bytes, copied, len, cur_len;
 	ssize_t total_written = 0;
 	struct kvec *to_send;
 	struct page **pages;
@@ -1594,36 +1596,58 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
 			iov_iter_advance(&it, copied);
 			to_send[i+1].iov_base = kmap(pages[i]);
 			to_send[i+1].iov_len = copied;
-		}
 
+		save_len = cur_len;
+		for (i = 0; i < nr_pages; i++) {
+			bytes = min_t(const size_t, cur_len, PAGE_SIZE);
+			copied = iov_iter_copy_from_user(wdata->pages[i], &it,
+							 0, bytes);
+			cur_len -= copied;
+			iov_iter_advance(&it, copied);
+			/*
+			 * If we didn't copy as much as we expected, then that
+			 * may mean we trod into an unmapped area. Stop copying
+			 * at that point. On the next pass through the big
+			 * loop, we'll likely end up getting a zero-length
+			 * write and bailing out of it.
+			 */
+			if (copied < bytes)
+				break;
+		}
 		cur_len = save_len - cur_len;
 
-		do {
-			if (open_file->invalidHandle) {
-				rc = cifs_reopen_file(open_file, false);
-				if (rc != 0)
-					break;
-			}
-			io_parms.netfid = open_file->netfid;
-			io_parms.pid = pid;
-			io_parms.tcon = pTcon;
-			io_parms.offset = *poffset;
-			io_parms.length = cur_len;
-			rc = CIFSSMBWrite2(xid, &io_parms, &written, to_send,
-					   npages, 0);
-		} while (rc == -EAGAIN);
+		/*
+		 * If we have no data to send, then that probably means that
+		 * the copy above failed altogether. That's most likely because
+		 * the address in the iovec was bogus. Set the rc to -EFAULT,
+		 * free anything we allocated and bail out.
+		 */
+		if (!cur_len) {
+			for (i = 0; i < nr_pages; i++)
+				put_page(wdata->pages[i]);
+			kfree(wdata);
+			rc = -EFAULT;
+			break;
+		}
 
-		for (i = 0; i < npages; i++)
-			kunmap(pages[i]);
+		/*
+		 * i + 1 now represents the number of pages we actually used in
+		 * the copy phase above. Bring nr_pages down to that, and free
+		 * any pages that we didn't use.
+		 */
+		for ( ; nr_pages > i + 1; nr_pages--)
+			put_page(wdata->pages[nr_pages - 1]);
 
-		if (written) {
-			len -= written;
-			total_written += written;
-			cifs_update_eof(CIFS_I(inode), *poffset, written);
-			*poffset += written;
-		} else if (rc < 0) {
-			if (!total_written)
-				total_written = rc;
+		wdata->sync_mode = WB_SYNC_ALL;
+		wdata->nr_pages = nr_pages;
+		wdata->offset = (__u64)offset;
+		wdata->cfile = cifsFileInfo_get(open_file);
+		wdata->pid = pid;
+		wdata->bytes = cur_len;
+		wdata->marshal_iov = cifs_uncached_marshal_iov;
+		rc = cifs_uncached_retry_writev(wdata);
+		if (rc) {
+			kref_put(&wdata->refcount, cifs_writedata_release);
 			break;
 		}
 
