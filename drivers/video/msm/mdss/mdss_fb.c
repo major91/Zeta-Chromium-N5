@@ -1520,18 +1520,14 @@ static int __mdss_fb_display_thread(void *data)
 
 	while (1) {
 		ret = wait_event_interruptible(mfd->commit_wait_q,
-				(atomic_read(&mfd->commits_pending) ||
-				 kthread_should_stop()));
-
+				atomic_read(&mfd->commits_pending));
 		if (ret) {
 			pr_info("%s: interrupted", __func__);
 			continue;
 		}
 
-		if (kthread_should_stop())
-			break;
-
 		ret = __mdss_fb_perform_commit(mfd);
+
 		atomic_dec(&mfd->commits_pending);
 		wake_up_all(&mfd->idle_wait_q);
 	}
