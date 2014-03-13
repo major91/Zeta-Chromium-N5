@@ -1,7 +1,8 @@
 Image
 zImage
+zImage-dtb
 xipImage
 bootpImage
 uImage
 *.dtb
-zImage-dtb
+dt.img
