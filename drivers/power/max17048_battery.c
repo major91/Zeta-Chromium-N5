@@ -263,12 +263,21 @@ static int max17048_check_recharge(struct max17048_chip *chip)
 {
 	union power_supply_propval ret = {true,};
 	int chg_status;
+#ifdef CONFIG_BLX
+	int blx_max = 0;
+
+	blx_max = get_charginglimit();
+#endif
 
 	if (chip->batt_health != POWER_SUPPLY_HEALTH_GOOD)
 		return false;
 
 	chg_status = max17048_get_prop_status(chip);
+#ifdef CONFIG_BLX
+	if (chip->capacity_level <= blx_max &&
+#else
 	if (chip->capacity_level <= 99 &&
+#endif
 			chg_status == POWER_SUPPLY_STATUS_NOT_CHARGING) {
 		chip->ac_psy->set_property(chip->ac_psy,
 				POWER_SUPPLY_PROP_CHARGING_ENABLED,
