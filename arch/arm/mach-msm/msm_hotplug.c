@@ -128,7 +128,7 @@ struct load_thresh_tbl {
 static struct load_thresh_tbl load[] = {
 	LOAD_SCALE(400, 0),
 	LOAD_SCALE(40, 0),
-	LOAD_SCALE(80, 20)
+	LOAD_SCALE(80, 20),
 	LOAD_SCALE(140, 60),
 	LOAD_SCALE(410, 140),
 };
