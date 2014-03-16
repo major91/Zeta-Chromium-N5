@@ -29,7 +29,7 @@ static void f2fs_read_end_io(struct bio *bio, int err)
 	struct bio_vec *bvec;
 	int i;
 
-	__bio_for_each_segment(bvec, bio, i, 0) {
+	bio_for_each_segment_all(bvec, bio, i) {
 		struct page *page = bvec->bv_page;
 
 		if (!err) {
@@ -49,7 +49,7 @@ static void f2fs_write_end_io(struct bio *bio, int err)
 	struct bio_vec *bvec;
 	int i;
 
-	__bio_for_each_segment(bvec, bio, i, 0) {
+	bio_for_each_segment_all(bvec, bio, i) {
 		struct page *page = bvec->bv_page;
 
 		if (unlikely(err)) {
@@ -85,7 +85,7 @@ static struct bio *__bio_alloc(struct f2fs_sb_info *sbi, block_t blk_addr,
 	bio = bio_alloc(GFP_NOIO, npages);
 
 	bio->bi_bdev = sbi->sb->s_bdev;
-	bio->bi_sector = SECTOR_FROM_BLOCK(sbi, blk_addr);
+	bio->bi_iter.bi_sector = SECTOR_FROM_BLOCK(sbi, blk_addr);
 	bio->bi_end_io = is_read ? f2fs_read_end_io : f2fs_write_end_io;
 	bio->bi_private = sbi;
 
@@ -1018,7 +1018,8 @@ static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
 							get_data_block);
 }
 
-static void f2fs_invalidate_data_page(struct page *page, unsigned long offset)
+static void f2fs_invalidate_data_page(struct page *page, unsigned int offset,
+				      unsigned int length)
 {
 	struct inode *inode = page->mapping->host;
 	if (PageDirty(page))
