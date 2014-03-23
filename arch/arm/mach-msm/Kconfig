@@ -281,10 +281,11 @@ config ARCH_MSM8974
 	select MSM_RPM_STATS_LOG
 	select QMI_ENCDEC
 	select MSM_ULTRASOUND_B
-	select MSM_LPM_TEST
 	select MSM_RPM_LOG
 	select ARCH_WANT_KMAP_ATOMIC_FLUSH
+	select KRAIT_REGULATOR
 	select ENABLE_VMALLOC_SAVINGS
+	select HAS_MACH_MEMUTILS
 
 config ARCH_APQ8084
 	bool "APQ8084"
@@ -3089,11 +3090,25 @@ config WALL_CLK_SYSFS
 	 Support the wallclk directory in sysfs filesystem to enable the
 	 wall clock simulation and read the current SFN.
 
+config KRAIT_REGULATOR
+	bool "Support Kraits powered via ganged regulators in the pmic"
+	help
+	 Certain MSMs have the Krait CPUs powered via a single supply
+	 line from the PMIC. This supply line is powered by multiple
+	 regulators running in ganged mode inside the PMIC. Enable
+	 this option to support such configurations.
+
 config FORCE_FAST_CHARGE
 	bool "Force AC charge mode at will"
 	default y
 	help
 	  A simple sysfs interface to force adapters that
 	  are detected as USB to charge as AC.
+
+config HAS_MACH_MEMUTILS
+	default n
+	bool "Motorola MSM memcpy enhancements"
+	help
+	Faster memcpy performance for Krait
 
 endif
