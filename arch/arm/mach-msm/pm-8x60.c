@@ -1034,7 +1034,7 @@ int msm_pm_wait_cpu_shutdown(unsigned int cpu)
 		if (acc_sts & msm_pm_slp_sts[cpu].mask)
 			return 0;
 		udelay(100);
-		WARN(++timeout == 20, "CPU%u didn't collape within 2ms\n",
+		WARN(++timeout == 50, "CPU%u didn't collapse within 5ms\n",
 					cpu);
 	}
 
@@ -1137,6 +1137,7 @@ static int msm_pm_enter(suspend_state_t state)
 		int ret = -ENODEV;
 		uint32_t power;
 		uint32_t msm_pm_max_sleep_time = 0;
+		int collapsed = 0;
 
 		if (MSM_PM_DEBUG_SUSPEND & msm_pm_debug_mask)
 			pr_info("%s: power collapse\n", __func__);
