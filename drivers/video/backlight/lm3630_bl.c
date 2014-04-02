@@ -71,8 +71,11 @@
 
 #define BL_OFF 0x00
 
-bool backlight_dimmer = false;
-module_param(backlight_dimmer, bool, 0755);
+static bool backlight_dimmer = true;
+module_param(backlight_dimmer, bool, 0664);
+
+static int min_brightness = 5;
+module_param(min_brightness, int, 0664);
 
 enum {
 	LED_BANK_A,
@@ -231,17 +234,15 @@ static void lm3630_set_main_current_level(struct i2c_client *client, int level)
 		if (unlikely(!level)) {
 			lm3630_write_reg(client, CONTROL_REG, BL_OFF);
 		} else {
-			if (level > dev->max_brightness) 
-				level = dev->max_brightness;
-			else if (level < dev->min_brightness) 
-				level = dev->min_brightness;
-	
 			if (level < 15) {
-				max_current = 0;
-				brightness = level - 1;
+				if (level < min_brightness)
+					level = min_brightness;
+
+				max_current = max(level - dev->min_brightness, 0);
+				brightness = level - dev->min_brightness;
 				
-				if (brightness < dev->min_brightness) {
-					brightness = dev->min_brightness;
+				if (brightness < min_brightness) {
+					brightness = min_brightness;
 				}
 			} else {
 				brightness = 
