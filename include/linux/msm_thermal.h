@@ -30,7 +30,7 @@ struct msm_thermal_data {
 	int32_t psm_temp_hyst_degC;
 };
 
-#if defined(CONFIG_THERMAL_MONITOR) || defined(CONFIG_INTELLI_THERMAL) || defined(CONFIG_FK_THERMAL)
+#ifdef CONFIG_THERMAL_MONITOR
 extern int msm_thermal_init(struct msm_thermal_data *pdata);
 extern int msm_thermal_device_init(void);
 #else
