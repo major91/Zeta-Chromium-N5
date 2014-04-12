@@ -27,14 +27,16 @@
  * It helps to keep variable names smaller, simpler
  */
 
-#define DEF_FREQUENCY_UP_THRESHOLD		(90)
-#define DEF_FREQUENCY_DOWN_THRESHOLD		(30)
+#define DEF_FREQUENCY_UP_THRESHOLD		(95)
+#define DEF_FREQUENCY_DOWN_THRESHOLD		(40)
 #define MIN_SAMPLING_RATE_RATIO			(2)
+#define MIN_SAMPLING_RATE                       10000
+#define DEF_SAMPLING_RATE                       15000
 
 static unsigned int min_sampling_rate;
 
-#define LATENCY_MULTIPLIER			(1000)
-#define MIN_LATENCY_MULTIPLIER			(100)
+#define LATENCY_MULTIPLIER			(500)
+#define MIN_LATENCY_MULTIPLIER			(20)
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(10)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)
@@ -103,7 +105,7 @@ static struct dbs_tuners {
 	.down_threshold = DEF_FREQUENCY_DOWN_THRESHOLD,
 	.sampling_down_factor = DEF_SAMPLING_DOWN_FACTOR,
 	.ignore_nice = 0,
-	.freq_step = 5,
+	.freq_step = 3,
 };
 
 static inline u64 get_cpu_idle_time_jiffy(unsigned int cpu,
@@ -565,14 +567,9 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			 * conservative does not implement micro like ondemand
 			 * governor, thus we are bound to jiffes/HZ
 			 */
-			min_sampling_rate =
-				MIN_SAMPLING_RATE_RATIO * jiffies_to_usecs(10);
-			/* Bring kernel and HW constraints together */
-			min_sampling_rate = max(min_sampling_rate,
-					MIN_LATENCY_MULTIPLIER * latency);
-			dbs_tuners_ins.sampling_rate =
-				max(min_sampling_rate,
-				    latency * LATENCY_MULTIPLIER);
+                        min_sampling_rate = MIN_SAMPLING_RATE;
+                        /* Bring kernel and HW constraints together */
+                        dbs_tuners_ins.sampling_rate = DEF_SAMPLING_RATE;
 
 			cpufreq_register_notifier(
 					&dbs_cpufreq_notifier_block,
