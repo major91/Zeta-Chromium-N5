@@ -742,14 +742,8 @@ static int mdss_mdp_overlay_start(struct msm_fb_data_type *mfd)
 	int rc;
 	struct mdss_overlay_private *mdp5_data = mfd_to_mdp5_data(mfd);
 
-	if (mdp5_data->ctl->power_on) {
-		if (!mdp5_data->mdata->batfet)
-			mdss_mdp_batfet_ctrl(mdp5_data->mdata, true);
-		if (!is_mdss_iommu_attached() &&
-					!mfd->panel_info->cont_splash_enabled)
-			mdss_iommu_attach(mdp5_data->mdata);
+	if (mdp5_data->ctl->power_on)
 		return 0;
-	}
 
 	pr_debug("starting fb%d overlay\n", mfd->index);
 
@@ -806,10 +800,6 @@ int mdss_mdp_overlay_kickoff(struct msm_fb_data_type *mfd)
 	struct mdss_mdp_ctl *ctl = mfd_to_ctl(mfd);
 	struct mdss_mdp_ctl *tmp;
 	int ret = 0;
-
-	if (!is_mdss_iommu_attached() && !mfd->panel_info->cont_splash_enabled)
-		mdss_iommu_attach(mdp5_data->mdata);
-
 	if (ctl->shared_lock)
 		mutex_lock(ctl->shared_lock);
 
@@ -1831,10 +1821,6 @@ static int mdss_fb_get_hw_caps(struct msm_fb_data_type *mfd,
 		caps->features |= MDP_BWC_EN;
 	if (mdata->has_decimation)
 		caps->features |= MDP_DECIMATION_EN;
-
-	caps->max_smp_cnt = mdss_res->smp_mb_cnt;
-	caps->smp_per_pipe = mdata->smp_mb_per_pipe;
-
 	return 0;
 }
 

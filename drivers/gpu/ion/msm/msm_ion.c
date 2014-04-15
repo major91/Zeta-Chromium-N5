@@ -52,7 +52,7 @@ static struct ion_heap_desc ion_heap_meta[] = {
 	{
 		.id	= ION_SYSTEM_HEAP_ID,
 		.type	= ION_HEAP_TYPE_SYSTEM,
-		.name	= ION_SYSTEM_HEAP_NAME,
+		.name	= ION_VMALLOC_HEAP_NAME,
 	},
 	{
 		.id	= ION_SYSTEM_CONTIG_HEAP_ID,
@@ -127,16 +127,6 @@ static struct ion_heap_desc ion_heap_meta[] = {
 struct ion_client *msm_ion_client_create(unsigned int heap_mask,
 					const char *name)
 {
-	/*
-	 * The assumption is that if there is a NULL device, the ion
-	 * driver has not yet probed.
-	 */
-	if (idev == NULL)
-		return ERR_PTR(-EPROBE_DEFER);
-
-	if (IS_ERR(idev))
-		return (struct ion_client *)idev;
-
 	return ion_client_create(idev, name);
 }
 EXPORT_SYMBOL(msm_ion_client_create);
@@ -1006,7 +996,6 @@ static void msm_ion_heap_destroy(struct ion_heap *heap)
 
 static int msm_ion_probe(struct platform_device *pdev)
 {
-	static struct ion_device *new_dev;
 	struct ion_platform_data *pdata;
 	unsigned int pdata_needs_to_be_freed;
 	int err = -1;
@@ -1032,14 +1021,9 @@ static int msm_ion_probe(struct platform_device *pdev)
 		goto out;
 	}
 
-	new_dev = ion_device_create(msm_ion_custom_ioctl);
-	if (IS_ERR_OR_NULL(new_dev)) {
-		/*
-		 * set this to the ERR to indicate to the clients
-		 * that Ion failed to probe.
-		 */
-		idev = new_dev;
-		err = PTR_ERR(new_dev);
+	idev = ion_device_create(msm_ion_custom_ioctl);
+	if (IS_ERR_OR_NULL(idev)) {
+		err = PTR_ERR(idev);
 		goto freeheaps;
 	}
 
@@ -1066,18 +1050,13 @@ static int msm_ion_probe(struct platform_device *pdev)
 							  heap_data->name);
 		}
 
-		ion_device_add_heap(new_dev, heaps[i]);
+		ion_device_add_heap(idev, heaps[i]);
 	}
 	check_for_heap_overlap(pdata->heaps, num_heaps);
 	if (pdata_needs_to_be_freed)
 		free_pdata(pdata);
 
-	platform_set_drvdata(pdev, new_dev);
-	/*
-	 * intentionally set this at the very end to allow probes to be deferred
-	 * completely until Ion is setup
-	 */
-	idev = new_dev;
+	platform_set_drvdata(pdev, idev);
 	return 0;
 
 freeheaps:

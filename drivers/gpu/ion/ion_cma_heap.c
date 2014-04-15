@@ -76,10 +76,10 @@ static int ion_cma_allocate(struct ion_heap *heap, struct ion_buffer *buffer,
 
 	if (!ION_IS_CACHED(flags))
 		info->cpu_addr = dma_alloc_writecombine(dev, len,
-					&(info->handle), GFP_KERNEL);
+					&(info->handle), 0);
 	else
 		info->cpu_addr = dma_alloc_nonconsistent(dev, len,
-					&(info->handle), GFP_KERNEL);
+					&(info->handle), 0);
 
 	if (!info->cpu_addr) {
 		dev_err(dev, "Fail to allocate buffer\n");
@@ -180,17 +180,19 @@ static void ion_cma_unmap_kernel(struct ion_heap *heap,
 }
 
 static int ion_cma_print_debug(struct ion_heap *heap, struct seq_file *s,
-			const struct list_head *mem_map)
+			const struct rb_root *mem_map)
 {
 	if (mem_map) {
-		struct mem_map_data *data;
+		struct rb_node *n;
 
 		seq_printf(s, "\nMemory Map\n");
 		seq_printf(s, "%16.s %14.s %14.s %14.s\n",
 			   "client", "start address", "end address",
 			   "size (hex)");
 
-		list_for_each_entry(data, mem_map, node) {
+		for (n = rb_first(mem_map); n; n = rb_next(n)) {
+			struct mem_map_data *data =
+					rb_entry(n, struct mem_map_data, node);
 			const char *client_name = "(null)";
 
 

@@ -41,6 +41,8 @@
 
 #include <asm/system_info.h>
 
+#include "mdss_dsi.h"
+
 #define DT_CMD_HDR 6
 #define GAMMA_COMPAT 11
 
@@ -436,7 +438,7 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 		if (dchdr->dlen > len) {
 			pr_err("%s: dtsi cmd=%x error, len=%d",
 				__func__, dchdr->dtype, dchdr->dlen);
-			return -ENOMEM;
+			goto exit_free;
 		}
 		bp += sizeof(*dchdr);
 		len -= sizeof(*dchdr);
@@ -448,14 +450,13 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 	if (len != 0) {
 		pr_err("%s: dcs_cmd=%x len=%d error!",
 				__func__, buf[0], blen);
-		kfree(buf);
-		return -ENOMEM;
+		goto exit_free;
 	}
 
 	pcmds->cmds = kzalloc(cnt * sizeof(struct dsi_cmd_desc),
 						GFP_KERNEL);
 	if (!pcmds->cmds)
-		return -ENOMEM;
+		goto exit_free;
 
 	pcmds->cmd_cnt = cnt;
 	pcmds->buf = buf;
@@ -483,6 +484,10 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 		pcmds->buf[0], pcmds->blen, pcmds->cmd_cnt, pcmds->link_state);
 
 	return 0;
+
+exit_free:
+	kfree(buf);
+	return -ENOMEM;
 }
 
 int mdss_dsi_panel_id(void)
@@ -1154,12 +1159,11 @@ static int read_local_on_cmds(char *buf, size_t cmd)
 		return -EINVAL;
 	}
 
-	/* Skip last bit */
 	dlen = local_pdata->on_cmds.cmds[cmd].dchdr.dlen - 1;
 	if (!dlen)
 		return -ENOMEM;
 
-	/* Skip first bit */
+	/* don't print first and last bits */
 	for (i = 1; i < dlen; i++)
 		len += sprintf(buf + len, "%d ",
 			       local_pdata->on_cmds.cmds[cmd].payload[i]);
@@ -1197,7 +1201,7 @@ static int write_local_on_cmds(struct device *dev, const char *buf,
 	}
 
 	ctrl = container_of(cmds_panel_data, struct mdss_dsi_ctrl_pdata,
-			    panel_data);
+				panel_data);
 
 	/*
 	 * Last bit is not written because it's either fixed at 0x00 for
@@ -1207,10 +1211,8 @@ static int write_local_on_cmds(struct device *dev, const char *buf,
 	if (!dlen)
 		return -EINVAL;
 
-	/* Backup previous panel data */
 	prev_local_data = local_pdata;
 
-	/* Skip first bit again */
 	for (i = 1; i < dlen; i++) {
 		rc = sscanf(buf, "%u", &val);
 		if (rc != 1)
@@ -1223,14 +1225,9 @@ static int write_local_on_cmds(struct device *dev, const char *buf,
 		}
 
 		local_pdata->on_cmds.cmds[cmd].payload[i] = val;
-		/*
-		 * Duplicate positive/negative polarities for both,
-		 * white point and RGB values.
-		 */
+		/* white point value must be duplicated */
 		if (cmd == 5)
 			local_pdata->on_cmds.cmds[cmd].payload[i + 1] = val;
-		else
-			local_pdata->on_cmds.cmds[cmd + 2].payload[i] = val;
 
 		sscanf(buf, "%s", tmp);
 		buf += strlen(tmp) + 1;
@@ -1285,10 +1282,13 @@ static ssize_t read_##file_name					\
 	return read_local_on_cmds(buf, cmd);			\
 }
 
-read_one(kgamma_w,  5);
-read_one(kgamma_r,  7);
-read_one(kgamma_g, 11);
-read_one(kgamma_b, 15);
+read_one(kgamma_w,   5);
+read_one(kgamma_rp,  7);
+read_one(kgamma_rn,  9);
+read_one(kgamma_gp, 11);
+read_one(kgamma_gn, 13);
+read_one(kgamma_bp, 15);
+read_one(kgamma_bn, 17);
 
 #define write_one(file_name, cmd)				\
 static ssize_t write_##file_name				\
@@ -1298,24 +1298,33 @@ static ssize_t write_##file_name				\
 	return write_local_on_cmds(dev, buf, cmd);		\
 }
 
-write_one(kgamma_w,  5);
-write_one(kgamma_r,  7);
-write_one(kgamma_g, 11);
-write_one(kgamma_b, 15);
+write_one(kgamma_w,   5);
+write_one(kgamma_rp,  7);
+write_one(kgamma_rn,  9);
+write_one(kgamma_gp, 11);
+write_one(kgamma_gn, 13);
+write_one(kgamma_bp, 15);
+write_one(kgamma_bn, 17);
 
 #define define_one_rw(_name)					\
 static DEVICE_ATTR(_name, 0644, read_##_name, write_##_name);
 
 define_one_rw(kgamma_w);
-define_one_rw(kgamma_r);
-define_one_rw(kgamma_g);
-define_one_rw(kgamma_b);
+define_one_rw(kgamma_rp);
+define_one_rw(kgamma_rn);
+define_one_rw(kgamma_gp);
+define_one_rw(kgamma_gn);
+define_one_rw(kgamma_bp);
+define_one_rw(kgamma_bn);
 
 static struct attribute *dsi_panel_attributes[] = {
 	&dev_attr_kgamma_w.attr,
-	&dev_attr_kgamma_r.attr,
-	&dev_attr_kgamma_g.attr,
-	&dev_attr_kgamma_b.attr,
+	&dev_attr_kgamma_rp.attr,
+	&dev_attr_kgamma_rn.attr,
+	&dev_attr_kgamma_gp.attr,
+	&dev_attr_kgamma_gn.attr,
+	&dev_attr_kgamma_bp.attr,
+	&dev_attr_kgamma_bn.attr,
 	&dev_attr_kgamma_send.attr,
 	NULL
 };
