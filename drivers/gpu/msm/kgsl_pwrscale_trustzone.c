@@ -25,10 +25,6 @@
 #include "kgsl_pwrscale.h"
 #include "kgsl_device.h"
 
-#ifdef CONFIG_MSM_KGSL_SIMPLE_GOV
-#include <linux/module.h>
-#endif
-
 #define TZ_GOVERNOR_PERFORMANCE 0
 #define TZ_GOVERNOR_ONDEMAND    1
 #define TZ_GOVERNOR_INTERACTIVE	2
