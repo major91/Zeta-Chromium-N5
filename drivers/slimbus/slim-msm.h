@@ -16,6 +16,7 @@
 #include <linux/irq.h>
 #include <linux/kthread.h>
 #include <mach/msm_qmi_interface.h>
+#include <mach/subsystem_notif.h>
 
 /* Per spec.max 40 bytes per received message */
 #define SLIM_MSGQ_BUF_LEN	40
@@ -35,6 +36,10 @@
 #define SLIM_USR_MC_CONNECT_SRC		0x2C
 #define SLIM_USR_MC_CONNECT_SINK	0x2D
 #define SLIM_USR_MC_DISCONNECT_PORT	0x2E
+
+#define SLIM_USR_MC_REPEAT_CHANGE_VALUE	0x0
+#define MSM_SLIM_VE_MAX_MAP_ADDR	0xFFF
+#define SLIM_MAX_VE_SLC_BYTES		16
 
 #define MSM_SLIM_AUTOSUSPEND		MSEC_PER_SEC
 
@@ -198,12 +203,19 @@ struct msm_slim_endp {
 struct msm_slim_qmi {
 	struct qmi_handle		*handle;
 	struct task_struct		*task;
+	struct task_struct		*slave_thread;
+	struct completion		slave_notify;
 	struct kthread_work		kwork;
 	struct kthread_worker		kworker;
 	struct completion		qmi_comp;
 	struct notifier_block		nb;
 	struct work_struct		ssr_down;
 	struct work_struct		ssr_up;
+};
+
+struct msm_slim_mdm {
+	struct notifier_block nb;
+	void *ssr;
 };
 
 struct msm_slim_pdata {
@@ -251,9 +263,9 @@ struct msm_slim_ctrl {
 	struct completion	ctrl_up;
 	int			nsats;
 	u32			ver;
-	struct work_struct	slave_notify;
 	struct msm_slim_qmi	qmi;
 	struct msm_slim_pdata	pdata;
+	struct msm_slim_mdm	mdm;
 };
 
 struct msm_sat_chan {
@@ -299,8 +311,8 @@ int msm_alloc_port(struct slim_controller *ctrl, u8 pn);
 void msm_dealloc_port(struct slim_controller *ctrl, u8 pn);
 int msm_slim_connect_pipe_port(struct msm_slim_ctrl *dev, u8 pn);
 enum slim_port_err msm_slim_port_xfer_status(struct slim_controller *ctr,
-				u8 pn, u8 **done_buf, u32 *done_len);
-int msm_slim_port_xfer(struct slim_controller *ctrl, u8 pn, u8 *iobuf,
+				u8 pn, phys_addr_t *done_buf, u32 *done_len);
+int msm_slim_port_xfer(struct slim_controller *ctrl, u8 pn, phys_addr_t iobuf,
 			u32 len, struct completion *comp);
 int msm_send_msg_buf(struct msm_slim_ctrl *dev, u32 *buf, u8 len, u32 tx_reg);
 u32 *msm_get_msg_buf(struct msm_slim_ctrl *dev, int len);
@@ -318,4 +330,5 @@ void msm_slim_disconnect_endp(struct msm_slim_ctrl *dev,
 void msm_slim_qmi_exit(struct msm_slim_ctrl *dev);
 int msm_slim_qmi_init(struct msm_slim_ctrl *dev, bool apps_is_master);
 int msm_slim_qmi_power_request(struct msm_slim_ctrl *dev, bool active);
+int msm_slim_qmi_check_framer_request(struct msm_slim_ctrl *dev);
 #endif
