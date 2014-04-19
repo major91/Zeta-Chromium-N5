@@ -364,6 +364,18 @@ static int kgsl_pwrctrl_min_pwrlevel_show(struct device *dev,
 	return snprintf(buf, PAGE_SIZE, "%d\n", pwr->min_pwrlevel);
 }
 
+static int kgsl_pwrctrl_active_pwrlevel_show(struct device *dev,
+                                        struct device_attribute *attr,
+                                        char *buf)
+{
+	struct kgsl_device *device = kgsl_device_from_dev(dev);
+	struct kgsl_pwrctrl *pwr;
+	if (device == NULL)
+		return 0;
+	pwr = &device->pwrctrl;
+	return snprintf(buf, PAGE_SIZE, "%d\n", pwr->active_pwrlevel);
+}
+
 static int kgsl_pwrctrl_num_pwrlevels_show(struct device *dev,
 					struct device_attribute *attr,
 					char *buf)
@@ -760,6 +772,9 @@ DEVICE_ATTR(max_pwrlevel, 0644,
 DEVICE_ATTR(min_pwrlevel, 0644,
 	kgsl_pwrctrl_min_pwrlevel_show,
 	kgsl_pwrctrl_min_pwrlevel_store);
+DEVICE_ATTR(active_pwrlevel, 0444,
+	kgsl_pwrctrl_active_pwrlevel_show,
+	NULL);
 DEVICE_ATTR(thermal_pwrlevel, 0644,
 	kgsl_pwrctrl_thermal_pwrlevel_show,
 	kgsl_pwrctrl_thermal_pwrlevel_store);
@@ -791,6 +806,7 @@ static const struct device_attribute *pwrctrl_attr_list[] = {
 	&dev_attr_gpu_available_frequencies,
 	&dev_attr_max_pwrlevel,
 	&dev_attr_min_pwrlevel,
+	&dev_attr_active_pwrlevel,
 	&dev_attr_thermal_pwrlevel,
 	&dev_attr_num_pwrlevels,
 	&dev_attr_pmqos_latency,
@@ -1398,9 +1414,16 @@ int kgsl_pwrctrl_sleep(struct kgsl_device *device)
 }
 EXPORT_SYMBOL(kgsl_pwrctrl_sleep);
 
-/******************************************************************/
-/* Caller must hold the device mutex. */
-int kgsl_pwrctrl_wake(struct kgsl_device *device)
+/**
+ * kgsl_pwrctrl_wake() - Power up the GPU from a slumber/sleep state
+ * @device - Pointer to the kgsl_device struct
+ * @priority - Boolean flag to indicate that the GPU start should be run in the
+ * higher priority thread
+ *
+ * Resume the GPU from a lower power state to ACTIVE.  The caller to this
+ * fucntion must host the kgsl_device mutex.
+ */
+int kgsl_pwrctrl_wake(struct kgsl_device *device, int priority)
 {
 	int status = 0;
 	unsigned int context_id;
@@ -1411,7 +1434,8 @@ int kgsl_pwrctrl_wake(struct kgsl_device *device)
 	kgsl_pwrctrl_request_state(device, KGSL_STATE_ACTIVE);
 	switch (device->state) {
 	case KGSL_STATE_SLUMBER:
-		status = device->ftbl->start(device);
+		status = device->ftbl->start(device, priority);
+
 		if (status) {
 			kgsl_pwrctrl_request_state(device, KGSL_STATE_NONE);
 			KGSL_DRV_ERR(device, "start failed %d\n", status);
@@ -1543,7 +1567,7 @@ int kgsl_active_count_get(struct kgsl_device *device)
 		wait_for_completion(&device->hwaccess_gate);
 		mutex_lock(&device->mutex);
 
-		ret = kgsl_pwrctrl_wake(device);
+		ret = kgsl_pwrctrl_wake(device, 1);
 	}
 	if (ret == 0)
 		atomic_inc(&device->active_cnt);
