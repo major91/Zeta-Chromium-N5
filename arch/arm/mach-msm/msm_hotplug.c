@@ -25,6 +25,7 @@
 #include "acpuclock.h"
 
 #define MSM_HOTPLUG		"msm_hotplug"
+#define HOTPLUG_ENABLED		1
 #define DEFAULT_UPDATE_RATE	HZ / 10
 #define START_DELAY		HZ * 20
 #define NUM_LOAD_LEVELS		5
@@ -45,6 +46,7 @@ do { 				\
 } while (0)
 
 static struct cpu_hotplug {
+	unsigned int enabled;
 	unsigned int suspend_freq;
 	unsigned int target_cpus;
 	unsigned int min_cpus_online;
@@ -59,6 +61,7 @@ static struct cpu_hotplug {
 	struct work_struct resume_work;
 	struct timer_list lock_timer;
 } hotplug = {
+	.enabled = HOTPLUG_ENABLED,
 	.min_cpus_online = DEFAULT_MIN_CPUS_ONLINE,
 	.max_cpus_online = DEFAULT_MAX_CPUS_ONLINE,
 	.cpus_boosted = DEFAULT_NR_CPUS_BOOSTED,
@@ -365,6 +368,38 @@ static struct input_handler hotplug_input_handler = {
 
 /************************** sysfs interface ************************/
 
+static ssize_t show_enable_hotplug(struct device *dev,
+				   struct device_attribute *msm_hotplug_attrs,
+				   char *buf)
+{
+	return sprintf(buf, "%u\n", hotplug.enabled);
+}
+
+static ssize_t store_enable_hotplug(struct device *dev,
+				    struct device_attribute *msm_hotplug_attrs,
+				    const char *buf, size_t count)
+{
+	int ret;
+	unsigned int val;
+
+	ret = sscanf(buf, "%u", &val);
+	if (ret != 1 || val < 0 || val > 1)
+		return -EINVAL;
+
+	hotplug.enabled = val;
+
+	if (hotplug.enabled) {
+		reschedule_hotplug_work();
+	} else {
+		hotplug.down_lock = 0;
+		offline_cpu(DEFAULT_MIN_CPUS_ONLINE);
+		flush_workqueue(hotplug_wq);
+		cancel_delayed_work_sync(&hotplug_work);
+	}
+
+	return count;
+}
+
 static ssize_t show_down_lock_duration(struct device *dev,
 				       struct device_attribute
 				       *msm_hotplug_attrs, char *buf)
@@ -528,8 +563,6 @@ static ssize_t store_max_cpus_online(struct device *dev,
 	if (hotplug.min_cpus_online > val)
 		hotplug.min_cpus_online = val;
 	hotplug.max_cpus_online = val;
-	hotplug.down_lock = 0;
-	online_cpu(val);
 
 	return count;
 }
@@ -564,6 +597,7 @@ static ssize_t show_current_load(struct device *dev,
 	return sprintf(buf, "%u\n", stats.current_load);
 }
 
+static DEVICE_ATTR(enabled, 644, show_enable_hotplug, store_enable_hotplug);
 static DEVICE_ATTR(down_lock_duration, 644, show_down_lock_duration,
 		   store_down_lock_duration);
 static DEVICE_ATTR(update_rate, 644, show_update_rate, store_update_rate);
@@ -577,6 +611,7 @@ static DEVICE_ATTR(cpus_boosted, 644, show_cpus_boosted, store_cpus_boosted);
 static DEVICE_ATTR(current_load, 444, show_current_load, NULL);
 
 static struct attribute *msm_hotplug_attrs[] = {
+	&dev_attr_enabled.attr,
 	&dev_attr_down_lock_duration.attr,
 	&dev_attr_update_rate.attr,
 	&dev_attr_load_levels.attr,
