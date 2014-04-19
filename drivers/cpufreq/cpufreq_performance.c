@@ -42,6 +42,7 @@ static void __ref cpu_down_work(struct work_struct *work)
 
 static DECLARE_WORK(performance_up_work, cpu_up_work);
 static DECLARE_WORK(performance_down_work, cpu_down_work);
+#define LOAD 100
 
 static int cpufreq_governor_performance(struct cpufreq_policy *policy,
 					unsigned int event)
@@ -54,6 +55,7 @@ static int cpufreq_governor_performance(struct cpufreq_policy *policy,
 						policy->max, event);
 		__cpufreq_driver_target(policy, policy->max,
 						CPUFREQ_RELATION_H);
+		cpufreq_notify_utilization(policy, LOAD);
 		break;
 	case CPUFREQ_GOV_STOP:
 		schedule_work_on(0, &performance_down_work);
