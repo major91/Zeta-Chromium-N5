@@ -350,7 +350,7 @@ static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 		wdog_dd->last_pet, nanosec_rem / 1000);
 	if (wdog_dd->do_ipi_ping)
 		dump_cpu_alive_mask(wdog_dd);
-	printk(KERN_INFO "Causing a watchdog bite!");
+	printk(KERN_INFO "Causing a watchdog bite! IRQ = %lu.\n", (unsigned long) irq);
 #ifdef CONFIG_LGE_HANDLE_PANIC
 	lge_set_restart_reason(LGE_RB_MAGIC | LGE_ERR_TZ | LGE_ERR_TZ_WDT_BARK);
 #endif
@@ -498,8 +498,9 @@ static int __devinit msm_wdog_dt_to_pdata(struct platform_device *pdev,
 	wdog_resource = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	pdata->size = resource_size(wdog_resource);
 	pdata->phys_base = wdog_resource->start;
-	if (unlikely(!(devm_request_region(&pdev->dev, pdata->phys_base,
-					pdata->size, "msm-watchdog")))) {
+	if (unlikely(!(devm_request_mem_region(&pdev->dev, pdata->phys_base,
+					       pdata->size, "msm-watchdog")))) {
+
 		dev_err(&pdev->dev, "%s cannot reserve watchdog region\n",
 								__func__);
 		return -ENXIO;
