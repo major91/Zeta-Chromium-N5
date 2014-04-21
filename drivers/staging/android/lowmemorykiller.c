@@ -30,7 +30,6 @@
  *
  */
 
-#define REALLY_WANT_TRACEPOINTS
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/mm.h>
@@ -41,8 +40,9 @@
 #include <linux/mutex.h>
 #include <linux/delay.h>
 #include <linux/swap.h>
-
-#include <trace/events/memkill.h>
+#include <linux/fs.h>
+#include <linux/kobject.h>
+#include <linux/slab.h>
 
 #ifdef CONFIG_HIGHMEM
 #define _ZONE ZONE_HIGHMEM
@@ -69,6 +69,10 @@ static int lmk_fast_run = 1;
 
 static unsigned long lowmem_deathpending_timeout;
 
+static struct shrink_control lowmem_notif_sc = {GFP_KERNEL, 0};
+static size_t lowmem_minfree_notif_trigger;
+static struct kobject *lowmem_notify_kobj;
+
 #define lowmem_print(level, x...)			\
 	do {						\
 		if (lowmem_debug_level >= (level))	\
@@ -77,7 +81,7 @@ static unsigned long lowmem_deathpending_timeout;
 
 static int test_task_flag(struct task_struct *p, int flag)
 {
-	struct task_struct *t = p;
+	struct task_struct *t;
 
 	for_each_thread(p,t) {
 		task_lock(t);
@@ -118,73 +122,82 @@ int can_use_cma_pages(gfp_t gfp_mask)
 	return can_use;
 }
 
-struct zone_avail {
-	unsigned long free;
-	unsigned long file;
-};
-
-
 void tune_lmk_zone_param(struct zonelist *zonelist, int classzone_idx,
 					int *other_free, int *other_file,
-					int use_cma_pages,
-				struct zone_avail zall[][MAX_NR_ZONES])
+					int use_cma_pages)
 {
 	struct zone *zone;
 	struct zoneref *zoneref;
 	int zone_idx;
 
 	for_each_zone_zonelist(zone, zoneref, zonelist, MAX_NR_ZONES) {
-		struct zone_avail *za;
-		int node_idx = zone_to_nid(zone);
-
 		zone_idx = zonelist_zone_idx(zoneref);
-		za = &zall[node_idx][zone_idx];
-		za->free = zone_page_state(zone, NR_FREE_PAGES);
-		za->file = zone_page_state(zone, NR_FILE_PAGES)
-					- zone_page_state(zone, NR_SHMEM);
 		if (zone_idx == ZONE_MOVABLE) {
-			if (!use_cma_pages) {
-				unsigned long free_cma = zone_page_state(zone,
-						NR_FREE_CMA_PAGES);
-				za->free -= free_cma;
-				*other_free -= free_cma;
-			}
+			if (!use_cma_pages)
+				*other_free -=
+				    zone_page_state(zone, NR_FREE_CMA_PAGES);
 			continue;
 		}
 
 		if (zone_idx > classzone_idx) {
 			if (other_free != NULL)
-				*other_free -= za->free;
+				*other_free -= zone_page_state(zone,
+							       NR_FREE_PAGES);
 			if (other_file != NULL)
-				*other_file -= za->file;
-			za->free = za->file = 0;
+				*other_file -= zone_page_state(zone,
+							       NR_FILE_PAGES)
+					      - zone_page_state(zone, NR_SHMEM);
 		} else if (zone_idx < classzone_idx) {
 			if (zone_watermark_ok(zone, 0, 0, classzone_idx, 0)) {
-				unsigned long lowmem_reserve =
-					  zone->lowmem_reserve[classzone_idx];
 				if (!use_cma_pages) {
-					unsigned long free_cma =
-						zone_page_state(zone,
-							NR_FREE_CMA_PAGES);
-					unsigned long delta =
-						min(lowmem_reserve + free_cma,
-							za->free);
-					*other_free -= delta;
-					za->free -= delta;
+					*other_free -= min(
+					  zone->lowmem_reserve[classzone_idx] +
+					  zone_page_state(
+					    zone, NR_FREE_CMA_PAGES),
+					  zone_page_state(
+					    zone, NR_FREE_PAGES));
 				} else {
-					*other_free -= lowmem_reserve;
-					za->free -= lowmem_reserve;
+					*other_free -=
+					  zone->lowmem_reserve[classzone_idx];
 				}
 			} else {
-				*other_free -= za->free;
-				za->free = 0;
+				*other_free -=
+					   zone_page_state(zone, NR_FREE_PAGES);
 			}
 		}
 	}
 }
 
-void tune_lmk_param(int *other_free, int *other_file, struct shrink_control *sc,
-				struct zone_avail zall[][MAX_NR_ZONES])
+#ifdef CONFIG_HIGHMEM
+void adjust_gfp_mask(gfp_t *gfp_mask)
+{
+	struct zone *preferred_zone;
+	struct zonelist *zonelist;
+	enum zone_type high_zoneidx;
+
+	if (current_is_kswapd()) {
+		zonelist = node_zonelist(0, *gfp_mask);
+		high_zoneidx = gfp_zone(*gfp_mask);
+		first_zones_zonelist(zonelist, high_zoneidx, NULL,
+				&preferred_zone);
+
+		if (high_zoneidx == ZONE_NORMAL) {
+			if (zone_watermark_ok_safe(preferred_zone, 0,
+					high_wmark_pages(preferred_zone), 0,
+					0))
+				*gfp_mask |= __GFP_HIGHMEM;
+		} else if (high_zoneidx == ZONE_HIGHMEM) {
+			*gfp_mask |= __GFP_HIGHMEM;
+		}
+	}
+}
+#else
+void adjust_gfp_mask(gfp_t *unused)
+{
+}
+#endif
+
+void tune_lmk_param(int *other_free, int *other_file, struct shrink_control *sc)
 {
 	gfp_t gfp_mask;
 	struct zone *preferred_zone;
@@ -192,15 +205,15 @@ void tune_lmk_param(int *other_free, int *other_file, struct shrink_control *sc,
 	enum zone_type high_zoneidx, classzone_idx;
 	unsigned long balance_gap;
 	int use_cma_pages;
-	struct zone_avail *za;
 
 	gfp_mask = sc->gfp_mask;
+	adjust_gfp_mask(&gfp_mask);
+
 	zonelist = node_zonelist(0, gfp_mask);
 	high_zoneidx = gfp_zone(gfp_mask);
 	first_zones_zonelist(zonelist, high_zoneidx, NULL, &preferred_zone);
 	classzone_idx = zone_idx(preferred_zone);
 	use_cma_pages = can_use_cma_pages(gfp_mask);
-	za = &zall[zone_to_nid(preferred_zone)][classzone_idx];
 
 	balance_gap = min(low_wmark_pages(preferred_zone),
 			  (preferred_zone->present_pages +
@@ -212,41 +225,37 @@ void tune_lmk_param(int *other_free, int *other_file, struct shrink_control *sc,
 			  balance_gap, 0, 0))) {
 		if (lmk_fast_run)
 			tune_lmk_zone_param(zonelist, classzone_idx, other_free,
-				       other_file, use_cma_pages, zall);
+				       other_file, use_cma_pages);
 		else
 			tune_lmk_zone_param(zonelist, classzone_idx, other_free,
-				       NULL, use_cma_pages, zall);
+				       NULL, use_cma_pages);
 
 		if (zone_watermark_ok(preferred_zone, 0, 0, _ZONE, 0)) {
-			unsigned long lowmem_reserve =
-				preferred_zone->lowmem_reserve[_ZONE];
 			if (!use_cma_pages) {
-				unsigned long free_cma = zone_page_state(
-					preferred_zone, NR_FREE_CMA_PAGES);
-				unsigned long delta = min(lowmem_reserve +
-					free_cma, za->free);
-				*other_free -= delta;
-				za->free -= delta;
+				*other_free -= min(
+				  preferred_zone->lowmem_reserve[_ZONE]
+				  + zone_page_state(
+				    preferred_zone, NR_FREE_CMA_PAGES),
+				  zone_page_state(
+				    preferred_zone, NR_FREE_PAGES));
 			} else {
-				*other_free -= lowmem_reserve;
-				za->free -= lowmem_reserve;
+				*other_free -=
+				  preferred_zone->lowmem_reserve[_ZONE];
 			}
 		} else {
-			*other_free -= za->free;
-			za->free = 0;
+			*other_free -= zone_page_state(preferred_zone,
+						      NR_FREE_PAGES);
 		}
 
 		lowmem_print(4, "lowmem_shrink of kswapd tunning for highmem "
 			     "ofree %d, %d\n", *other_free, *other_file);
 	} else {
 		tune_lmk_zone_param(zonelist, classzone_idx, other_free,
-			       other_file, use_cma_pages, zall);
+			       other_file, use_cma_pages);
 
 		if (!use_cma_pages) {
-			unsigned long free_cma = zone_page_state(preferred_zone,
-						NR_FREE_CMA_PAGES);
-			*other_free -= free_cma;
-			za->free -= free_cma;
+			*other_free -=
+			  zone_page_state(preferred_zone, NR_FREE_CMA_PAGES);
 		}
 
 		lowmem_print(4, "lowmem_shrink tunning for others ofree %d, "
@@ -254,11 +263,29 @@ void tune_lmk_param(int *other_free, int *other_file, struct shrink_control *sc,
 	}
 }
 
-#ifdef CONFIG_ANDROID_LMK_ADJ_RBTREE
-static struct task_struct *pick_next_from_adj_tree(struct task_struct *task);
-static struct task_struct *pick_first_task(void);
-static struct task_struct *pick_last_task(void);
-#endif
+static void lowmem_notify_killzone_approach(void);
+
+static int get_free_ram(int *other_free, int *other_file,
+		             struct shrink_control *sc)
+{
+	*other_free = global_page_state(NR_FREE_PAGES);
+
+	if (global_page_state(NR_SHMEM) + total_swapcache_pages <
+		global_page_state(NR_FILE_PAGES))
+		*other_file = global_page_state(NR_FILE_PAGES) -
+						global_page_state(NR_SHMEM) -
+						total_swapcache_pages;
+	else
+		*other_file = 0;
+
+	tune_lmk_param(other_free, other_file, sc);
+
+	if (*other_free < lowmem_minfree_notif_trigger &&
+			*other_file < lowmem_minfree_notif_trigger)
+		return 1;
+	else
+		return 0;
+}
 
 static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 {
@@ -274,25 +301,16 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	int other_free;
 	int other_file;
 	unsigned long nr_to_scan = sc->nr_to_scan;
-	struct zone_avail zall[MAX_NUMNODES][MAX_NR_ZONES];
-
-	tsk = current->group_leader;
-	if ((tsk->flags & PF_EXITING) && test_task_flag(tsk, TIF_MEMDIE)) {
-		set_tsk_thread_flag(current, TIF_MEMDIE);
-		return 0;
-	}
 
 	if (nr_to_scan > 0) {
 		if (mutex_lock_interruptible(&scan_mutex) < 0)
 			return 0;
 	}
 
-	other_free = global_page_state(NR_FREE_PAGES);
-	other_file = global_page_state(NR_FILE_PAGES) -
-						global_page_state(NR_SHMEM);
+	lowmem_notif_sc.gfp_mask = sc->gfp_mask;
 
-	memset(zall, 0, sizeof(zall));
-	tune_lmk_param(&other_free, &other_file, sc, zall);
+	if (get_free_ram(&other_free, &other_file, sc))
+		lowmem_notify_killzone_approach();
 
 	if (lowmem_adj_size < array_size)
 		array_size = lowmem_adj_size;
@@ -325,14 +343,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	selected_oom_score_adj = min_score_adj;
 
 	rcu_read_lock();
-
-#ifdef CONFIG_ANDROID_LMK_ADJ_RBTREE
-	for (tsk = pick_first_task();
-		tsk != pick_last_task();
-		tsk = pick_next_from_adj_tree(tsk)) {
-#else
 	for_each_process(tsk) {
-#endif
 		struct task_struct *p;
 		int oom_score_adj;
 
@@ -347,11 +358,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			if (test_task_flag(tsk, TIF_MEMDIE)) {
 				rcu_read_unlock();
 				/* give the system time to free up the memory */
-				if (!same_thread_group(current, tsk))
-					msleep_interruptible(20);
-				else
-					set_tsk_thread_flag(current,
-								TIF_MEMDIE);
+				msleep_interruptible(20);
 				mutex_unlock(&scan_mutex);
 				return 0;
 			}
@@ -364,17 +371,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		oom_score_adj = p->signal->oom_score_adj;
 		if (oom_score_adj < min_score_adj) {
 			task_unlock(p);
-#ifdef CONFIG_ANDROID_LMK_ADJ_RBTREE
-			break;
-#else
-			continue;
-#endif
-		}
-		if (fatal_signal_pending(p) ||
-				((p->flags & PF_EXITING) &&
-					test_tsk_thread_flag(p, TIF_MEMDIE))) {
-			lowmem_print(2, "skip slow dying process %d\n", p->pid);
-			task_unlock(p);
 			continue;
 		}
 		tasksize = get_mm_rss(p->mm);
@@ -383,11 +379,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			continue;
 		if (selected) {
 			if (oom_score_adj < selected_oom_score_adj)
-#ifdef CONFIG_ANDROID_LMK_ADJ_RBTREE
-				break;
-#else
 				continue;
-#endif
 			if (oom_score_adj == selected_oom_score_adj &&
 			    tasksize <= selected_tasksize)
 				continue;
@@ -399,30 +391,10 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			     p->pid, p->comm, oom_score_adj, tasksize);
 	}
 	if (selected) {
-		int i, j;
-		char zinfo[ZINFO_LENGTH];
-		char *p = zinfo;
 		lowmem_print(1, "send sigkill to %d (%s), adj %d, size %d\n",
 			     selected->pid, selected->comm,
 			     selected_oom_score_adj, selected_tasksize);
 		lowmem_deathpending_timeout = jiffies + HZ;
-
-		/* Due to MotoCare parser can't handle unfixed column,
-		 * show all zones info even its free & file are zero.
-		 * it will show as the following examples:
-		 *   0:0:756:1127 0:1:0:0 0:2:0:0
-		 *   0:0:767:322 0:1:152:2364 0:2:0:0
-		 */
-		for (i = 0; i < MAX_NUMNODES; i++)
-			for (j = 0; j < MAX_NR_ZONES; j++)
-				p += snprintf(p, ZINFO_DIGITS,
-					"%d:%d:%lu:%lu ", i, j,
-					zall[i][j].free,
-					zall[i][j].file);
-
-		trace_lmk_kill(selected->pid, selected->comm,
-				selected_oom_score_adj, selected_tasksize,
-				min_score_adj, sc->gfp_mask, zinfo);
 		send_sig(SIGKILL, selected, 0);
 		set_tsk_thread_flag(selected, TIF_MEMDIE);
 		rem -= selected_tasksize;
@@ -443,42 +415,79 @@ static struct shrinker lowmem_shrinker = {
 	.seeks = DEFAULT_SEEKS * 16
 };
 
-#ifdef CONFIG_ANDROID_BG_SCAN_MEM
-static int lmk_task_migration_notify(struct notifier_block *nb,
-					unsigned long data, void *arg)
+static void lowmem_notify_killzone_approach(void)
 {
-	struct shrink_control sc = {
-		.gfp_mask = GFP_KERNEL,
-		.nr_to_scan = 1,
-	};
-
-	lowmem_shrink(&lowmem_shrinker, &sc);
-
-	return NOTIFY_OK;
+	lowmem_print(3, "notification trigger activated\n");
+	sysfs_notify(lowmem_notify_kobj, NULL,
+			"notify_trigger_active");
 }
 
-static struct notifier_block tsk_migration_nb = {
-	.notifier_call = lmk_task_migration_notify,
+static ssize_t lowmem_notify_trigger_active_show(struct kobject *k,
+				struct kobj_attribute *attr, char *buf)
+{
+	int other_free, other_file;
+	if (get_free_ram(&other_free, &other_file, &lowmem_notif_sc))
+		return snprintf(buf, 3, "1\n");
+	else
+		return snprintf(buf, 3, "0\n");
+}
+
+static struct kobj_attribute lowmem_notify_trigger_active_attr =
+	__ATTR(notify_trigger_active, S_IRUGO,
+			lowmem_notify_trigger_active_show, NULL);
+
+static struct attribute *lowmem_notify_default_attrs[] = {
+	&lowmem_notify_trigger_active_attr.attr, NULL,
 };
-#endif
+
+static ssize_t lowmem_show(struct kobject *k, struct attribute *attr, char *buf)
+{
+	struct kobj_attribute *kobj_attr;
+	kobj_attr = container_of(attr, struct kobj_attribute, attr);
+	return kobj_attr->show(k, kobj_attr, buf);
+}
+
+static const struct sysfs_ops lowmem_notify_ops = {
+	.show = lowmem_show,
+};
+
+static void lowmem_notify_kobj_release(struct kobject *kobj)
+{
+	/* Nothing to be done here */
+}
+
+static struct kobj_type lowmem_notify_kobj_type = {
+	.release = lowmem_notify_kobj_release,
+	.sysfs_ops = &lowmem_notify_ops,
+	.default_attrs = lowmem_notify_default_attrs,
+};
 
 static int __init lowmem_init(void)
 {
+	int rc;
+
+	lowmem_notify_kobj = kzalloc(sizeof(*lowmem_notify_kobj), GFP_KERNEL);
+	if(!lowmem_notify_kobj) {
+		return -ENOMEM;
+	}
+
+	rc = kobject_init_and_add(lowmem_notify_kobj, &lowmem_notify_kobj_type,
+			mm_kobj, "lowmemkiller");
+	if(rc) {
+		kfree(lowmem_notify_kobj);
+		return rc;
+	}
+
 	register_shrinker(&lowmem_shrinker);
-#ifdef CONFIG_ANDROID_BG_SCAN_MEM
-	raw_notifier_chain_register(&bgtsk_migration_notifier_head,
-					&tsk_migration_nb);
-#endif
+
 	return 0;
 }
 
 static void __exit lowmem_exit(void)
 {
+	kobject_put(lowmem_notify_kobj);
+	kfree(lowmem_notify_kobj);
 	unregister_shrinker(&lowmem_shrinker);
-#ifdef CONFIG_ANDROID_BG_SCAN_MEM
-	raw_notifier_chain_unregister(&bgtsk_migration_notifier_head,
-					&tsk_migration_nb);
-#endif
 }
 
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
@@ -558,85 +567,6 @@ static const struct kparam_array __param_arr_adj = {
 };
 #endif
 
-#ifdef CONFIG_ANDROID_LMK_ADJ_RBTREE
-DEFINE_SPINLOCK(lmk_lock);
-struct rb_root tasks_scoreadj = RB_ROOT;
-void add_2_adj_tree(struct task_struct *task)
-{
-	struct rb_node **link = &tasks_scoreadj.rb_node;
-	struct rb_node *parent = NULL;
-	struct task_struct *task_entry;
-	s64 key = task->signal->oom_score_adj;
-	/*
-	 * Find the right place in the rbtree:
-	 */
-	spin_lock(&lmk_lock);
-	while (*link) {
-		parent = *link;
-		task_entry = rb_entry(parent, struct task_struct, adj_node);
-
-		if (key < task_entry->signal->oom_score_adj)
-			link = &parent->rb_right;
-		else
-			link = &parent->rb_left;
-	}
-
-	rb_link_node(&task->adj_node, parent, link);
-	rb_insert_color(&task->adj_node, &tasks_scoreadj);
-	spin_unlock(&lmk_lock);
-}
-
-void delete_from_adj_tree(struct task_struct *task)
-{
-	spin_lock(&lmk_lock);
-	rb_erase(&task->adj_node, &tasks_scoreadj);
-	spin_unlock(&lmk_lock);
-}
-
-
-static struct task_struct *pick_next_from_adj_tree(struct task_struct *task)
-{
-	struct rb_node *next;
-
-	spin_lock(&lmk_lock);
-	next = rb_next(&task->adj_node);
-	spin_unlock(&lmk_lock);
-
-	if (!next)
-		return NULL;
-
-	 return rb_entry(next, struct task_struct, adj_node);
-}
-
-static struct task_struct *pick_first_task(void)
-{
-	struct rb_node *left;
-
-	spin_lock(&lmk_lock);
-	left = rb_first(&tasks_scoreadj);
-	spin_unlock(&lmk_lock);
-
-	if (!left)
-		return NULL;
-
-	return rb_entry(left, struct task_struct, adj_node);
-}
-
-static struct task_struct *pick_last_task(void)
-{
-	struct rb_node *right;
-
-	spin_lock(&lmk_lock);
-	right = rb_last(&tasks_scoreadj);
-	spin_unlock(&lmk_lock);
-
-	if (!right)
-		return NULL;
-
-	return rb_entry(right, struct task_struct, adj_node);
-}
-#endif
-
 module_param_named(cost, lowmem_shrinker.seeks, int, S_IRUGO | S_IWUSR);
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
 __module_param_call(MODULE_PARAM_PREFIX, adj,
@@ -652,6 +582,8 @@ module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
 module_param_named(lmk_fast_run, lmk_fast_run, int, S_IRUGO | S_IWUSR);
+module_param_named(notify_trigger, lowmem_minfree_notif_trigger, uint,
+			 S_IRUGO | S_IWUSR);
 
 module_init(lowmem_init);
 module_exit(lowmem_exit);
