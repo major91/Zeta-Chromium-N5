@@ -96,6 +96,41 @@ config CPU_FREQ_DEFAULT_GOV_ONDEMAND
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the performance governor.
 
+config CPU_FREQ_DEFAULT_GOV_ONDEMANDX
+	bool "ondemandX"
+	select CPU_FREQ_GOV_ONDEMANDX
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'ondemand' as default. This allows
+	  you to get a full dynamic frequency capable system by simply
+	  loading your cpufreq low-level hardware driver.
+	  Be aware that not all cpufreq drivers support the ondemand
+	  governor. If unsure have a look at the help section of the
+	  driver. Fallback governor will be the performance governor.
+	  OndemandX has built in sleep profile, but not working Sysfs
+	  interface.
+
+
+config CPU_FREQ_DEFAULT_GOV_ADAPTIVE
+	bool "adaptive"
+	select CPU_FREQ_GOV_ADAPTIVE
+	---help---
+	  Use the CPUFreq governor 'adaptive' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'adaptive' governor for latency-sensitive workloads and demanding
+	  performance.
+
+config CPU_FREQ_DEFAULT_GOV_BRAZILIANWAX
+	bool "brazilianwax"
+	select CPU_FREQ_GOV_BRAZILIANWAX
+	---help---
+	  Use the CPUFreq governor 'brazilianwax' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'brazilianwax' governor for latency-sensitive workloads and demanding
+	  performance.
+
 config CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 	bool "conservative"
 	select CPU_FREQ_GOV_CONSERVATIVE
@@ -122,7 +157,29 @@ config CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
 	select CPU_FREQ_GOV_INTELLIDEMAND
 	help
 	  Use the CPUFreq governor 'intellidemand' as default. This is
-	  based on Ondemand with browsing detection based on GPU loading
+	  based on Ondemand with browsing detection based on GPU loading 
+
+config CPU_FREQ_DEFAULT_GOV_INTERACTIVEX
+	bool "interactiveX"
+	select CPU_FREQ_GOV_INTERACTIVEX
+	help
+	  Use the CPUFreq governor 'interactiveX' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'interactiveX' governor for latency-sensitive workloads.
+
+config CPU_FREQ_DEFAULT_GOV_LIONHEART
+	bool "lionheart"
+	select CPU_FREQ_GOV_LIONHEART
+	help
+	  Use the CPUFreq governor 'Lionheart' as default.
+
+config CPU_FREQ_DEFAULT_GOV_LULZACTIVE
+	bool "lulzactive"
+	select CPU_FREQ_GOV_LULZACTIVE
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'lulzactive' as default.
 
 config CPU_FREQ_DEFAULT_GOV_WHEATLEY
 	bool "wheatley"
@@ -142,6 +199,12 @@ config CPU_FREQ_DEFAULT_GOV_LAZY
 	help
 	  Use the CPUFreq governor 'lazy' as default.
 
+config CPU_FREQ_DEFAULT_GOV_SMARTASS2
+	bool "smartass2"
+	select CPU_FREQ_GOV_SMARTASS2
+	help
+	  Use the CPUFreq governor 'smartassV2' as default.
+
 config CPU_FREQ_DEFAULT_GOV_ONDEMANDPLUS
 	bool "ondemandplus"
 	select CPU_FREQ_GOV_ONDEMANDPLUS
@@ -153,6 +216,50 @@ config CPU_FREQ_DEFAULT_GOV_ONDEMANDPLUS
 	 Be aware that not all cpufreq drivers support the ondemandplus
 	 governor. If unsure have a look at the help section of the
 	 driver. Fallback governor will be the performance governor.
+
+config CPU_FREQ_DEFAULT_GOV_ABYSSPLUG
+        bool "abyssplug"
+        select CPU_FREQ_GOV_ABYSSPLUG
+        select CPU_FREQ_GOV_PERFORMANCE
+        ---help---
+         Use the CPUFreq governor 'abyssplug' as default. This allows you
+         to get a full dynamic frequency capable system with CPU
+         hotplug support by simply loading your cpufreq low-level
+         hardware driver. Be aware that not all cpufreq drivers
+         support the hotplug governor. If unsure have a look at
+         the help section of the driver. Fallback governor will be the
+         performance governor.
+
+config CPU_FREQ_DEFAULT_GOV_ABYSSPLUGV2
+        bool "abyssplugv2"
+        select CPU_FREQ_GOV_ABYSSPLUG
+        select CPU_FREQ_GOV_PERFORMANCE
+        ---help---
+         Use the CPUFreq governor 'abyssplugv2' as default. This allows you
+         to get a full dynamic frequency capable system with CPU
+         hotplug support by simply loading your cpufreq low-level
+         hardware driver. Be aware that not all cpufreq drivers
+         support the hotplug governor. If unsure have a look at
+         the help section of the driver. Fallback governor will be the
+         performance governor.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTASSH3
+        bool "smartassH3"
+        select CPU_FREQ_GOV_SMARTASSH3
+        help
+         Use the CPUFreq governor 'slp' as default.
+
+config CPU_FREQ_DEFAULT_GOV_BADASS
+	bool "badass"
+	select CPU_FREQ_GOV_BADASS
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'badass' as default. This allows
+	  you to get a full dynamic frequency capable system by simply
+	  loading your cpufreq low-level hardware driver.
+	  Be aware that not all cpufreq drivers support the badass
+	  governor. If unsure have a look at the help section of the
+	  driver. Fallback governor will be the performance governor.
 
 config CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE
 	bool "intelliactive"
@@ -277,6 +384,47 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
+config CPU_FREQ_GOV_ONDEMANDX
+	tristate "'ondemandx' cpufreq policy governor"
+	select CPU_FREQ_TABLE
+	help
+	  'ondemandx' - This driver adds a dynamic cpufreq policy governor.
+	  The governor does a periodic polling and
+	  changes frequency based on the CPU utilization.
+	  The support for this governor depends on CPU capability to
+	  do fast frequency switching (i.e, very low latency frequency
+	  transitions).
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_ondemand.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_INTERACTIVEX
+	tristate "'interactiveX' cpufreq policy governor"
+	help
+	  'interactiveX' - Modified version of interactive with sleep+wake code.
+
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_LIONHEART
+	tristate "'lionheart' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'Lionheart' - A brave and agile conservative-based governor.
+
+config CPU_FREQ_GOV_LULZACTIVE
+	tristate "'lulzactive' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'lulzactive' - a new interactive governor by Tegrak!
+	  For more information please visit:
+	  http://tegrak2x.blogspot.com/2011/11/lulzactive-governor-v2.html
+
+	  If in doubt, say N.
+
 config CPU_FREQ_GOV_INTELLIDEMAND
         tristate "'intellidemand' cpufreq policy governor"
         select CPU_FREQ_TABLE
@@ -328,6 +476,15 @@ config CPU_FREQ_GOV_LAZY
 	tristate "'lazy' cpufreq governor"
 	depends on CPU_FREQ
 
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartassV2' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'smartassV2' - a "smart" optimized governor!
+
+	   If in doubt, say N.
+
+
 config CPU_FREQ_GOV_ONDEMANDPLUS
 	tristate "'ondemandplus' cpufreq policy governor"
 	select CPU_FREQ_TABLE
@@ -345,6 +502,107 @@ config CPU_FREQ_GOV_ONDEMANDPLUS
 	 For details, take a look at linux/Documentation/cpu-freq.
 
 	 If in doubt, say N.
+
+config CPU_FREQ_GOV_ABYSSPLUG
+        tristate "'abyssplug' cpufreq governor"
+        depends on CPU_FREQ && NO_HZ && HOTPLUG_CPU
+        ---help---
+         'abyssplug' - this driver mimics the frequency scaling behavior
+         in 'ondemand', but with several key differences. First is
+         that frequency transitions use the CPUFreq table directly,
+         instead of incrementing in a percentage of the maximum
+         available frequency. Second 'abyssplug' will offline auxillary
+         CPUs when the system is idle, and online those CPUs once the
+         system becomes busy again. This last feature is needed for
+         architectures which transition to low power states when only
+         the "master" CPU is online, or for thermally constrained
+         devices.
+         If you don't have one of these architectures or devices, use
+         'ondemand' instead.
+         If in doubt, say N.
+
+config CPU_FREQ_GOV_ABYSSPLUGV2
+        tristate "'abyssplugv2' cpufreq governor"
+        depends on CPU_FREQ && NO_HZ && HOTPLUG_CPU
+        ---help---
+         'abyssplugv2' - this driver mimics the frequency scaling behavior
+         in 'ondemand', but with several key differences. First is
+         that frequency transitions use the CPUFreq table directly,
+         instead of incrementing in a percentage of the maximum
+         available frequency. Second 'abyssplug' will offline auxillary
+         CPUs when the system is idle, and online those CPUs once the
+         system becomes busy again. This last feature is needed for
+         architectures which transition to low power states when only
+         the "master" CPU is online, or for thermally constrained
+         devices.
+         If you don't have one of these architectures or devices, use
+         'ondemand' instead.
+         If in doubt, say N.
+
+config CPU_FREQ_GOV_SMARTASSH3
+        tristate "'smartassH3' cpufreq governor"
+        depends on CPU_FREQ
+        help
+                    'smartassH3' - a "smart" governor
+
+config CPU_FREQ_GOV_BADASS
+	tristate "'badass' cpufreq policy governor"
+	select CPU_FREQ_TABLE
+	help
+	  'badass' - This driver adds a dynamic cpufreq policy governor.
+	  The governor does a periodic polling and
+	  changes frequency based on the CPU utilization.
+	  The support for this governor depends on CPU capability to
+	  do fast frequency switching (i.e, very low latency frequency	  transitions).
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_badass.
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_BADASS_2_PHASE
+	tristate "'2-phase' power-efficiency badass algorithm"
+	depends on CPU_FREQ_GOV_BADASS
+	help
+	  '2-phase' - This driver adds a new algo to save power
+
+config CPU_FREQ_GOV_BADASS_2_PHASE_FREQ
+	int "'2-phase' badass frequency"
+	default 1267200
+	depends on CPU_FREQ_GOV_BADASS
+	depends on CPU_FREQ_GOV_BADASS_2_PHASE
+
+config CPU_FREQ_GOV_BADASS_3_PHASE
+	tristate "'3-phase' power-efficiency badass algorithm"
+	depends on CPU_FREQ_GOV_BADASS
+	depends on CPU_FREQ_GOV_BADASS_2_PHASE
+	help
+	  '3-phase' - This driver adds a new algo to save power
+
+config CPU_FREQ_GOV_BADASS_3_PHASE_FREQ
+	int "'3-phase' badass frequency"
+	default 1497600
+	depends on CPU_FREQ_GOV_BADASS
+	depends on CPU_FREQ_GOV_BADASS_2_PHASE
+	depends on CPU_FREQ_GOV_BADASS_3_PHASE
+
+config CPU_FREQ_GOV_BADASS_GPU_CONTROL
+	tristate "'gpu_control' power-efficiency badass algorithm"
+	depends on CPU_FREQ_GOV_BADASS
+	depends on CPU_FREQ_GOV_BADASS_2_PHASE
+	help
+	  'gpu_control' - This driver adds a new algo to save power
+
+config CPU_FREQ_GOV_BADASS_LOWBAT_POWERSAVE
+	tristate "'lowbat_powersave' power-efficiency badass algorithm"
+	depends on CPU_FREQ_GOV_BADASS
+	help
+	  'lowbat_powersave' - This driver adds a new algo to save power
+
+config CPU_FREQ_GOV_BADASS_ALLOW_BYPASS
+	tristate "Allows bypassing phases"
+	depends on CPU_FREQ_GOV_BADASS
+	depends on CPU_FREQ_GOV_BADASS_2_PHASE
+	help
+	  'allow_bypass' - This driver adds a bypass to the phases
 
 config CPU_FREQ_GOV_INTELLIACTIVE
 	tristate "'intelliactive' cpufreq policy governor"
