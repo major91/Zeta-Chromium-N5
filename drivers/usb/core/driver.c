@@ -534,7 +534,7 @@ int usb_match_one_id_intf(struct usb_device *dev,
 			  struct usb_host_interface *intf,
 			  const struct usb_device_id *id)
 {
-	/* The interface class, subclass, protocol and number should never be
+	/* The interface class, subclass, and protocol should never be
 	 * checked for a match if the device class is Vendor Specific,
 	 * unless the match record specifies the Vendor ID. */
 	if (dev->descriptor.bDeviceClass == USB_CLASS_VENDOR_SPEC &&
@@ -961,12 +961,58 @@ void usb_rebind_intf(struct usb_interface *intf)
 
 #ifdef CONFIG_PM
 
-/* Unbind drivers for @udev's interfaces that don't support suspend/resume
- * There is no check for reset_resume here because it can be determined
+#define DO_UNBIND	0
+#define DO_REBIND	1
+
+/* Unbind drivers for @udev's interfaces that don't support suspend/resume,
+ * or rebind interfaces that have been unbound, according to @action.
  * only during resume whether reset_resume is needed.
  *
  * The caller must hold @udev's device lock.
  */
+
+static void do_unbind_rebind(struct usb_device *udev, int action)
+{
+	struct usb_host_config	*config;
+	int			i;
+	struct usb_interface	*intf;
+	struct usb_driver	*drv;
+
+	config = udev->actconfig;
+	if (config) {
+		for (i = 0; i < config->desc.bNumInterfaces; ++i) {
+			intf = config->interface[i];
+			switch (action) {
+			case DO_UNBIND:
+				if (intf->dev.driver) {
+					drv = to_usb_driver(intf->dev.driver);
+					if (!drv->suspend || !drv->resume)
+						usb_forced_unbind_intf(intf);
+				}
+				break;
+			case DO_REBIND:
+				if (intf->needs_binding) {
+
+	/* FIXME: The next line is needed because we are going to probe
+	 * the interface, but as far as the PM core is concerned the
+	 * interface is still suspended.  The problem wouldn't exist
+	 * if we could rebind the interface during the interface's own
+	 * resume() call, but at the time the usb_device isn't locked!
+	 *
+	 * The real solution will be to carry this out during the device's
+	 * complete() callback.  Until that is implemented, we have to
+	 * use this hack.
+	 */
+//					intf->dev.power.sleeping = 0;
+
+					usb_rebind_intf(intf);
+				}
+				break;
+			}
+		}
+	}
+}
+
 static void unbind_no_pm_drivers_interfaces(struct usb_device *udev)
 {
 	struct usb_host_config	*config;
