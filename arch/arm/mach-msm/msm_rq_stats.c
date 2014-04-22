@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -45,6 +45,7 @@ struct cpu_load_data {
 	cputime64_t prev_cpu_wall;
 	cputime64_t prev_cpu_iowait;
 	unsigned int avg_load_maxfreq;
+	unsigned int cur_load_maxfreq;
 	unsigned int samples;
 	unsigned int window_size;
 	unsigned int cur_freq;
@@ -152,7 +153,7 @@ static int update_average_load(unsigned int freq, unsigned int cpu)
 	return 0;
 }
 
-static unsigned int report_load_at_max_freq(void)
+unsigned int report_load_at_max_freq(void)
 {
 	int cpu;
 	struct cpu_load_data *pcpu;
@@ -163,10 +164,19 @@ static unsigned int report_load_at_max_freq(void)
 		mutex_lock(&pcpu->cpu_load_mutex);
 		update_average_load(pcpu->cur_freq, cpu);
 		total_load += pcpu->avg_load_maxfreq;
+		pcpu->cur_load_maxfreq = pcpu->avg_load_maxfreq;
 		pcpu->avg_load_maxfreq = 0;
 		mutex_unlock(&pcpu->cpu_load_mutex);
 	}
 	return total_load;
+}
+
+
+unsigned int report_avg_load_cpu(unsigned int cpu)
+{
+	struct cpu_load_data *pcpu= &per_cpu(cpuload, cpu);
+
+	return pcpu->cur_load_maxfreq;
 }
 
 static int cpufreq_transition_handler(struct notifier_block *nb,
@@ -376,11 +386,12 @@ static int __init msm_rq_stats_init(void)
 	int ret;
 	int i;
 	struct cpufreq_policy cpu_policy;
+
+#ifndef CONFIG_SMP
 	/* Bail out if this is not an SMP Target */
-	if (!is_smp()) {
-		rq_info.init = 0;
-		return -ENOSYS;
-	}
+	rq_info.init = 0;
+	return -ENOSYS;
+#endif
 
 	rq_wq = create_singlethread_workqueue("rq_stats");
 	BUG_ON(!rq_wq);
@@ -416,11 +427,11 @@ late_initcall(msm_rq_stats_init);
 
 static int __init msm_rq_stats_early_init(void)
 {
+#ifndef CONFIG_SMP
 	/* Bail out if this is not an SMP Target */
-	if (!is_smp()) {
-		rq_info.init = 0;
-		return -ENOSYS;
-	}
+	rq_info.init = 0;
+	return -ENOSYS;
+#endif
 
 	pm_notifier(system_suspend_handler, 0);
 	return 0;
