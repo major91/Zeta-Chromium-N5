@@ -33,9 +33,6 @@
 
 #include "msm_qmi_interface_priv.h"
 
-#define BUILD_INSTANCE_ID(vers, ins) (((vers) & 0xFF) | (((ins) & 0xFF) << 8))
-#define LOOKUP_MASK 0xFFFFFFFF
-
 static LIST_HEAD(svc_event_nb_list);
 static DEFINE_MUTEX(svc_event_nb_list_lock);
 static DEFINE_MUTEX(msm_qmi_init_lock);
@@ -163,10 +160,6 @@ static void handle_resume_tx(struct work_struct *work)
 		msg_id = ((struct qmi_header *)pend_txn->enc_data)->msg_id;
 		kfree(pend_txn->enc_data);
 		if (ret < 0) {
-			pr_err("%s: Sending transaction %d from port %d failed",
-				__func__, pend_txn->txn_id,
-				((struct msm_ipc_port *)handle->src_port)->
-							this_port.port_id);
 			if (pend_txn->type == QMI_ASYNC_TXN) {
 				pend_txn->resp_cb(pend_txn->handle,
 						msg_id, pend_txn->resp,
@@ -178,6 +171,10 @@ static void handle_resume_tx(struct work_struct *work)
 				pend_txn->send_stat = ret;
 				wake_up(&pend_txn->wait_q);
 			}
+			pr_err("%s: Sending transaction %d from port %d failed",
+				__func__, pend_txn->txn_id,
+				((struct msm_ipc_port *)handle->src_port)->
+							this_port.port_id);
 		} else {
 			list_del(&pend_txn->list);
 			list_add_tail(&pend_txn->list, &handle->txn_list);
@@ -628,15 +625,12 @@ int qmi_recv_msg(struct qmi_handle *handle)
 EXPORT_SYMBOL(qmi_recv_msg);
 
 int qmi_connect_to_service(struct qmi_handle *handle,
-			   uint32_t service_id,
-			   uint32_t service_vers,
-			   uint32_t service_ins)
+			   uint32_t service_id, uint32_t instance_id)
 {
 	struct msm_ipc_port_name svc_name;
 	struct msm_ipc_server_info svc_info;
 	struct msm_ipc_addr *svc_dest_addr;
 	int rc;
-	uint32_t instance_id;
 
 	if (!handle)
 		return -EINVAL;
@@ -648,15 +642,12 @@ int qmi_connect_to_service(struct qmi_handle *handle,
 		return -ENOMEM;
 	}
 
-	instance_id = BUILD_INSTANCE_ID(service_vers, service_ins);
 	svc_name.service = service_id;
 	svc_name.instance = instance_id;
 
-	rc = msm_ipc_router_lookup_server_name(&svc_name, &svc_info,
-						1, LOOKUP_MASK);
+	rc = msm_ipc_router_lookup_server_name(&svc_name, &svc_info, 1, 0xFF);
 	if (rc <= 0) {
-		pr_err("%s: Server %08x:%08x not found\n",
-			__func__, service_id, instance_id);
+		pr_err("%s: Server not found\n", __func__);
 		return -ENODEV;
 	}
 	svc_dest_addr->addrtype = MSM_IPC_ADDR_ID;
@@ -789,16 +780,13 @@ static struct svc_event_nb *find_and_add_svc_event_nb(uint32_t service_id,
 }
 
 int qmi_svc_event_notifier_register(uint32_t service_id,
-				    uint32_t service_vers,
-				    uint32_t service_ins,
+				    uint32_t instance_id,
 				    struct notifier_block *nb)
 {
 	struct svc_event_nb *temp;
 	unsigned long flags;
 	int ret;
-	uint32_t instance_id;
 
-	instance_id = BUILD_INSTANCE_ID(service_vers, service_ins);
 	temp = find_and_add_svc_event_nb(service_id, instance_id);
 	if (!temp)
 		return -EFAULT;
@@ -822,16 +810,13 @@ int qmi_svc_event_notifier_register(uint32_t service_id,
 EXPORT_SYMBOL(qmi_svc_event_notifier_register);
 
 int qmi_svc_event_notifier_unregister(uint32_t service_id,
-				      uint32_t service_vers,
-				      uint32_t service_ins,
+				      uint32_t instance_id,
 				      struct notifier_block *nb)
 {
 	int ret;
 	struct svc_event_nb *temp;
 	unsigned long flags;
-	uint32_t instance_id;
 
-	instance_id = BUILD_INSTANCE_ID(service_vers, service_ins);
 	mutex_lock(&svc_event_nb_list_lock);
 	temp = find_svc_event_nb(service_id, instance_id);
 	if (!temp) {
