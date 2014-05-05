@@ -511,13 +511,26 @@ EXPORT_SYMBOL(clk_set_rate);
 
 long clk_round_rate(struct clk *clk, unsigned long rate)
 {
+	long rrate;
+	unsigned long fmax = 0, i;
+
 	if (IS_ERR_OR_NULL(clk))
 		return -EINVAL;
 
 	if (!clk->ops->round_rate)
 		return -ENOSYS;
 
-	return clk->ops->round_rate(clk, rate);
+	for (i = 0; i < clk->num_fmax; i++)
+		fmax = max(fmax, clk->fmax[i]);
+
+	if (!fmax)
+		fmax = ULONG_MAX;
+
+	rate = min(rate, fmax);
+	rrate = clk->ops->round_rate(clk, rate);
+	if (rrate > fmax)
+		return -EINVAL;
+	return rrate;
 }
 EXPORT_SYMBOL(clk_round_rate);
 
@@ -544,8 +557,6 @@ int clk_set_parent(struct clk *clk, struct clk *parent)
 	if (clk->parent == parent)
 		goto out;
 	rc = clk->ops->set_parent(clk, parent);
-	if (!rc)
-		clk->parent = parent;
 out:
 	mutex_unlock(&clk->prepare_lock);
 
