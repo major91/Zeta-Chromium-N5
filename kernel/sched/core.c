@@ -2184,7 +2184,6 @@ unsigned long nr_iowait(void)
 	return sum;
 }
 
-#ifdef CONFIG_INTELLI_HOTPLUG
 unsigned long avg_nr_running(void)
 {
 	unsigned long i, sum = 0;
@@ -2211,7 +2210,6 @@ unsigned long avg_nr_running(void)
 
 	return sum;
 }
-#endif
 
 unsigned long nr_iowait_cpu(int cpu)
 {

@@ -371,12 +371,10 @@ struct rq {
 #endif
 	int skip_clock_update;
 
-#ifdef CONFIG_INTELLI_HOTPLUG
 	/* time-based average load */
 	u64 nr_last_stamp;
 	unsigned int ave_nr_running;
 	seqcount_t ave_seqcnt;
-#endif
 
 	/* capture load from *all* tasks on this cpu: */
 	struct load_weight load;
@@ -940,7 +938,6 @@ extern void cpuacct_charge(struct task_struct *tsk, u64 cputime);
 static inline void cpuacct_charge(struct task_struct *tsk, u64 cputime) {}
 #endif
 
-#ifdef CONFIG_INTELLI_HOTPLUG
 /* 27 ~= 134217728ns = 134.2ms
  * 26 ~=  67108864ns =  67.1ms
  * 25 ~=  33554432ns =  33.5ms
@@ -967,34 +964,25 @@ static inline unsigned int do_avg_nr_running(struct rq *rq)
 
 	return ave_nr_running;
 }
-#endif
 
 static inline void inc_nr_running(struct rq *rq)
 {
 	sched_update_nr_prod(cpu_of(rq), rq->nr_running, true);
-#ifdef CONFIG_INTELLI_HOTPLUG
 	write_seqcount_begin(&rq->ave_seqcnt);
 	rq->ave_nr_running = do_avg_nr_running(rq);
 	rq->nr_last_stamp = rq->clock_task;
-#endif
 	rq->nr_running++;
-#ifdef CONFIG_INTELLI_HOTPLUG
 	write_seqcount_end(&rq->ave_seqcnt);
-#endif
 }
 
 static inline void dec_nr_running(struct rq *rq)
 {
 	sched_update_nr_prod(cpu_of(rq), rq->nr_running, false);
-#ifdef CONFIG_INTELLI_HOTPLUG
 	write_seqcount_begin(&rq->ave_seqcnt);
 	rq->ave_nr_running = do_avg_nr_running(rq);
 	rq->nr_last_stamp = rq->clock_task;
-#endif
 	rq->nr_running--;
-#ifdef CONFIG_INTELLI_HOTPLUG
 	write_seqcount_end(&rq->ave_seqcnt);
-#endif
 }
 
 extern void update_rq_clock(struct rq *rq);
