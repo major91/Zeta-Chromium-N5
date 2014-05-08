@@ -485,9 +485,6 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	unsigned int ret = -EINVAL;
 	char	str_governor[16];
 	struct cpufreq_policy new_policy;
-	char *envp[3];
-	char buf1[64];
-	char buf2[64];
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
@@ -510,12 +507,7 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 
 	sysfs_notify(&policy->kobj, NULL, "scaling_governor");
 
-	snprintf(buf1, sizeof(buf1), "GOV=%s", policy->governor->name);
-	snprintf(buf2, sizeof(buf2), "CPU=%u", policy->cpu);
-	envp[0] = buf1;
-	envp[1] = buf2;
-	envp[2] = NULL;
-	kobject_uevent_env(cpufreq_global_kobject, KOBJ_ADD, envp);
+	kobject_uevent(cpufreq_global_kobject, KOBJ_ADD);
 
 	if (ret)
 		return ret;
@@ -632,17 +624,13 @@ static ssize_t show_bios_limit(struct cpufreq_policy *policy, char *buf)
 	return sprintf(buf, "%u\n", policy->cpuinfo.max_freq);
 }
 
-extern ssize_t acpuclk_get_vdd_levels_str(char *buf);
-extern void acpuclk_set_vdd(const char *buf);
+#ifdef CONFIG_MSM_CPU_VOLTAGE_CONTROL
+extern ssize_t show_UV_mV_table(struct cpufreq_policy *policy,
+				char *buf);
 
-static ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf) {
-	return acpuclk_get_vdd_levels_str(buf);
-}
-
-static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, const char *buf, size_t count) {
-	acpuclk_set_vdd(buf);
-	return count;
-}
+extern ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
+				 const char *buf, size_t count);
+#endif
 
 cpufreq_freq_attr_ro_perm(cpuinfo_cur_freq, 0400);
 cpufreq_freq_attr_ro(cpuinfo_min_freq);
@@ -659,7 +647,9 @@ cpufreq_freq_attr_rw(scaling_min_freq);
 cpufreq_freq_attr_rw(scaling_max_freq);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
+#ifdef CONFIG_MSM_CPU_VOLTAGE_CONTROL
 cpufreq_freq_attr_rw(UV_mV_table);
+#endif
 
 static struct attribute *default_attrs[] = {
 	&cpuinfo_min_freq.attr,
@@ -674,7 +664,9 @@ static struct attribute *default_attrs[] = {
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
+#ifdef CONFIG_MSM_CPU_VOLTAGE_CONTROL
 	&UV_mV_table.attr,
+#endif
 	NULL
 };
 
@@ -873,19 +865,6 @@ static int cpufreq_add_dev_symlink(unsigned int cpu,
 	return ret;
 }
 
-static const char *kset_name(struct kset *kset, struct kobject *kobj)
-{
-	return kobj->name;
-}
-
-static struct kset_uevent_ops cpufreq_uevent_ops = {
-	.name = kset_name,
-};
-
-static struct kset_uevent_ops cpudev_uevent_ops = {
-	.name = kset_name,
-};
-
 static int cpufreq_add_dev_interface(unsigned int cpu,
 				     struct cpufreq_policy *policy,
 				     struct device *dev)
@@ -895,8 +874,6 @@ static int cpufreq_add_dev_interface(unsigned int cpu,
 	unsigned long flags;
 	int ret = 0;
 	unsigned int j;
-	char *envp[2];
-	char buf[64];
 
 	/* prepare interface data */
 	ret = kobject_init_and_add(&policy->kobj, &ktype_cpufreq,
@@ -906,16 +883,13 @@ static int cpufreq_add_dev_interface(unsigned int cpu,
 
 	/* create cpu device kset */
 	if (!cpudev_kset) {
-		cpudev_kset = kset_create_and_add("cpudev_kset", &cpudev_uevent_ops, NULL);
+		cpudev_kset = kset_create_and_add("kset", NULL, &dev->kobj);
 		BUG_ON(!cpudev_kset);
 		dev->kobj.kset = cpudev_kset;
 	}
 
 	/* send uevent when cpu device is added */
-	snprintf(buf, sizeof(buf), "CPU=%u", policy->cpu);
-	envp[0] = buf;
-	envp[1] = NULL;
-	kobject_uevent_env(&dev->kobj, KOBJ_ADD, envp);
+	kobject_uevent(&dev->kobj, KOBJ_ADD);
 
 	/* set up files for this cpu device */
 	drv_attr = cpufreq_driver->attr;
@@ -1043,15 +1017,10 @@ static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 #ifdef CONFIG_HOTPLUG_CPU
 	for_each_online_cpu(sibling) {
 		struct cpufreq_policy *cp = per_cpu(cpufreq_cpu_data, sibling);
-		if (cp && cp->governor) {
+		if (cp && cp->governor &&
+		    (cpumask_test_cpu(cpu, cp->related_cpus))) {
 			policy->governor = cp->governor;
-			policy->min = cp->min;
-			policy->max = cp->max;
-			policy->user_policy.min = cp->user_policy.min;
-			policy->user_policy.max = cp->user_policy.max;
-
 			found = 1;
-			//pr_info("sibling: found sibling!\n");
 			break;
 		}
 	}
@@ -1797,7 +1766,6 @@ static int __cpufreq_set_policy(struct cpufreq_policy *data,
 				struct cpufreq_policy *policy)
 {
 	int ret = 0;
-	struct cpufreq_policy *cpu0_policy = NULL;
 
 	pr_debug("setting new policy for CPU %u: %u - %u kHz\n", policy->cpu,
 		policy->min, policy->max);
@@ -1834,14 +1802,8 @@ static int __cpufreq_set_policy(struct cpufreq_policy *data,
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
 			CPUFREQ_NOTIFY, policy);
 
-	if (policy->cpu) {
-		cpu0_policy = __cpufreq_cpu_get(0,0);
-		data->min = cpu0_policy->min;
-		data->max = cpu0_policy->max;
-	} else {
-		data->min = policy->min;
-		data->max = policy->max;
-	}
+	data->min = policy->min;
+	data->max = policy->max;
 
 	pr_debug("new min and max freqs are %u - %u kHz\n",
 					data->min, data->max);
@@ -1862,12 +1824,7 @@ static int __cpufreq_set_policy(struct cpufreq_policy *data,
 				__cpufreq_governor(data, CPUFREQ_GOV_STOP);
 
 			/* start new governor */
-			if (policy->cpu >= 1 && cpu0_policy) {
-				data->governor = cpu0_policy->governor;
-			} else {
-				data->governor = policy->governor;
-			}
-
+			data->governor = policy->governor;
 			if (__cpufreq_governor(data, CPUFREQ_GOV_START)) {
 				/* new governor failed, so re-start old one */
 				pr_debug("starting governor %s failed\n",
@@ -2239,7 +2196,7 @@ static int __init cpufreq_core_init(void)
 	BUG_ON(!cpufreq_global_kobject);
 
 	/* create cpufreq kset */
-	cpufreq_kset = kset_create_and_add("cpufreq_kset", &cpufreq_uevent_ops, NULL);
+	cpufreq_kset = kset_create_and_add("kset", NULL, cpufreq_global_kobject);
 	BUG_ON(!cpufreq_kset);
 	cpufreq_global_kobject->kset = cpufreq_kset;
 
