@@ -42,7 +42,6 @@
 #include <asm/system_info.h>
 
 #include "mdss_dsi.h"
-
 #ifdef CONFIG_POWERSUSPEND
 #include <linux/powersuspend.h>
 #endif
@@ -340,7 +339,7 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	}
 
 #ifdef CONFIG_POWERSUSPEND
-	set_power_suspend_state_pannel_hook(POWER_SUSPEND_INACTIVE);
+	set_power_suspend_state_panel_hook(POWER_SUSPEND_INACTIVE);
 #endif
 
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
@@ -412,7 +411,7 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
 #ifdef CONFIG_POWERSUSPEND
-	set_power_suspend_state_pannel_hook(POWER_SUSPEND_ACTIVE);
+	set_power_suspend_state_panel_hook(POWER_SUSPEND_ACTIVE);
 #endif
 
 	pr_info("%s:\n", __func__);
@@ -450,7 +449,7 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 		if (dchdr->dlen > len) {
 			pr_err("%s: dtsi cmd=%x error, len=%d",
 				__func__, dchdr->dtype, dchdr->dlen);
-			goto exit_free;
+			return -ENOMEM;
 		}
 		bp += sizeof(*dchdr);
 		len -= sizeof(*dchdr);
@@ -462,13 +461,14 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 	if (len != 0) {
 		pr_err("%s: dcs_cmd=%x len=%d error!",
 				__func__, buf[0], blen);
-		goto exit_free;
+		kfree(buf);
+		return -ENOMEM;
 	}
 
 	pcmds->cmds = kzalloc(cnt * sizeof(struct dsi_cmd_desc),
 						GFP_KERNEL);
 	if (!pcmds->cmds)
-		goto exit_free;
+		return -ENOMEM;
 
 	pcmds->cmd_cnt = cnt;
 	pcmds->buf = buf;
@@ -496,10 +496,6 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 		pcmds->buf[0], pcmds->blen, pcmds->cmd_cnt, pcmds->link_state);
 
 	return 0;
-
-exit_free:
-	kfree(buf);
-	return -ENOMEM;
 }
 
 int mdss_dsi_panel_id(void)

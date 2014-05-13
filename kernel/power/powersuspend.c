@@ -276,7 +276,8 @@ static struct attribute_group power_suspend_attr_group =
 
 static struct kobject *power_suspend_kobj;
 
-// ------------------ sysfs interface -----------------------
+// ------------------------------------------ sysfs interface ------------------------------------------
+
 static int __init power_suspend_init(void)
 {
 
@@ -324,4 +325,3 @@ MODULE_AUTHOR("Paul Reioux <reioux@gmail.com> / Jean-Pierre Rasquin <yank555.lu@
 MODULE_DESCRIPTION("power_suspend - A replacement kernel PM driver for"
         "Android's deprecated early_suspend/late_resume PM driver!");
 MODULE_LICENSE("GPL v2");
-
