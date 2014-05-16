@@ -65,6 +65,13 @@
 #define __visible __attribute__((externally_visible))
 #endif
 
+#if __GNUC_MINOR__ >= 6
+/*
+ * Tell the optimizer that something else uses this function or variable.
+ */
+#define __visible __attribute__((externally_visible))
+#endif
+
 /*
  * GCC 'asm goto' miscompiles certain code sequences:
  *
