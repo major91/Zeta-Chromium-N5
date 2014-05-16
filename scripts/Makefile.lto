@@ -39,6 +39,7 @@ LTO_FINAL_CFLAGS := -flto=$(shell getconf _NPROCESSORS_ONLN)
 ifdef CONFIG_LTO_SLIM
 	# requires plugin ar passed and very recent HJ binutils
         LTO_CFLAGS += -fno-fat-lto-objects
+	KBUILD_ARFLAGS += --plugin $(shell $(CC) -print-prog-name=liblto_plugin.so.0)
 endif
 # Used to disable LTO for specific files (e.g. vdso)
 DISABLE_LTO := -fno-lto
