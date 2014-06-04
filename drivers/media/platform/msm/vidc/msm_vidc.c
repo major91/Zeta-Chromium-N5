@@ -1291,3 +1291,8 @@ int msm_vidc_close(void *instance)
 	kfree(inst);
 	return 0;
 }
+
+int msm_vidc_suspend(int core_id)
+{
+	return msm_comm_suspend(core_id);
+}
