@@ -240,7 +240,7 @@ void __switch_to_xtra(struct task_struct *prev_p, struct task_struct *next_p,
 	propagate_user_return_notify(prev_p, next_p);
 }
 
-asmregparm int sys_fork(struct pt_regs *regs)
+int sys_fork(struct pt_regs *regs)
 {
 	return do_fork(SIGCHLD, regs->sp, regs, 0, NULL, NULL);
 }
@@ -255,13 +255,13 @@ asmregparm int sys_fork(struct pt_regs *regs)
  * do not have enough call-clobbered registers to hold all
  * the information you need.
  */
-asmregparm int sys_vfork(struct pt_regs *regs)
+int sys_vfork(struct pt_regs *regs)
 {
 	return do_fork(CLONE_VFORK | CLONE_VM | SIGCHLD, regs->sp, regs, 0,
 		       NULL, NULL);
 }
 
-asmregparm long
+long
 sys_clone(unsigned long clone_flags, unsigned long newsp,
 	  void __user *parent_tid, void __user *child_tid, struct pt_regs *regs)
 {
@@ -275,7 +275,7 @@ sys_clone(unsigned long clone_flags, unsigned long newsp,
  * function to call, and %di containing
  * the "args".
  */
-asmregparm extern void kernel_thread_helper(void);
+extern void kernel_thread_helper(void);
 
 /*
  * Create a kernel thread
@@ -311,7 +311,7 @@ EXPORT_SYMBOL(kernel_thread);
 /*
  * sys_execve() executes a new program.
  */
-asmregparm long sys_execve(const char __user *name,
+long sys_execve(const char __user *name,
 		const char __user *const __user *argv,
 		const char __user *const __user *envp, struct pt_regs *regs)
 {

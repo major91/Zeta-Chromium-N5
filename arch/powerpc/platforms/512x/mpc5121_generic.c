@@ -26,7 +26,7 @@
 /*
  * list of supported boards
  */
-static const char * const board[] __initconst = {
+static const char *board[] __initdata = {
 	"prt,prtlvt",
 	NULL
 };

@@ -4,7 +4,6 @@
 #include <linux/sys.h>
 #include <linux/cache.h>
 #include <asm/asm-offsets.h>
-#include <asm/syscall.h>
 
 #define __SYSCALL_COMMON(nr, sym, compat) __SYSCALL_64(nr, sym, compat)
 
@@ -20,9 +19,11 @@
 
 #define __SYSCALL_64(nr, sym, compat) [nr] = sym,
 
+typedef void (*sys_call_ptr_t)(void);
+
 extern void sys_ni_syscall(void);
 
-asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
+const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
 	/*
 	 * Smells like a compiler bug -- it doesn't work
 	 * when the & below is removed.

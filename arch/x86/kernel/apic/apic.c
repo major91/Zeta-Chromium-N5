@@ -878,7 +878,7 @@ static void local_apic_timer_interrupt(void)
  * [ if a single-CPU system runs an SMP kernel then we call the local
  *   interrupt as well. Thus we cannot inline the local irq ... ]
  */
-asmregparm void __irq_entry smp_apic_timer_interrupt(struct pt_regs *regs)
+void __irq_entry smp_apic_timer_interrupt(struct pt_regs *regs)
 {
 	struct pt_regs *old_regs = set_irq_regs(regs);
 
@@ -1869,7 +1869,7 @@ int __init APIC_init_uniprocessor(void)
 /*
  * This interrupt should _never_ happen with our APIC/SMP architecture
  */
-asmregparm void smp_spurious_interrupt(struct pt_regs *regs)
+void smp_spurious_interrupt(struct pt_regs *regs)
 {
 	u32 v;
 
@@ -1895,7 +1895,7 @@ asmregparm void smp_spurious_interrupt(struct pt_regs *regs)
 /*
  * This interrupt should never happen with our APIC/SMP architecture
  */
-asmregparm void smp_error_interrupt(struct pt_regs *regs)
+void smp_error_interrupt(struct pt_regs *regs)
 {
 	u32 v0, v1;
 	u32 i = 0;

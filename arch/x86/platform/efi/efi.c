@@ -50,7 +50,7 @@
 
 #define EFI_DEBUG	1
 
-struct efi __visible __read_mostly efi = {
+struct efi __read_mostly efi = {
 	.mps        = EFI_INVALID_TABLE_ADDR,
 	.acpi       = EFI_INVALID_TABLE_ADDR,
 	.acpi20     = EFI_INVALID_TABLE_ADDR,

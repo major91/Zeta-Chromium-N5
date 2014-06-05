@@ -614,7 +614,7 @@ fail:
 	return 0;
 }
 
-static struct clk *const standard_pmc_clocks[] __initconst = {
+static struct clk *const standard_pmc_clocks[] __initdata = {
 	/* four primary clocks */
 	&clk32k,
 	&main_clk,

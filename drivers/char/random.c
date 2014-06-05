@@ -1638,7 +1638,7 @@ int random_int_secret_init(void)
  * depleting entropy is too high
  */
 static DEFINE_PER_CPU(__u32 [MD5_DIGEST_WORDS], get_random_int_hash);
-__visible unsigned int get_random_int(void)
+unsigned int get_random_int(void)
 {
 	__u32 *hash;
 	unsigned int ret;

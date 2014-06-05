@@ -21,7 +21,7 @@ void xen_force_evtchn_callback(void)
 	(void)HYPERVISOR_xen_version(0, NULL);
 }
 
-asmregparm unsigned long xen_save_fl(void)
+static unsigned long xen_save_fl(void)
 {
 	struct vcpu_info *vcpu;
 	unsigned long flags;
@@ -39,7 +39,7 @@ asmregparm unsigned long xen_save_fl(void)
 }
 PV_CALLEE_SAVE_REGS_THUNK(xen_save_fl);
 
-asmregparm void xen_restore_fl(unsigned long flags)
+static void xen_restore_fl(unsigned long flags)
 {
 	struct vcpu_info *vcpu;
 
@@ -66,7 +66,7 @@ asmregparm void xen_restore_fl(unsigned long flags)
 }
 PV_CALLEE_SAVE_REGS_THUNK(xen_restore_fl);
 
-asmregparm void xen_irq_disable(void)
+static void xen_irq_disable(void)
 {
 	/* There's a one instruction preempt window here.  We need to
 	   make sure we're don't switch CPUs between getting the vcpu
@@ -77,7 +77,7 @@ asmregparm void xen_irq_disable(void)
 }
 PV_CALLEE_SAVE_REGS_THUNK(xen_irq_disable);
 
-asmregparm void xen_irq_enable(void)
+static void xen_irq_enable(void)
 {
 	struct vcpu_info *vcpu;
 

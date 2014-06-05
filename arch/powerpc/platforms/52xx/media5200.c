@@ -232,7 +232,7 @@ static void __init media5200_setup_arch(void)
 }
 
 /* list of the supported boards */
-static const char * const board[] __initconst = {
+static const char *board[] __initdata = {
 	"fsl,media5200",
 	NULL
 };

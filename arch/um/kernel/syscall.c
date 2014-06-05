@@ -51,7 +51,6 @@ long old_mmap(unsigned long addr, unsigned long len,
 	return err;
 }
 
-asmlinkage
 int kernel_execve(const char *filename,
 		  const char *const argv[],
 		  const char *const envp[])

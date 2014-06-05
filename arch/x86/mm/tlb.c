@@ -124,7 +124,10 @@ EXPORT_SYMBOL_GPL(leave_mm);
  * entry calls in with the first parameter in %eax.  Maybe define
  * intrlinkage?
  */
-asmregparm void smp_invalidate_interrupt(struct pt_regs *regs)
+#ifdef CONFIG_X86_64
+asmlinkage
+#endif
+void smp_invalidate_interrupt(struct pt_regs *regs)
 {
 	unsigned int cpu;
 	unsigned int sender;

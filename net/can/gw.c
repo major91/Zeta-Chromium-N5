@@ -58,7 +58,7 @@
 #include <net/sock.h>
 
 #define CAN_GW_VERSION "20101209"
-static __initconst const char banner[] =
+static __initdata const char banner[] =
 	KERN_INFO "can: netlink gateway (rev " CAN_GW_VERSION ")\n";
 
 MODULE_DESCRIPTION("PF_CAN netlink gateway");

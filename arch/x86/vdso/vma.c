@@ -3,7 +3,6 @@
  * Copyright 2007 Andi Kleen, SUSE Labs.
  * Subject to the GPL, v.2
  */
-#define __VVAR_ADDR 1
 #include <linux/mm.h>
 #include <linux/err.h>
 #include <linux/sched.h>

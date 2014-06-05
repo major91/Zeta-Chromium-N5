@@ -18,8 +18,7 @@
 #include <asm/asm-offsets.h>	/* For NR_syscalls */
 #include <asm/unistd.h>
 
-typedef void (*sys_call_ptr_t)(void);
-extern const sys_call_ptr_t sys_call_table[];
+extern const unsigned long sys_call_table[];
 
 /*
  * Only the low 32 bits of orig_ax are meaningful, so we return int.
