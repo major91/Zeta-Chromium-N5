@@ -364,7 +364,7 @@ static int mhl_sii_wait_for_rgnd(struct mhl_tx_ctrl *mhl_ctrl)
 	 * after toggling reset line and enabling disc
 	 * tx can take a while to generate intr
 	 */
-	timeout = wait_for_completion_timeout
+	timeout = wait_for_completion_interruptible_timeout
 		(&mhl_ctrl->rgnd_done, HZ * 3);
 	if (!timeout) {
 		/* most likely nothing plugged in USB */
