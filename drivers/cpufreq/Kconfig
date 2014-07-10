@@ -584,8 +584,6 @@ config CPU_FREQ_GOV_BADASS_ALLOW_BYPASS
 	help
 	  'allow_bypass' - This driver adds a bypass to the phases
 
-=======
->>>>>>> 2dcf638... intellidemand: cumulative updateis to version 5.5
 config CPU_FREQ_GOV_INTELLIACTIVE
 	tristate "'intelliactive' cpufreq policy governor"
 	help
