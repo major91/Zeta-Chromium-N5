@@ -1011,10 +1011,11 @@ static int f2fs_write_end(struct file *file,
 }
 
 static int check_direct_IO(struct inode *inode, int rw,
-		const struct iovec *iov, loff_t offset, unsigned long nr_segs)
+		struct iov_iter *iter, loff_t offset)
 {
 	unsigned blocksize_mask = inode->i_sb->s_blocksize - 1;
-	int i;
+	size_t count = iov_iter_count(iter);
+	loff_t final_size = offset + count;
 
 	if (rw == READ)
 		return 0;
@@ -1022,27 +1023,35 @@ static int check_direct_IO(struct inode *inode, int rw,
 	if (offset & blocksize_mask)
 		return -EINVAL;
 
-	for (i = 0; i < nr_segs; i++)
-		if (iov[i].iov_len & blocksize_mask)
-			return -EINVAL;
+	if (final_size & blocksize_mask)
+		return -EINVAL;
+
 	return 0;
 }
 
 static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
-		const struct iovec *iov, loff_t offset, unsigned long nr_segs)
+		struct iov_iter *iter, loff_t offset)
 {
 	struct file *file = iocb->ki_filp;
-	struct inode *inode = file->f_mapping->host;
+	struct address_space *mapping = file->f_mapping;
+	struct inode *inode = mapping->host;
+	size_t count = iov_iter_count(iter);
+	int err;
 
 	/* Let buffer I/O handle the inline data case. */
 	if (f2fs_has_inline_data(inode))
 		return 0;
 
-	if (check_direct_IO(inode, rw, iov, offset, nr_segs))
+	if (check_direct_IO(inode, rw, iter, offset))
 		return 0;
 
-	return blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
-							get_data_block);
+	/* clear fsync mark to recover these blocks */
+	fsync_mark_clear(F2FS_SB(inode->i_sb), inode->i_ino);
+
+	err = blockdev_direct_IO(rw, iocb, inode, iter, offset, get_data_block);
+	if (err < 0 && (rw & WRITE))
+		f2fs_write_failed(mapping, offset + count);
+	return err;
 }
 
 static void f2fs_invalidate_data_page(struct page *page, unsigned long offset)
