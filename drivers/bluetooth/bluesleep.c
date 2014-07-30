@@ -529,11 +529,11 @@ static void bluesleep_stop(void)
 	clear_bit(BT_PROTO, &flags);
 
 	if (test_bit(BT_ASLEEP, &flags)) {
-                spin_unlock_irqrestore(&rw_lock, irq_flags);
 		clear_bit(BT_ASLEEP, &flags);
+		spin_unlock_irqrestore(&rw_lock, irq_flags);
 		hsuart_power(1);
-        } else {
-                spin_unlock_irqrestore(&rw_lock, irq_flags);
+	} else {
+		spin_unlock_irqrestore(&rw_lock, irq_flags);
 	}
 
 	atomic_inc(&open_count);
