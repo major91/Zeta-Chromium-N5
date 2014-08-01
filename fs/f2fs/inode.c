@@ -77,6 +77,7 @@ static int do_read_inode(struct inode *inode)
 	if (check_nid_range(sbi, inode->i_ino)) {
 		f2fs_msg(inode->i_sb, KERN_ERR, "bad inode number: %lu",
 			 (unsigned long) inode->i_ino);
+		WARN_ON(1);
 		return -EINVAL;
 	}
 
@@ -271,7 +272,7 @@ void f2fs_evict_inode(struct inode *inode)
 
 	if (inode->i_ino == F2FS_NODE_INO(sbi) ||
 			inode->i_ino == F2FS_META_INO(sbi))
-		goto no_delete;
+		goto out_clear;
 
 	f2fs_bug_on(get_dirty_dents(inode));
 	remove_dirty_dir_inode(inode);
@@ -292,6 +293,10 @@ void f2fs_evict_inode(struct inode *inode)
 
 no_delete:
 	invalidate_mapping_pages(NODE_MAPPING(sbi), inode->i_ino, inode->i_ino);
+	if (is_inode_flag_set(F2FS_I(inode), FI_APPEND_WRITE))
+		add_dirty_inode(sbi, inode->i_ino, APPEND_INO);
+	if (is_inode_flag_set(F2FS_I(inode), FI_UPDATE_WRITE))
+		add_dirty_inode(sbi, inode->i_ino, UPDATE_INO);
 out_clear:
 	end_writeback(inode);
 }
