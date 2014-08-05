@@ -228,8 +228,9 @@ static pgoff_t __get_first_dirty_index(struct address_space *mapping,
 
 	/* find first dirty page index */
 	pagevec_init(&pvec, 0);
-	nr_pages = pagevec_lookup_tag(&pvec, mapping, &pgofs, PAGECACHE_TAG_DIRTY, 1);
-	pgofs = nr_pages ? pvec.pages[0]->index: LONG_MAX;
+	nr_pages = pagevec_lookup_tag(&pvec, mapping, &pgofs,
+					PAGECACHE_TAG_DIRTY, 1);
+	pgofs = nr_pages ? pvec.pages[0]->index : LONG_MAX;
 	pagevec_release(&pvec);
 	return pgofs;
 }
@@ -685,6 +686,8 @@ static int expand_inode_data(struct inode *inode, loff_t offset,
 	loff_t new_size = i_size_read(inode);
 	loff_t off_start, off_end;
 	int ret = 0;
+
+	f2fs_balance_fs(sbi);
 
 	ret = inode_newsize_ok(inode, (len + offset));
 	if (ret)
