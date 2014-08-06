@@ -53,6 +53,7 @@ enum {
 	Opt_inline_data,
 	Opt_flush_merge,
 	Opt_nobarrier,
+	Opt_barrier,
 	Opt_err,
 };
 
@@ -71,6 +72,7 @@ static match_table_t f2fs_tokens = {
 	{Opt_inline_data, "inline_data"},
 	{Opt_flush_merge, "flush_merge"},
 	{Opt_nobarrier, "nobarrier"},
+	{Opt_barrier, "barrier"},
 	{Opt_err, NULL},
 };
 
@@ -344,6 +346,9 @@ static int parse_options(struct super_block *sb, char *options)
 		case Opt_nobarrier:
 			set_opt(sbi, NOBARRIER);
 			break;
+		case Opt_barrier:
+			set_opt(sbi, BARRIER);
+			break;
 		default:
 			f2fs_msg(sb, KERN_ERR,
 				"Unrecognized mount option \"%s\" or missing value",
@@ -551,6 +556,8 @@ static int f2fs_show_options(struct seq_file *seq, struct dentry *root)
 		seq_puts(seq, ",flush_merge");
 	if (test_opt(sbi, NOBARRIER))
 		seq_puts(seq, ",nobarrier");
+	if (test_opt(sbi, BARRIER))
+		seq_puts(seq, ",barrier");
 	seq_printf(seq, ",active_logs=%u", sbi->active_logs);
 
 	return 0;
@@ -928,6 +935,10 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
 #ifdef CONFIG_F2FS_FS_POSIX_ACL
 	set_opt(sbi, POSIX_ACL);
 #endif
+
+	/* arter97: set nobarrier by default and gain a huge amount of performance improvements */
+	set_opt(sbi, NOBARRIER);
+
 	/* parse mount options */
 	err = parse_options(sb, (char *)data);
 	if (err)

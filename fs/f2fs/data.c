@@ -139,7 +139,7 @@ void f2fs_submit_merged_bio(struct f2fs_sb_info *sbi,
 	/* change META to META_FLUSH in the checkpoint procedure */
 	if (type >= META_FLUSH) {
 		io->fio.type = META_FLUSH;
-		if (test_opt(sbi, NOBARRIER))
+		if ((test_opt(sbi, NOBARRIER)) && !(test_opt(sbi, BARRIER)))
 			io->fio.rw = WRITE_FLUSH | REQ_META | REQ_PRIO;
 		else
 			io->fio.rw = WRITE_FLUSH_FUA | REQ_META | REQ_PRIO;

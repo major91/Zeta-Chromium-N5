@@ -269,7 +269,7 @@ int f2fs_issue_flush(struct f2fs_sb_info *sbi)
 	trace_f2fs_issue_flush(sbi->sb, test_opt(sbi, NOBARRIER),
 					test_opt(sbi, FLUSH_MERGE));
 
-	if (test_opt(sbi, NOBARRIER))
+	if ((test_opt(sbi, NOBARRIER)) && !(test_opt(sbi, BARRIER)))
 		return 0;
 
 	if (!test_opt(sbi, FLUSH_MERGE))
