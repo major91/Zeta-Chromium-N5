@@ -683,17 +683,17 @@ void mdss_fb_update_backlight(struct msm_fb_data_type *mfd)
 {
 	struct mdss_panel_data *pdata;
 
+	mutex_lock(&mfd->bl_lock);
 	if (mfd->unset_bl_level && !mfd->bl_updated) {
 		pdata = dev_get_platdata(&mfd->pdev->dev);
 		if ((pdata) && (pdata->set_backlight)) {
-			mutex_lock(&mfd->bl_lock);
 			mfd->bl_level = mfd->unset_bl_level;
 			pdata->set_backlight(pdata, mfd->bl_level);
 			mfd->bl_level_scaled = mfd->unset_bl_level;
-			mutex_unlock(&mfd->bl_lock);
 			mfd->bl_updated = 1;
 		}
 	}
+	mutex_unlock(&mfd->bl_lock);
 }
 
 static int mdss_fb_blank_sub(int blank_mode, struct fb_info *info,
@@ -744,9 +744,11 @@ static int mdss_fb_blank_sub(int blank_mode, struct fb_info *info,
 
 			mfd->op_enable = false;
 			curr_pwr_state = mfd->panel_power_on;
+			mutex_lock(&mfd->bl_lock);
 			mdss_fb_set_backlight(mfd, 0);
 			mfd->panel_power_on = false;
 			mfd->bl_updated = 0;
+			mutex_unlock(&mfd->bl_lock);
 
 			ret = mfd->mdp.off_fnc(mfd);
 			if (ret)
@@ -1630,8 +1632,7 @@ static int __mdss_fb_display_thread(void *data)
 		pr_info("%s: set priority failed\n", __func__);
 
 	while (1) {
-		while (wait_event_interruptible(
-             mfd->commit_wait_q,
+		while (wait_event_interruptible(mfd->commit_wait_q,
 				(atomic_read(&mfd->commits_pending) ||
 				kthread_should_stop())) != 0);
 
